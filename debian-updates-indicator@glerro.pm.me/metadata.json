@@ -5,7 +5,7 @@
   "version": 1,
   "url": "https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator",
   "gettext-domain": "gnome-shell-extension-debian-updates-indicator",
-  "settings-schema": "org.gnome.shell.extension.debian-updates-indicator",
+  "settings-schema": "org.gnome.shell.extensions.debian-updates-indicator",
   "shell-version": [
     "40", "41", "42", "43", "44"
   ],
