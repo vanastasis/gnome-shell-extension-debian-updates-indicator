@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- SPDX-FileCopyrightText: 2021-2022 Gianni Lerro <glerro@pm.me> -->
+<Project xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+         xmlns:foaf="http://xmlns.com/foaf/0.1/"
+         xmlns:gnome="http://api.gnome.org/doap-extensions#"
+         xmlns="http://usefulinc.com/ns/doap#">
+
+    <name>gnome-shell-extension-debian-updates-indicator</name>
+    <shortname>gnome-shell-extension-debian-updates-indicator</shortname>
+    <shortdesc xml:lang="en">Updates indicator for Debian Linux based distributions.</shortdesc>
+    <description xml:lang="en">
+This extension add an indicator to Gnome Shell for monitoring Debian Linux based distributions packages update.
+Check for updates and shows also the following packages status (as in Synaptic):
+Available updates; New packages in repository; Local/Obsolete packages; Residual config files;
+Autoremovable packages.
+    </description>
+    <homepage rdf:resource="https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator" />
+    <download-page rdf:resource="https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator" />
+    <bug-database rdf:resource="https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator/issues" />
+    <license rdf:resource="https://spdx.org/licenses/GPL-3.0+.html"/>
+    <category rdf:resource="http://api.gnome.org/doap-extensions#core" />
+    <programming-language>JavaScript</programming-language>
+
+    <maintainer>
+        <foaf:Person>
+            <foaf:name>Gianni Lerro</foaf:name>
+            <foaf:mbox rdf:resource="mailto:glerro@pm.me" />
+            <foaf:nick>glerro</foaf:nick>
+            <gnome:userid>glerro</gnome:userid>
+        </foaf:Person>
+    </maintainer>
+</Project>
+
