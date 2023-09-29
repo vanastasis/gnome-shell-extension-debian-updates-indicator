@@ -19,6 +19,54 @@ This extension add an indicator to Gnome Shell for monitoring Debian Linux based
 * Show a notification when there are new updates.
 * Support Gnome Shell Versions 40, 41, 42, 43, 44.
 
+## Manual Installation
+You can check out the latest version with git, build and install it with [Meson](https://mesonbuild.com/).
+
+You must install git, meson, ninja and xgettext.
+
+For a regular use and local installation these are the steps:
+
+```bash
+git clone https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator.git
+cd gnome-shell-extension-debian-updates-indicator
+meson setup --prefix=$HOME/.local _build
+meson install -C _build
+```
+
+Otherwise you can run the `./local_install.sh` script, it performs the build steps specified in the
+previous section.
+
+You may need to restart GNOME Shell (<kbd>Alt</kbd>+<kbd>F2</kbd>, <kbd>r</kbd>, <kbd>⏎</kbd>)
+after that, or logout and login again.
+
+Finally after restarting Gnome Shell or logging in, you need to enable the extension:
+```bash
+gnome-extensions enable debian-updates-indicator@glerro.pm.me
+```
+
+## Export extension ZIP file
+To create a ZIP file with the extension, just run:
+
+```bash
+git clone https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator.git
+cd gnome-shell-extension-debian-updates-indicator
+./export-zip.sh
+```
+
+This will create the file `debian-updates-indicator@glerro.pm.me.shell-extension.zip` with the extension, you can install it with this steps:
+
+```bash
+gnome-extensions install debian-updates-indicator@glerro.pm.me.shell-extension.zip
+```
+
+You may need to restart GNOME Shell (<kbd>Alt</kbd>+<kbd>F2</kbd>, <kbd>r</kbd>, <kbd>⏎</kbd>) after that, or logout and login again.
+
+Finally after restarting Gnome Shell or logging in, you need to enable the extension:
+
+```bash
+gnome-extensions enable debian-updates-indicator@glerro.pm.me
+```
+
 ## Acknowledgments
 This extension is based on APT Update Indicator by Fran Glais.
 
