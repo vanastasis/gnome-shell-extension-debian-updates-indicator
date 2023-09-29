@@ -9,15 +9,16 @@ This extension add an indicator to Gnome Shell for monitoring Debian Linux based
 
 ## Features
 * Check for updates and show in the linked menu the following package status (as in Synaptic):
-    1. Updates available.
-    2. New packages in the repository.
-    3. Local/obsolete packages (Require apt-show-versions).
-    4. Residual configuration files.
-    5. Self-removable packages.
+  * Updates available.
+  * New packages in the repository.
+  * Local/obsolete packages (Require apt-show-versions).
+  * Residual configuration files.
+  * Self-removable packages.
 * In the menu it is also possible check for updates, apply the updates and see when the last check was made.
 * It is customizable in many parts via extension settings.
 * Show a notification when there are new updates.
 * Support Gnome Shell Versions 40, 41, 42, 43, 44.
+* Translatable.
 
 ## Manual Installation
 You can check out the latest version with git, build and install it with [Meson](https://mesonbuild.com/).
@@ -66,6 +67,56 @@ Finally after restarting Gnome Shell or logging in, you need to enable the exten
 ```bash
 gnome-extensions enable debian-updates-indicator@glerro.pm.me
 ```
+
+## Translating
+
+To contribute translations you will need a Gnome GitLab account, git, meson, ninja, xgettext and a translation program like Gtranslator.
+
+Start by creating a fork on Gnome GitLab.
+
+Clone your fork with git and setup a project with meson:
+
+```bash
+git clone https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator.git
+cd gnome-shell-extension-debian-updates-indicator
+meson setup --prefix=$HOME/.local _build
+meson compile -C _build
+```
+
+Ensure the translation template is updated:
+
+```bash
+meson compile -C _build gnome-shell-extension-debian-updates-indicator-pot
+```
+
+Add the [language code](https://www.gnu.org/software/gettext/manual/html_node/Language-Codes.html) for your translation in /po/LINGUAS file.
+
+Create the /po/<language code.po> file:
+
+```bash
+meson compile -C _build gnome-shell-extension-debian-updates-indicator-update-po
+```
+
+Open /po/<language code>.po whith Gtranslator or a similar program, translate all messages and save.
+
+To test your translation, install the extension and restart GNOME Shell:
+
+```bash
+meson setup --prefix=$HOME/.local _build --reconfigure
+meson install -C _build
+```
+
+You may need to restart GNOME Shell (<kbd>Alt</kbd>+<kbd>F2</kbd>, <kbd>r</kbd>, <kbd>⏎</kbd>)
+after that, or logout and login again.
+
+When you're happy with your translation, commit the changes and push them to your fork:
+
+```bash
+git commit -a -m "New translations (<language>)"
+git push
+```
+
+Finally, open a New Merge Request from your fork at https://gitlab.gnome.org/<your_username>/gnome-shell-extension-wifiqrcode.
 
 ## Acknowledgments
 This extension is based on APT Update Indicator by Fran Glais.
