@@ -30,6 +30,8 @@
 
 /* exported DebianUpdatesIndicator */
 
+'use strict';
+
 const Gettext = imports.gettext;
 
 const {Clutter, GLib, GObject, Meta, Shell, St} = imports.gi;
@@ -78,7 +80,6 @@ var DebianUpdatesIndicator = GObject.registerClass({
     GTypeName: 'DebianUpdatesIndicator',
 }, class DebianUpdatesIndicator extends PanelMenu.Button {
     _init(updateManager) {
-
         this._upgradeProcess_sourceId = null;
 
         this._updateList = [];

@@ -24,9 +24,9 @@
  * SPDX-FileCopyrightText: 2023 Gianni Lerro <glerro@pm.me>
  */
 
-'use strict';
-
 /* exported IgnoreListBox */
+
+'use strict';
 
 const {GLib, Gio, GObject, Gtk, Pango, Adw} = imports.gi;
 
