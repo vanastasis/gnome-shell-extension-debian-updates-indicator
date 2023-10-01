@@ -127,7 +127,7 @@ msgstr "Modifica voce"
 
 #: debian-updates-indicator@glerro.pm.me/updateManager.js:607
 msgid "Last check: "
-msgstr "Ultimo controllo:"
+msgstr "Ultimo controllo: "
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:58
 msgid "Basic"
