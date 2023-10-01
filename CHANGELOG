@@ -1,3 +1,8 @@
+2023-10-01 Gianni Lerro <glerro@pm.me>
+ * Release version 2.
+ * Fix a typo in settins schema path.
+ * Fix a missing space in italian translation.
+
 2023-09-29 Gianni Lerro <glerro@pm.me>
  * First version of extension.
 
