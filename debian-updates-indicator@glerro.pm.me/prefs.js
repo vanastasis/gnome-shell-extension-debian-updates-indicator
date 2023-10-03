@@ -55,8 +55,6 @@ try {
 
 const IgnoreListBox = Adw != null ? Me.imports.ignoreListBox.IgnoreListBox : null;
 
-let settings;
-
 /**
  * This function connect Dialogs Windows (GTK4 - GS < 42).
  *
@@ -136,9 +134,10 @@ function connectDialogs(builder, notebook) {
  * @function setupIgnoreList
  * @param {Gtk.Builder} builder - Builder prefs widgets.
  * @param {Gtk.Notebook} notebook - Builder prefs notebook.
+ * @param {Gio.Settings} settings - Extension settings.
  * @returns {void}
  */
-function setupIgnoreList(builder, notebook) {
+function setupIgnoreList(builder, notebook, settings) {
     // Ignore list tab:
     // Set up the List of packages
     let column = new Gtk.TreeViewColumn();
@@ -347,11 +346,11 @@ function selectionChanged(selection, liststore) {
  * This function remove Entry from IgnoreList (GTK4 - GS < 42).
  *
  * @function removeEntry
- * @param {Gio.Settings} gsettings - Extension settings.
+ * @param {Gio.Settings} settings - Extension settings.
  * @returns {void}
  */
-function removeEntry(gsettings) {
-    let entries = gsettings.get_strv('ignore-list');
+function removeEntry(settings) {
+    let entries = settings.get_strv('ignore-list');
 
     if (!entries.length || selectedEntry < 0)
         return 0;
@@ -372,12 +371,12 @@ let list = null;
  * @function refreshUI
  * @param {Gtk.ListStore} listStore - Ignore Entry List.
  * @param {Gtk.TreeView} treeView - Widget that visualize Ignore Entries List.
- * @param {Gio.Settings} gsettings - Extension Settings.
+ * @param {Gio.Settings} settings - Extension Settings.
  * @returns {void}
  */
-function refreshUI(listStore, treeView, gsettings) {
+function refreshUI(listStore, treeView, settings) {
     let restoreForced = selectedEntry;
-    let entries = gsettings.get_strv('ignore-list');
+    let entries = settings.get_strv('ignore-list');
 
     if (list !== entries) {
         if (listStore !== undefined)
@@ -427,10 +426,11 @@ function changeSelection(treeview, entries) {
  * This function setup Preferences binding (GTK4 - ADW1).
  *
  * @function bindPrefs
- * @param {Gtk.Builder} builder - Builder prefs widgets..
+ * @param {Gtk.Builder} builder - Builder prefs widgets.
+ * @param {Gio.Settings} settings - Extension settings.
  * @returns {void}
  */
-function bindPrefs(builder) {
+function bindPrefs(builder, settings) {
     // Basic settings tab:
     // Check updates
     settings.bind('check-interval',
@@ -623,11 +623,11 @@ function bindPrefs(builder) {
  * This function set Shortcut (GTK4 - ADW1).
  *
  * @function setShortcut
- * @param {Gio.Settings} gsettings - Extrension Settings.
+ * @param {Gio.Settings} settings - Extrension Settings.
  * @returns {void}
  */
-function setShortcut(gsettings) {
-    let shortcutText = gsettings.get_string('shortcut-text');
+function setShortcut(settings) {
+    let shortcutText = settings.get_string('shortcut-text');
     let key, mods;
 
     [, key, mods] = Gtk.accelerator_parse(shortcutText);
@@ -647,7 +647,6 @@ function setShortcut(gsettings) {
  */
 function init() {
     ExtensionUtils.initTranslations();
-    settings = ExtensionUtils.getSettings();
 }
 
 /**
@@ -657,14 +656,16 @@ function init() {
  * @returns {Gtk.Widget} - the prefs widget
  */
 function buildPrefsWidget() {
+    const settings = ExtensionUtils.getSettings();
+
     // Prepare labels and controls
     let builder = new Gtk.Builder();
     builder.add_from_file(`${Me.dir.get_path()}/${TEMPLATE_GTK}`);
     let notebook = builder.get_object('prefs_widget');
 
     connectDialogs(builder, notebook);
-    setupIgnoreList(builder, notebook);
-    bindPrefs(builder);
+    setupIgnoreList(builder, notebook, settings);
+    bindPrefs(builder, settings);
 
     return notebook;
 }
@@ -679,6 +680,8 @@ function buildPrefsWidget() {
  */
 function fillPreferencesWindow(window) {
     if (Adw) {
+        const settings = ExtensionUtils.getSettings();
+
         let builder = Gtk.Builder.new();
         builder.add_from_file(`${Me.dir.get_path()}/${TEMPLATE_ADW}`);
 
@@ -699,7 +702,7 @@ function fillPreferencesWindow(window) {
         window.search_enabled = true;
         window.set_default_size(580, 580);
 
-        bindPrefs(builder);
+        bindPrefs(builder, settings);
 
         let ignoreListGroup = builder.get_object('ignore_list_group');
         let ignoreListBox = new IgnoreListBox(builder, settings);

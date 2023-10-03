@@ -30,8 +30,6 @@
 
 const {GLib, Gio, GObject, Gtk, Pango, Adw} = imports.gi;
 
-let _settings;
-
 const NewItem = GObject.registerClass(
 class NewItem extends GObject.Object {
 });
@@ -63,15 +61,17 @@ const IgnoreListModel = GObject.registerClass(
 class IgnoreListModel extends GObject.Object {
     static [GObject.interfaces] = [Gio.ListModel];
 
-    constructor() {
+    constructor(extensionSettings) {
         super();
 
-        this._names = _settings.get_strv('ignore-list');
+        this._extensionSettings = extensionSettings;
+
+        this._names = this._extensionSettings.get_strv('ignore-list');
         this._items = Gtk.StringList.new(this._names);
 
-        this._changedId = _settings.connect('changed::ignore-list', () => {
+        this._changedId = this._extensionSettings.connect('changed::ignore-list', () => {
             const removed = this._names.length;
-            this._names = _settings.get_strv('ignore-list');
+            this._names = this._extensionSettings.get_strv('ignore-list');
             this._items.splice(0, removed, this._names);
             this.items_changed(0, removed, this._names.length);
         });
@@ -83,9 +83,9 @@ class IgnoreListModel extends GObject.Object {
 
         // TODO: Order alphabetically and remove duplicates
 
-        _settings.block_signal_handler(this._changedId);
-        _settings.set_strv('ignore-list', this._names);
-        _settings.unblock_signal_handler(this._changedId);
+        this._extensionSettings.block_signal_handler(this._changedId);
+        this._extensionSettings.set_strv('ignore-list', this._names);
+        this._extensionSettings.unblock_signal_handler(this._changedId);
 
         const pos = this._items.get_n_items();
         this._items.append(name);
@@ -99,9 +99,9 @@ class IgnoreListModel extends GObject.Object {
 
         this._names.splice(pos, 1);
 
-        _settings.block_signal_handler(this._changedId);
-        _settings.set_strv('ignore-list', this._names);
-        _settings.unblock_signal_handler(this._changedId);
+        this._extensionSettings.block_signal_handler(this._changedId);
+        this._extensionSettings.set_strv('ignore-list', this._names);
+        this._extensionSettings.unblock_signal_handler(this._changedId);
 
         this._items.remove(pos);
         this.items_changed(pos, 1, 0);
@@ -117,9 +117,9 @@ class IgnoreListModel extends GObject.Object {
 
         // TODO: Split, order alphabetically, remove duplicates and join
 
-        _settings.block_signal_handler(this._changedId);
-        _settings.set_strv('ignore-list', this._names);
-        _settings.unblock_signal_handler(this._changedId);
+        this._extensionSettings.block_signal_handler(this._changedId);
+        this._extensionSettings.set_strv('ignore-list', this._names);
+        this._extensionSettings.unblock_signal_handler(this._changedId);
     }
 
     vfunc_get_item_type() {
@@ -224,18 +224,18 @@ class IgnoreListRow extends Adw.PreferencesRow {
 
 var IgnoreListBox = GObject.registerClass(
 class IgnoreListBox extends Gtk.ListBox {
-    constructor(builder, settings) {
+    constructor(builder, extensionSettings) {
         super({
             selection_mode: Gtk.SelectionMode.NONE,
             css_classes: ['boxed-list'],
         });
 
         let _builder = builder;
-        _settings = settings;
+        this._extensionSettings = extensionSettings;
 
         let NewItemRow = _builder.get_object('new_item_row');
 
-        let _ignoreListModel = new IgnoreListModel();
+        let _ignoreListModel = new IgnoreListModel(this._extensionSettings);
 
         const store = new Gio.ListStore({item_type: Gio.ListModel});
         const listModel = new Gtk.FlattenListModel({model: store});

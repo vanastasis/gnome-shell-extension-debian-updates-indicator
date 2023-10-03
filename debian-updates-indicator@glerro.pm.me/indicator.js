@@ -53,8 +53,6 @@ const {
     ngettext,
 } = Domain;
 
-const Clipboard = St.Clipboard.get_default();
-
 /* For error checking */
 var STATUS = {
     UNKNOWN:      -1,
@@ -92,6 +90,8 @@ var DebianUpdatesIndicator = GObject.registerClass({
         this._updateManager = updateManager;
 
         super._init(0.0, `${ExtensionName}`, false);
+
+        this._clipboard = St.Clipboard.get_default();
 
         this._updateIcon = new St.Icon({
             icon_name: 'package-x-generic-symbolic',
@@ -554,8 +554,8 @@ var DebianUpdatesIndicator = GObject.registerClass({
         text = text.replace('\t', ' ');
         text = text.replace(/\s\s+/g, ' ');
         item.connect('activate', () => {
-            Clipboard.set_text(St.ClipboardType.CLIPBOARD, text);
-            Clipboard.set_text(St.ClipboardType.PRIMARY, text);
+            this._clipboard.set_text(St.ClipboardType.CLIPBOARD, text);
+            this._clipboard.set_text(St.ClipboardType.PRIMARY, text);
         });
 
         return item;
