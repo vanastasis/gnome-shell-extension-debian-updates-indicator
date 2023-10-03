@@ -195,7 +195,7 @@ var UpdateManager = class UpdateManager {
                     CHECK_INTERVAL = 10;
             }
 
-            this._TimeoutId = GLib.timeout_add_seconds(
+            this._initTimeoutId = GLib.timeout_add_seconds(
                 GLib.PRIORITY_DEFAULT,
                 CHECK_INTERVAL,
                 () => {
@@ -214,7 +214,7 @@ var UpdateManager = class UpdateManager {
 
         let CHECK_INTERVAL = this._settings.get_int('check-interval') * 60 * 60;
         if (CHECK_INTERVAL) {
-            this._TimeoutId = GLib.timeout_add_seconds(
+            this._checkTimeoutId = GLib.timeout_add_seconds(
                 GLib.PRIORITY_DEFAULT,
                 CHECK_INTERVAL,
                 () => {
@@ -622,9 +622,20 @@ var UpdateManager = class UpdateManager {
     }
 
     destroy() {
-        if (this._TimeoutId) {
-            GLib.source_remove(this._TimeoutId);
-            this._TimeoutId = null;
+        // Remove timeouts
+        if (this._initTimeoutId) {
+            GLib.source_remove(this._initTimeoutId);
+            this._initTimeoutId = null;
+        }
+
+        if (this._checkTimeoutId) {
+            GLib.source_remove(this._checkTimeoutId);
+            this._checkTimeoutId = null;
+        }
+
+        if (this._ignoreListTimeoutId) {
+            GLib.source_remove(this._ignoreListTimeoutId);
+            this._ignoreListTimeoutId = null;
         }
 
         if (this._initialTimeoutId) {
@@ -632,6 +643,7 @@ var UpdateManager = class UpdateManager {
             this._initialTimeoutId = null;
         }
 
+        // Null settings
         if (this._settings !== null)
             this._settings = null;
 
