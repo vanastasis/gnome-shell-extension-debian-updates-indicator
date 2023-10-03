@@ -67,6 +67,9 @@ var UpdateManager = class UpdateManager {
         this._TimeoutId = null;
         this._initialTimeoutId = null;
 
+        // Create a Gio.Cancellable for use with Gio.SubProcess
+        this._cancellable = new Gio.Cancellable();
+
         // Create indicator on the panel and initialize it
         this._indicator = new Indicator.DebianUpdatesIndicator(this);
         this._indicator.updateStatus(STATUS.INITIALIZING);
@@ -368,22 +371,31 @@ var UpdateManager = class UpdateManager {
             // A check is running ! Maybe we should kill it and run another one ?
             return;
         }
-        try {
-            // Parse check command line
-            let [parseok, argvp] = GLib.shell_parse_argv(UPDATE_CMD);
-            if (!parseok)
-                throw new Error('Update cmd parse error');
-            let proc = new Gio.Subprocess({argv: argvp, flags: Gio.SubprocessFlags.STDOUT_PIPE});
-            proc.init(null);
 
+        // Parse check command line
+        let [parseok, argvp] = GLib.shell_parse_argv(UPDATE_CMD);
+        if (!parseok)
+            throw new Error('Update cmd parse error');
+
+        let proc = new Gio.Subprocess({argv: argvp, flags: Gio.SubprocessFlags.STDOUT_PIPE});
+        proc.init(this._cancellable);
+
+        let cancelId = 0;
+        if (this._cancellable instanceof Gio.Cancellable)
+            cancelId = this._cancellable.connect(() => proc.force_exit());
+
+        try {
             // Asynchronously call the output handler when script output is ready
-            proc.communicate_utf8_async(null, null, this._applyUpdatesEnd.bind(this));
+            proc.communicate_utf8_async(null, this._cancellable, this._applyUpdatesEnd.bind(this));
 
             this._upgradeProcess_sourceId = 1;
 
             GLib.strfreev(argvp);
         } catch (err) {
             log(`${ExtensionName} - ${err.message}`);
+        } finally {
+            if (cancelId > 0)
+                this._cancellable.disconnect(cancelId);
         }
     }
 
@@ -422,23 +434,32 @@ var UpdateManager = class UpdateManager {
             // A check is already running ! Maybe we should kill it and run another one ?
             return;
         }
-        // Run asynchronously, to avoid  shell freeze - even for a 1s check
-        try {
-            // Parse check command line
-            let [parseok, argvp] = GLib.shell_parse_argv(CHECK_CMD);
-            if (!parseok)
-                throw new Error('Check cmd parse error');
-            let proc = new Gio.Subprocess({argv: argvp, flags: Gio.SubprocessFlags.STDOUT_PIPE});
-            proc.init(null);
 
+        // Run asynchronously, to avoid  shell freeze - even for a 1s check
+        // Parse check command line
+        let [parseok, argvp] = GLib.shell_parse_argv(CHECK_CMD);
+        if (!parseok)
+            throw new Error('Check cmd parse error');
+
+        let proc = new Gio.Subprocess({argv: argvp, flags: Gio.SubprocessFlags.STDOUT_PIPE});
+        proc.init(this._cancellable);
+
+        let cancelId = 0;
+        if (this._cancellable instanceof Gio.Cancellable)
+            cancelId = this._cancellable.connect(() => proc.force_exit());
+
+        try {
             // Asynchronously call the output handler when script output is ready
-            proc.communicate_utf8_async(null, null, this._checkUpdatesEnd.bind(this));
+            proc.communicate_utf8_async(null, this._cancellable, this._checkUpdatesEnd.bind(this));
 
             this._upgradeProcess_sourceId = 1;
         } catch (err) {
             log(`${ExtensionName} - ${err.message}`);
             this._indicator.showChecking(false);
             this._indicator.updateStatus(STATUS.ERROR);
+        } finally {
+            if (cancelId > 0)
+                this._cancellable.disconnect(cancelId);
         }
     }
 
@@ -467,26 +488,34 @@ var UpdateManager = class UpdateManager {
         ];
 
         // Run asynchronously, to avoid shell freeze - even for a 1s check
+
+        let path = Me.dir.get_path();
+        let script = [
+            '/bin/bash',
+            `${path}/scripts/${scriptNames[index]}.sh`,
+            this._initializing ? '1' : '0',
+            `${path}/Temp/`,
+        ];
+
+        let proc = new Gio.Subprocess({argv: script, flags: Gio.SubprocessFlags.STDOUT_PIPE});
+        proc.init(this._cancellable);
+
+        let cancelId = 0;
+        if (this._cancellable instanceof Gio.Cancellable)
+            cancelId = this._cancellable.connect(() => proc.force_exit());
+
         try {
-            let path = Me.dir.get_path();
-            let script = [
-                '/bin/bash',
-                `${path}/scripts/${scriptNames[index]}.sh`,
-                this._initializing ? '1' : '0',
-                `${path}/Temp/`,
-            ];
-
-            let proc = new Gio.Subprocess({argv: script, flags: Gio.SubprocessFlags.STDOUT_PIPE});
-            proc.init(null);
-
             // Asynchronously call the output handler when script output is ready
-            proc.communicate_utf8_async(null, null, this._packagesRead.bind(this, index));
+            proc.communicate_utf8_async(null, this._cancellable, this._packagesRead.bind(this, index));
         } catch (err) {
             log(`${ExtensionName} - Failed to run ${scriptNames[index]}.sh - ${err.message}`);
             if (index === SCRIPT.UPGRADES) {
                 this._indicator.showChecking(false);
                 this._indicator.updateStatus(STATUS.ERROR);
             }
+        } finally {
+            if (cancelId > 0)
+                this._cancellable.disconnect(cancelId);
         }
     }
 
@@ -550,16 +579,24 @@ var UpdateManager = class UpdateManager {
     }
 
     _checkUrgency() {
-        try {
-            let path = Me.dir.get_path();
-            let script = ['/bin/bash', `${path}/scripts/urgency.sh`];
+        let path = Me.dir.get_path();
+        let script = ['/bin/bash', `${path}/scripts/urgency.sh`];
 
-            let proc = new Gio.Subprocess({argv: script, flags: Gio.SubprocessFlags.STDOUT_PIPE});
-            proc.init(null);
+        let proc = new Gio.Subprocess({argv: script, flags: Gio.SubprocessFlags.STDOUT_PIPE});
+        proc.init(this._cancellable);
+
+        let cancelId = 0;
+        if (this._cancellable instanceof Gio.Cancellable)
+            cancelId = this._cancellable.connect(() => proc.force_exit());
+
+        try {
             // Asynchronously call the output handler when script output is ready
-            proc.communicate_utf8_async(null, null, this._checkUrgencyRead.bind(this));
+            proc.communicate_utf8_async(null, this._cancellable, this._checkUrgencyRead.bind(this));
         } catch (err) {
             log(`${ExtensionName} - Failed to run urgency.sh - ${err.message}`);
+        } finally {
+            if (cancelId > 0)
+                this._cancellable.disconnect(cancelId);
         }
     }
 
@@ -667,6 +704,12 @@ var UpdateManager = class UpdateManager {
         if (this._indicator !== null) {
             this._indicator.destroy();
             this._indicator = null;
+        }
+
+        // Cancel all connected cancellable
+        if (this._cancellable !== null) {
+            this._cancellable.cancel();
+            this._cancellable = null;
         }
     }
 };
