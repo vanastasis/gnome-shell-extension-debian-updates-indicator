@@ -23,7 +23,7 @@ This extension add an indicator to Gnome Shell for monitoring Debian Linux based
 ## Installation
 Normal users are recommended to get the extension from
 
-[![Get it on GNOME Extensions](https://raw.githubusercontent.com/andyholmes/gnome-shell-extensions-badge/master/get-it-on-ego.svg?sanitize=true){width=45%}](https://extensions.gnome.org/extension/6322/debian-linux-updates-indicator/)
+[![Get it on GNOME Extensions](https://raw.githubusercontent.com/andyholmes/gnome-shell-extensions-badge/master/get-it-on-ego.svg?sanitize=true){height=100px}](https://extensions.gnome.org/extension/6322/debian-linux-updates-indicator/)
 
 ## Manual Installation
 You can check out the latest version with git, build and install it with [Meson](https://mesonbuild.com/).
