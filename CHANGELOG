@@ -1,3 +1,11 @@
+2023-10-04 Gianni Lerro <glerro@pm.me>
+ * Release version 3.
+ * Fix from ego review.
+ * Remove globals declaration.
+ * Use unique name for timeouts.
+ * Remove all timeouts in destroy function.
+ * Make cancellable all asynchronous function.
+
 2023-10-01 Gianni Lerro <glerro@pm.me>
  * Release version 2.
  * Fix a typo in settins schema path.

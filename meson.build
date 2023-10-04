@@ -1,5 +1,5 @@
 project('gnome-shell-extension-debian-updates-indicator',
-    version: '2',
+    version: '3',
     meson_version: '>= 0.53.0',
     license: 'GPL3')
 
