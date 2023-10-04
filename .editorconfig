@@ -13,6 +13,10 @@ indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
 
+# Quote type override for al Js files: single quote.
+[*.js]
+quote_type = single
+
 # Indentation override for all Json files: 2 space indents.
 [*.json]
 indent_style = space
