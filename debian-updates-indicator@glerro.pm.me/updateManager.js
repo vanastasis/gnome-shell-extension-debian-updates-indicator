@@ -29,26 +29,16 @@
  * SPDX-FileCopyrightText: 2023 Gianni Lerro <glerro@pm.me>
  */
 
-/* exported UpdateManager */
-
 'use strict';
 
-const Gettext = imports.gettext;
+import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
 
-const {Gio, GLib} = imports.gi;
+import {gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const ExtensionName = Me.metadata.name;
-
-const Indicator = Me.imports.indicator;
-const Monitors = Me.imports.monitors;
-const Utils = Me.imports.utils;
-
-const Domain = Gettext.domain(Me.metadata['gettext-domain']);
-const {
-    gettext: _,
-} = Domain;
+import * as Indicator from './indicator.js';
+import * as Monitors from './monitors.js';
+import * as Utils from './utils.js';
 
 /* Options */
 const STOCK_CHECK_CMD  = '/usr/bin/pkcon refresh';
@@ -62,8 +52,12 @@ const SCRIPT = Indicator.SCRIPT;
 /* For error checking */
 const STATUS = Indicator.STATUS;
 
-var UpdateManager = class UpdateManager {
-    constructor() {
+export const UpdateManager = class UpdateManager {
+    constructor(extension) {
+        this._extension = extension;
+        this._extensionName = this._extension.metadata.name;
+        this._extensionPath = this._extension.path;
+
         this._TimeoutId = null;
         this._initialTimeoutId = null;
 
@@ -75,7 +69,7 @@ var UpdateManager = class UpdateManager {
         this._indicator.updateStatus(STATUS.INITIALIZING);
 
         // Prepare to track connections
-        this._signalsHandler = new Utils.GlobalSignalsHandler();
+        this._signalsHandler = new Utils.GlobalSignalsHandler(this._extensionName);
 
         // The first run is initialization only: we only read the existing files
         this._initializing = true;
@@ -86,7 +80,7 @@ var UpdateManager = class UpdateManager {
         this._dontUpdateDate = false;
 
         // Load settings
-        this._settings = ExtensionUtils.getSettings();
+        this._extensionSettings = this._extension.getSettings();
         this._applySettings();
 
         // Start network and directory monitors
@@ -121,7 +115,7 @@ var UpdateManager = class UpdateManager {
     }
 
     _updateCMD() {
-        let option = this._settings.get_enum('update-cmd-options');
+        let option = this._extensionSettings.get_enum('update-cmd-options');
         if (option === 1) {
             // Synaptic package manager
             UPDATE_CMD = '/usr/bin/synaptic-pkexec';
@@ -131,16 +125,16 @@ var UpdateManager = class UpdateManager {
         } else if (option === 3) {
             // Update manager, Ubuntu only
             UPDATE_CMD = '/usr/bin/update-manager';
-        } else if (option === 4 && this._settings.get_string('update-cmd') !== '') {
+        } else if (option === 4 && this._extensionSettings.get_string('update-cmd') !== '') {
             // Custom command
-            if (this._settings.get_boolean('output-on-terminal')) {
-                UPDATE_CMD = `/usr/bin/${this._settings.get_string('terminal')}` +
-                             ` "echo ${this._settings.get_string('update-cmd')}` +
-                             `; ${this._settings.get_string('update-cmd')}` +
+            if (this._extensionSettings.get_boolean('output-on-terminal')) {
+                UPDATE_CMD = `/usr/bin/${this._extensionSettings.get_string('terminal')}` +
+                             ` "echo ${this._extensionSettings.get_string('update-cmd')}` +
+                             `; ${this._extensionSettings.get_string('update-cmd')}` +
                              '; echo Press any key to continue' +
                              '; read -n1 key"';
             } else {
-                UPDATE_CMD = `/usr/bin/${this._settings.get_string('update-cmd')}`;
+                UPDATE_CMD = `/usr/bin/${this._extensionSettings.get_string('update-cmd')}`;
             }
         }  else {
             // Default, or in case the command is empty, Gnome-Software
@@ -149,9 +143,9 @@ var UpdateManager = class UpdateManager {
     }
 
     _checkCMD() {
-        if (this._settings.get_boolean('use-custom-cmd') &&
-            this._settings.get_string('check-cmd-custom') !== '')
-            CHECK_CMD = `/usr/bin/${this._settings.get_string('check-cmd-custom')}`;
+        if (this._extensionSettings.get_boolean('use-custom-cmd') &&
+            this._extensionSettings.get_string('check-cmd-custom') !== '')
+            CHECK_CMD = `/usr/bin/${this._extensionSettings.get_string('check-cmd-custom')}`;
         else
             CHECK_CMD = STOCK_CHECK_CMD;
     }
@@ -164,7 +158,7 @@ var UpdateManager = class UpdateManager {
             GLib.source_remove(this._TimeoutId);
 
         // Interval in hours from settings, convert to seconds
-        let unit = this._settings.get_enum('interval-unit');
+        let unit = this._extensionSettings.get_enum('interval-unit');
         let conversion = 0;
 
         switch (unit) {
@@ -179,12 +173,12 @@ var UpdateManager = class UpdateManager {
             break;
         }
 
-        let CHECK_INTERVAL = conversion * this._settings.get_int('check-interval');
+        let CHECK_INTERVAL = conversion * this._extensionSettings.get_int('check-interval');
 
         if (CHECK_INTERVAL) {
             // This has to be relative to the last check!
             // Date is in milliseconds, convert to seconds
-            let lastCheck = this._settings.get_double('last-check-date-automatic-double');
+            let lastCheck = this._extensionSettings.get_double('last-check-date-automatic-double');
             let now = new Date();
             let elapsed = (now - lastCheck) / 1000; // In seconds
 
@@ -215,7 +209,7 @@ var UpdateManager = class UpdateManager {
         if (this._TimeoutId)
             GLib.source_remove(this._TimeoutId);
 
-        let CHECK_INTERVAL = this._settings.get_int('check-interval') * 60 * 60;
+        let CHECK_INTERVAL = this._extensionSettings.get_int('check-interval') * 60 * 60;
         if (CHECK_INTERVAL) {
             this._checkTimeoutId = GLib.timeout_add_seconds(
                 GLib.PRIORITY_DEFAULT,
@@ -229,7 +223,7 @@ var UpdateManager = class UpdateManager {
     }
 
     _newPackagesBinding() {
-        if (this._settings.get_boolean('new-packages')) {
+        if (this._extensionSettings.get_boolean('new-packages')) {
             this._launchScript(SCRIPT.NEW);
         } else {
             this._indicator._newPackagesList = [];
@@ -238,7 +232,7 @@ var UpdateManager = class UpdateManager {
     }
 
     _obsoletePackagesBinding() {
-        if (this._settings.get_boolean('obsolete-packages')) {
+        if (this._extensionSettings.get_boolean('obsolete-packages')) {
             this._launchScript(SCRIPT.OBSOLETE);
         } else {
             this._indicator._obsoletePackagesList = [];
@@ -247,7 +241,7 @@ var UpdateManager = class UpdateManager {
     }
 
     _residualPackagesBinding() {
-        if (this._settings.get_boolean('residual-packages')) {
+        if (this._extensionSettings.get_boolean('residual-packages')) {
             this._launchScript(SCRIPT.RESIDUAL);
         } else {
             this._indicator._residualPackagesList = [];
@@ -256,7 +250,7 @@ var UpdateManager = class UpdateManager {
     }
 
     _autoremovablePackagesBinding() {
-        if (this._settings.get_boolean('autoremovable-packages')) {
+        if (this._extensionSettings.get_boolean('autoremovable-packages')) {
             this._launchScript(SCRIPT.AUTOREMOVABLE);
         } else {
             this._indicator._autoremovablePackagesList = [];
@@ -267,54 +261,54 @@ var UpdateManager = class UpdateManager {
     _bindSettings() {
         this._signalsHandler.add([
         // Apply updates
-            this._settings,
+            this._extensionSettings,
             'changed::update-cmd-options',
             this._updateCMD.bind(this),
         ], [
-            this._settings,
+            this._extensionSettings,
             'changed::terminal',
             this._updateCMD.bind(this),
         ], [
-            this._settings,
+            this._extensionSettings,
             'changed::output-on-terminal',
             this._updateCMD.bind(this),
         ], [
-            this._settings,
+            this._extensionSettings,
             'changed::update-cmd',
             this._updateCMD.bind(this),
         ], [
         // Checking for updates
-            this._settings,
+            this._extensionSettings,
             'changed::check-cmd-custom',
             this._checkCMD.bind(this),
         ], [
-            this._settings,
+            this._extensionSettings,
             'changed::use-custom-cmd',
             this._checkCMD.bind(this),
         ], [
         // Basic settings
-            this._settings,
+            this._extensionSettings,
             'changed::check-interval',
             this._initializeInterval.bind(this),
         ], [
         // Basic settings
-            this._settings,
+            this._extensionSettings,
             'changed::interval-unit',
             this._initializeInterval.bind(this),
         ], [
-            this._settings,
+            this._extensionSettings,
             'changed::strip-versions',
             () => {
                 this._launchScript(SCRIPT.UPGRADES);
             },
         ], [
-            this._settings,
+            this._extensionSettings,
             'changed::show-critical-updates',
             () => {
                 this._launchScript(SCRIPT.UPGRADES);
             },
         ], [
-            this._settings,
+            this._extensionSettings,
             'changed::ignore-list',
             () => {
                 // We add a timeout in case many entries are deleted
@@ -334,19 +328,19 @@ var UpdateManager = class UpdateManager {
             },
         ], [
             // Synaptic like features
-            this._settings,
+            this._extensionSettings,
             'changed::new-packages',
             this._newPackagesBinding.bind(this),
         ], [
-            this._settings,
+            this._extensionSettings,
             'changed::obsolete-packages',
             this._obsoletePackagesBinding.bind(this),
         ], [
-            this._settings,
+            this._extensionSettings,
             'changed::residual-packages',
             this._residualPackagesBinding.bind(this),
         ], [
-            this._settings,
+            this._extensionSettings,
             'changed::autoremovable-packages',
             this._autoremovablePackagesBinding.bind(this),
         ], [
@@ -392,7 +386,7 @@ var UpdateManager = class UpdateManager {
 
             GLib.strfreev(argvp);
         } catch (err) {
-            log(`${ExtensionName} - ${err.message}`);
+            console.log(`${this._extensionName} - ${err.message}`);
         } finally {
             if (cancelId > 0)
                 this._cancellable.disconnect(cancelId);
@@ -454,7 +448,7 @@ var UpdateManager = class UpdateManager {
 
             this._upgradeProcess_sourceId = 1;
         } catch (err) {
-            log(`${ExtensionName} - ${err.message}`);
+            console.log(`${this._extensionName} - ${err.message}`);
             this._indicator.showChecking(false);
             this._indicator.updateStatus(STATUS.ERROR);
         } finally {
@@ -489,7 +483,7 @@ var UpdateManager = class UpdateManager {
 
         // Run asynchronously, to avoid shell freeze - even for a 1s check
 
-        let path = Me.dir.get_path();
+        let path = this._extensionPath;
         let script = [
             '/bin/bash',
             `${path}/scripts/${scriptNames[index]}.sh`,
@@ -508,7 +502,7 @@ var UpdateManager = class UpdateManager {
             // Asynchronously call the output handler when script output is ready
             proc.communicate_utf8_async(null, this._cancellable, this._packagesRead.bind(this, index));
         } catch (err) {
-            log(`${ExtensionName} - Failed to run ${scriptNames[index]}.sh - ${err.message}`);
+            console.log(`${this._extensionName} - Failed to run ${scriptNames[index]}.sh - ${err.message}`);
             if (index === SCRIPT.UPGRADES) {
                 this._indicator.showChecking(false);
                 this._indicator.updateStatus(STATUS.ERROR);
@@ -548,7 +542,7 @@ var UpdateManager = class UpdateManager {
         // Since this runs async, the indicator might have been destroyed!
         if (this._indicator) {
             // Update indicator
-            if (index === SCRIPT.UPGRADES && this._settings.get_boolean('show-critical-updates')) {
+            if (index === SCRIPT.UPGRADES && this._extensionSettings.get_boolean('show-critical-updates')) {
                 this._checkUrgency();
             } else {
                 this._indicator.updatePackagesStatus(index);
@@ -563,13 +557,13 @@ var UpdateManager = class UpdateManager {
                 this._lastCheck();
 
                 // Launch other checks
-                if (this._settings.get_boolean('new-packages'))
+                if (this._extensionSettings.get_boolean('new-packages'))
                     this._launchScript(SCRIPT.NEW);
-                if (this._settings.get_boolean('obsolete-packages'))
+                if (this._extensionSettings.get_boolean('obsolete-packages'))
                     this._launchScript(SCRIPT.OBSOLETE);
-                if (this._settings.get_boolean('residual-packages'))
+                if (this._extensionSettings.get_boolean('residual-packages'))
                     this._launchScript(SCRIPT.RESIDUAL);
-                if (this._settings.get_boolean('autoremovable-packages'))
+                if (this._extensionSettings.get_boolean('autoremovable-packages'))
                     this._launchScript(SCRIPT.AUTOREMOVABLE);
                 this._initializing = false;
 
@@ -579,7 +573,7 @@ var UpdateManager = class UpdateManager {
     }
 
     _checkUrgency() {
-        let path = Me.dir.get_path();
+        let path = this._extensionPath;
         let script = ['/bin/bash', `${path}/scripts/urgency.sh`];
 
         let proc = new Gio.Subprocess({argv: script, flags: Gio.SubprocessFlags.STDOUT_PIPE});
@@ -593,7 +587,7 @@ var UpdateManager = class UpdateManager {
             // Asynchronously call the output handler when script output is ready
             proc.communicate_utf8_async(null, this._cancellable, this._checkUrgencyRead.bind(this));
         } catch (err) {
-            log(`${ExtensionName} - Failed to run urgency.sh - ${err.message}`);
+            console.log(`${this._extensionName} - Failed to run urgency.sh - ${err.message}`);
         } finally {
             if (cancelId > 0)
                 this._cancellable.disconnect(cancelId);
@@ -628,14 +622,14 @@ var UpdateManager = class UpdateManager {
         let date;
 
         if (this._initializing) {
-            let lastCheck = new Date(this._settings.get_double('last-check-date-double'));
+            let lastCheck = new Date(this._extensionSettings.get_double('last-check-date-double'));
             date = lastCheck.toLocaleFormat('%a %b %d, %H:%M').toString();
         } else {
             let now = new Date();
             date = now.toLocaleFormat('%a %b %d, %H:%M').toString();
-            this._settings.set_double('last-check-date-double', now);
+            this._extensionSettings.set_double('last-check-date-double', now);
             if (this._isAutomaticCheck) {
-                this._settings.set_double('last-check-date-automatic-double', now);
+                this._extensionSettings.set_double('last-check-date-automatic-double', now);
                 this._isAutomaticCheck = false;
             }
         }
@@ -647,7 +641,7 @@ var UpdateManager = class UpdateManager {
     }
 
     _filterList(packagesList) {
-        let ignoreList = this._settings.get_strv('ignore-list');
+        let ignoreList = this._extensionSettings.get_strv('ignore-list');
 
         return packagesList.filter(pkg => {
             // only get the package name, in case the version is included
@@ -681,8 +675,8 @@ var UpdateManager = class UpdateManager {
         }
 
         // Null settings
-        if (this._settings !== null)
-            this._settings = null;
+        if (this._extensionSettings !== null)
+            this._extensionSettings = null;
 
         // Disconnect global signals
         if (this._signalsHandler !== null) {

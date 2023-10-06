@@ -28,33 +28,26 @@
  * SPDX-FileCopyrightText: 2023 Gianni Lerro <glerro@pm.me>
  */
 
-/* exported DebianUpdatesIndicator */
-
 'use strict';
 
-const Gettext = imports.gettext;
+import Clutter from 'gi://Clutter';
+import GLib from 'gi://GLib';
+import GObject from 'gi://GObject';
+import Meta from 'gi://Meta';
+import Shell from 'gi://Shell';
+import St from 'gi://St';
 
-const {Clutter, GLib, GObject, Meta, Shell, St} = imports.gi;
+import {gettext as _, ngettext as n_} from 'resource:///org/gnome/shell/extensions/extension.js';
 
-const Main = imports.ui.main;
-const PanelMenu = imports.ui.panelMenu;
-const PopupMenu = imports.ui.popupMenu;
-const MessageTray = imports.ui.messageTray;
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
+import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
+import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const ExtensionName = Me.metadata.name;
-
-const Utils = Me.imports.utils;
-
-const Domain = Gettext.domain(Me.metadata['gettext-domain']);
-const {
-    gettext: _,
-    ngettext,
-} = Domain;
+import * as Utils from './utils.js';
 
 /* For error checking */
-var STATUS = {
+export const STATUS = {
     UNKNOWN:      -1,
     ERROR:        -2,
     NO_INTERNET:  -3,
@@ -66,7 +59,7 @@ let UPDATES_PENDING = STATUS.UNKNOWN;
 let UPDATES_LIST    = [];
 
 /* Various packages statuses */
-var SCRIPT = {
+export const SCRIPT = {
     UPGRADES:      0,
     NEW:           1,
     OBSOLETE:      2,
@@ -74,7 +67,7 @@ var SCRIPT = {
     AUTOREMOVABLE: 4,
 };
 
-var DebianUpdatesIndicator = GObject.registerClass({
+export const DebianUpdatesIndicator = GObject.registerClass({
     GTypeName: 'DebianUpdatesIndicator',
 }, class DebianUpdatesIndicator extends PanelMenu.Button {
     _init(updateManager) {
@@ -89,7 +82,10 @@ var DebianUpdatesIndicator = GObject.registerClass({
 
         this._updateManager = updateManager;
 
-        super._init(0.0, `${ExtensionName}`, false);
+        this._extension = this._updateManager._extension;
+        this._extensionName = this._extension.metadata.name;
+
+        super._init(0.0, `${this._extensionName}`, false);
 
         this._clipboard = St.Clipboard.get_default();
 
@@ -116,37 +112,37 @@ var DebianUpdatesIndicator = GObject.registerClass({
         this.add_child(this._box);
 
         // Prepare to track connections
-        this._signalsHandler = new Utils.GlobalSignalsHandler();
+        this._signalsHandler = new Utils.GlobalSignalsHandler(this._extensionName);
 
         // Assemble the menu
         this._assembleMenu();
 
         // Load settings
-        this._settings = ExtensionUtils.getSettings();
+        this._extensionSettings = this._extension.getSettings();
         this._bindSignals();
 
-        Main.panel.addToStatusArea(`${ExtensionName} Indicator`, this);
+        Main.panel.addToStatusArea(`${this._extensionName} Indicator`, this);
 
         this._shortcutIsSet = false;
         this._toggleShortcut();
     }
 
     _openSettings() {
-        ExtensionUtils.openPrefs();
+        this._extension.openPreferences();
     }
 
     _bindSignals() {
         // Bind settings
         this._signalsHandler.add([
-            this._settings,
+            this._extensionSettings,
             'changed::show-count',
             this._checkShowHideIndicator.bind(this),
         ], [
-            this._settings,
+            this._extensionSettings,
             'changed::always-visible',
             this._checkShowHideIndicator.bind(this),
         ], [
-            this._settings,
+            this._extensionSettings,
             'changed::use-shortcut',
             this._toggleShortcut.bind(this),
         ], [
@@ -211,8 +207,8 @@ var DebianUpdatesIndicator = GObject.registerClass({
 
         this._disableShortcut();
 
-        if (this._settings !== null)
-            this._settings = null;
+        if (this._extensionSettings !== null)
+            this._extensionSettings = null;
 
         super.destroy();
     }
@@ -236,12 +232,12 @@ var DebianUpdatesIndicator = GObject.registerClass({
             // Do not apply visibility change while checking for updates
             return;
 
-        if (!this._settings.get_boolean('always-visible') && this._updateList.length < 1)
+        if (!this._extensionSettings.get_boolean('always-visible') && this._updateList.length < 1)
             this.visible = false;
         else
             this.visible = true;
 
-        this._label.visible = this._settings.get_boolean('show-count') &&
+        this._label.visible = this._extensionSettings.get_boolean('show-count') &&
                               this._updateList.length > 0;
     }
 
@@ -253,7 +249,7 @@ var DebianUpdatesIndicator = GObject.registerClass({
 
     _checkAutoExpandList() {
         let count = this._updateList.length;
-        if (this.menu.isOpen && count > 0 && count <= this._settings.get_int('auto-expand-list'))
+        if (this.menu.isOpen && count > 0 && count <= this._extensionSettings.get_int('auto-expand-list'))
             this.updatesExpander.setSubmenuShown(true);
         else
             this.updatesExpander.setSubmenuShown(false);
@@ -325,11 +321,11 @@ var DebianUpdatesIndicator = GObject.registerClass({
                 }
             }
 
-            this._updateMenuExpander(true, ngettext('%d update pending',
+            this._updateMenuExpander(true, n_('%d update pending',
                 '%d updates pending', updatesCount).format(updatesCount));
 
             // Emit a notification if necessary
-            if (this._settings.get_boolean('notify') && UPDATES_PENDING < updatesCount)
+            if (this._extensionSettings.get_boolean('notify') && UPDATES_PENDING < updatesCount)
                 this._notify(updatesCount);
 
             // Store the new list
@@ -378,9 +374,9 @@ var DebianUpdatesIndicator = GObject.registerClass({
     }
 
     _notify(updatesCount) {
-        if (this._settings.get_int('verbosity') > 0) {
+        if (this._extensionSettings.get_int('verbosity') > 0) {
             let updateList = [];
-            if (this._settings.get_int('verbosity') > 1) {
+            if (this._extensionSettings.get_int('verbosity') > 1) {
                 updateList = this._updateList;
             } else {
                 // Keep only packets that was not in the previous notification
@@ -403,14 +399,14 @@ var DebianUpdatesIndicator = GObject.registerClass({
             if (updateList.length > 0) {
                 // Show notification only if there's new updates
                 this._showNotification(
-                    ngettext('New Update', 'New Updates', updateList.length),
+                    n_('New Update', 'New Updates', updateList.length),
                     updateList.join(', ')
                 );
             }
         } else {
             this._showNotification(
-                ngettext('New Update', 'New Updates', updatesCount),
-                ngettext('There is %d update pending', 'There are %d updates pending',
+                n_('New Update', 'New Updates', updatesCount),
+                n_('There is %d update pending', 'There are %d updates pending',
                     updatesCount).format(updatesCount)
             );
         }
@@ -434,7 +430,7 @@ var DebianUpdatesIndicator = GObject.registerClass({
     }
 
     _cleanUpgradeList(list, maxWidth) {
-        if (this._settings.get_boolean('strip-versions') === true) {
+        if (this._extensionSettings.get_boolean('strip-versions') === true) {
             return list.map(p => {
                 // example: firefox 50.0-1
                 // chunks[0] is the package name
@@ -582,7 +578,7 @@ var DebianUpdatesIndicator = GObject.registerClass({
      * */
 
     _showNotification(title, message) {
-        if (this._notifSource == null) {
+        if (this._notifSource === undefined) {
             // We have to prepare this only once
             this._notifSource = new MessageTray.SystemNotificationSource();
             this._notifSource.createIcon = () => {
@@ -606,12 +602,12 @@ var DebianUpdatesIndicator = GObject.registerClass({
             notification = this._notifSource.notifications[0];
             notification.update(title, message, {clear: true});
         }
-        notification.setTransient(this._settings.get_boolean('transient'));
+        notification.setTransient(this._extensionSettings.get_boolean('transient'));
         this._notifSource.showNotification(notification);
     }
 
     _toggleShortcut() {
-        if (this._settings.get_boolean('use-shortcut'))
+        if (this._extensionSettings.get_boolean('use-shortcut'))
             this._enableShortcut();
         else
             this._disableShortcut();
@@ -620,7 +616,7 @@ var DebianUpdatesIndicator = GObject.registerClass({
     _enableShortcut() {
         if (!this._shortcutIsSet) {
             Main.wm.addKeybinding('debian-updates-indicator-shortcut',
-                this._settings,
+                this._extensionSettings,
                 Meta.KeyBindingFlags.NONE,
                 Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
                 this.menu.toggle.bind(this.menu)

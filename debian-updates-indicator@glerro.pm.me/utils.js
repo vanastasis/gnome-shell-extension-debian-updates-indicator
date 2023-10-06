@@ -28,15 +28,9 @@
  * SPDX-FileCopyrightText: 2023 Gianni Lerro <glerro@pm.me>
  */
 
-/* exported GlobalSignalsHandler */
-
 'use strict';
 
-const GObject = imports.gi;
-
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const ExtensionName = Me.metadata.name;
+import GObject from 'gi://GObject';
 
 const SignalsHandlerFlags = {
     NONE: 0,
@@ -48,8 +42,9 @@ const SignalsHandlerFlags = {
  * abstract class
  */
 const BasicHandler = class BasicHandler {
-    constructor() {
+    constructor(extensionName) {
         this._storage = {};
+        this._extensionName = extensionName;
     }
 
     add(...args /* unlimited 3-long array arguments */) {
@@ -68,7 +63,7 @@ const BasicHandler = class BasicHandler {
             try {
                 item.push(this._create(args[i]));
             } catch (err) {
-                log(`${ExtensionName} - Add signal - ${err.message}`);
+                console.log(`${this._extensionName} - Add signal - ${err.message}`);
             }
         }
     }
@@ -111,7 +106,7 @@ const BasicHandler = class BasicHandler {
 /**
  * Manage global signals
  */
-var GlobalSignalsHandler = class GlobalSignalsHandler extends BasicHandler {
+export const GlobalSignalsHandler = class GlobalSignalsHandler extends BasicHandler {
     _create(item) {
         let object = item[0];
         let event = item[1];

@@ -28,51 +28,26 @@
  * SPDX-FileCopyrightText: 2023 Gianni Lerro <glerro@pm.me>
  */
 
-/* exported init */
-
 'use strict';
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
+import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 
-const ExtensionName = Me.metadata.name;
-const ExtensionVersion = Me.metadata.version;
+import * as UpdateManager from './updateManager.js';
 
-const UpdateManager = Me.imports.updateManager;
-
-class Extension {
-    constructor() {
-        this._updateManager = null;
-    }
-
+export default class DebianUpdatesExtension extends Extension {
     enable() {
-        log(`Enabling ${ExtensionName} - Version ${ExtensionVersion}`);
+        console.log(`Enabling ${this.metadata.name} - Version ${this.metadata.version}`);
 
-        this._updateManager = new UpdateManager.UpdateManager();
+        this._updateManager = new UpdateManager.UpdateManager(this);
     }
 
     disable() {
-        log(`Disabling ${ExtensionName} - Version ${ExtensionVersion}`);
+        console.log(`Disabling ${this.metadata.name} - Version ${this.metadata.version}`);
 
         if (this._updateManager !== null) {
             this._updateManager.destroy();
             this._updateManager = null;
         }
     }
-}
-
-/**
- * This function is called once when extension is loaded, not enabled.
- *
- * @param {ExtensionMeta} meta - An extension meta object.
- * @returns {Extension} - the extension object with enable() and disable() methods.
- */
-function init(meta) {
-    log(`Inizializing ${meta.metadata.name} - V ${meta.metadata.version}`);
-
-    // Inizializing translations
-    ExtensionUtils.initTranslations();
-
-    return new Extension();
 }
 
