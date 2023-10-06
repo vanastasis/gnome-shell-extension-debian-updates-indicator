@@ -36,6 +36,8 @@ import GLib from 'gi://GLib';
 
 import {gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
 
+import {formatDateWithCFormatString} from 'resource:///org/gnome/shell/misc/dateUtils.js';
+
 import * as Indicator from './indicator.js';
 import * as Monitors from './monitors.js';
 import * as Utils from './utils.js';
@@ -620,13 +622,14 @@ export const UpdateManager = class UpdateManager {
             return;
         }
         let date;
+        let dateFormat = '%a %b %d, %H:%M';
 
         if (this._initializing) {
             let lastCheck = new Date(this._extensionSettings.get_double('last-check-date-double'));
-            date = lastCheck.toLocaleFormat('%a %b %d, %H:%M').toString();
+            date = formatDateWithCFormatString(lastCheck, dateFormat);
         } else {
             let now = new Date();
-            date = now.toLocaleFormat('%a %b %d, %H:%M').toString();
+            date = formatDateWithCFormatString(now, dateFormat);
             this._extensionSettings.set_double('last-check-date-double', now);
             if (this._isAutomaticCheck) {
                 this._extensionSettings.set_double('last-check-date-automatic-double', now);
