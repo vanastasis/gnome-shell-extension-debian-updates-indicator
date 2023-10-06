@@ -31,6 +31,7 @@
 
 'use strict';
 
+import GObject from 'gi://GObject';
 import Adw from 'gi://Adw';
 import Gio from 'gi://Gio';
 import Gtk from 'gi://Gtk';
@@ -39,250 +40,239 @@ import {ExtensionPreferences} from 'resource:///org/gnome/Shell/Extensions/js/ex
 
 import {IgnoreListBox} from './ignoreListBox.js';
 
-const TEMPLATE_ADW = 'prefs_adw1.ui';
+const DebianUpdatesBasicPrefsPage = GObject.registerClass({
+    GTypeName: 'DebianUpdatesBasicPrefsPage',
+    Template: import.meta.url.replace('prefs.js', 'ui/prefs_basic_adw1.ui'),
+    InternalChildren: ['check_updates_group', 'interval', 'interval_unit_combo', 'updates_menu_group',
+         'strip_versions_switch', 'urgent_updates_switch', 'indicator_group', 'always_visible',
+         'show_count', 'auto_expand_list', 'notifications_group', 'notifications', 'transient_notifications',
+         'verbosity', 'shortcut_group', 'shortcut_entry', 'use_shortcut'],
+}, class DebianUpdatesBasicPrefsPage extends Adw.PreferencesPage {
+    constructor(settings, params = {}) {
+        super(params);
 
-/**
- * This function setup Preferences binding.
- *
- * @function bindPrefs
- * @param {Gtk.Builder} builder - Builder prefs widgets.
- * @param {Gio.Settings} settings - Extension settings.
- * @returns {void}
- */
-function bindPrefs(builder, settings) {
-    // Basic settings tab:
-    // Check updates
-    settings.bind('check-interval',
-        builder.get_object('interval'),
-        'value',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('strip-versions',
-        builder.get_object('strip_versions_switch'),
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('show-critical-updates',
-        builder.get_object('urgent_updates_switch'),
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
+        this._settings = settings;
 
-    // Hours, days or weeks
-    builder.get_object('interval_unit_combo').connect('changed', widget => {
-        settings.set_enum('interval-unit', widget.get_active());
-    });
-    builder.get_object('interval_unit_combo').set_active(settings.get_enum('interval-unit'));
+        // Basic settings tab:
+        // Check updates
+        this._settings.bind('check-interval', this._interval,
+            'value', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('strip-versions', this._strip_versions_switch,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('show-critical-updates', this._urgent_updates_switch,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
 
-    // Indicator settings
-    settings.bind('always-visible',
-        builder.get_object('always_visible'),
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('show-count',
-        builder.get_object('show_count'),
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('auto-expand-list',
-        builder.get_object('auto_expand_list'),
-        'value',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-
-    // Notification settings
-    settings.bind('notify',
-        builder.get_object('notifications'),
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('transient',
-        builder.get_object('transient_notifications'),
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('verbosity',
-        builder.get_object('verbosity'),
-        'selected',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('notify',
-        builder.get_object('transient_notifications'),
-        'sensitive',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('notify',
-        builder.get_object('verbosity'),
-        'sensitive',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-
-    // Shortcut
-    settings.bind('shortcut-text',
-        builder.get_object('shortcut_entry'),
-        'text',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    // We need to update the shortcut 'strv' when the text is modified
-    settings.connect('changed::shortcut-text', () => {
-        setShortcut(settings);
-    });
-    settings.bind('use-shortcut',
-        builder.get_object('use_shortcut'),
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('use-shortcut',
-        builder.get_object('shortcut_entry'),
-        'sensitive',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-
-    // Advanced settings tab:
-    // Update method
-    builder.get_object('update_cmd_options').connect('changed', widget => {
-        settings.set_enum('update-cmd-options', widget.get_active());
-    });
-
-    builder.get_object('update_cmd_options').set_active(settings.get_enum('update-cmd-options'));
-
-    if (settings.get_enum('update-cmd-options') !== 4)
-        builder.get_object('update_cmd_button').set_enable_expansion(false);
-
-    settings.connect('changed::update-cmd-options', () => {
-        if (settings.get_enum('update-cmd-options') === 4)
-            builder.get_object('update_cmd_button').set_enable_expansion(true);
-        else
-            builder.get_object('update_cmd_button').set_enable_expansion(false);
-    });
-
-    // Custom command for updating
-    settings.bind('output-on-terminal',
-        builder.get_object('output_on_terminal_switch'),
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('terminal',
-        builder.get_object('terminal_entry'),
-        'text',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('update-cmd',
-        builder.get_object('field_updatecmd'),
-        'text',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('output-on-terminal',
-        builder.get_object('terminal_entry'),
-        'sensitive',
-        Gio.SettingsBindFlags.GET
-    );
-
-    // Check commands
-    settings.bind('use-custom-cmd',
-        builder.get_object('use_custom_cmd_switch'),
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('check-cmd-custom',
-        builder.get_object('field_checkcmd_custom'),
-        'text',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('use-custom-cmd',
-        builder.get_object('field_checkcmd_custom'),
-        'sensitive',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-
-    // Reset button
-    builder.get_object('reset_button').connect('clicked', () => {
-        // restore default settings for the relevant keys
-        let keys = [
-            'terminal',
-            'output-on-terminal',
-            'update-cmd',
-            'update-cmd-options',
-            'use-custom-cmd',
-            'check-cmd-custom',
-        ];
-        keys.forEach(val => {
-            settings.set_value(val, settings.get_default_value(val));
+        // Hours, days or weeks
+        this._interval_unit_combo.connect('changed', widget => {
+            this._settings.set_enum('interval-unit', widget.get_active());
         });
-        // This one needs to be refreshed manually
-        builder.get_object('update_cmd_options').set_active(settings.get_enum('update-cmd-options'));
-    });
+        this._interval_unit_combo.set_active(this._settings.get_enum('interval-unit'));
 
+        // Indicator settings
+        this._settings.bind('always-visible', this._always_visible,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('show-count', this._show_count,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('auto-expand-list', this._auto_expand_list,
+            'value', Gio.SettingsBindFlags.DEFAULT
+        );
 
-    // Package status tab:
-    settings.bind('new-packages',
-        builder.get_object('new_packages_switch'),
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('obsolete-packages',
-        builder.get_object('obsolete_packages_switch'),
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('residual-packages',
-        builder.get_object('residual_packages_switch'),
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('autoremovable-packages',
-        builder.get_object('autoremovable_packages_switch'),
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-}
+        // Notification settings
+        this._settings.bind('notify', this._notifications,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('transient', this._transient_notifications,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('verbosity', this._verbosity,
+            'selected', Gio.SettingsBindFlags.DEFAULT
+        );
+        settings.bind('notify', this._transient_notifications,
+            'sensitive', Gio.SettingsBindFlags.DEFAULT
+        );
+        settings.bind('notify', this._verbosity,
+            'sensitive', Gio.SettingsBindFlags.DEFAULT
+        );
 
-/**
- * This function set Shortcut.
- *
- * @function setShortcut
- * @param {Gio.Settings} settings - Extrension Settings.
- * @returns {void}
- */
-function setShortcut(settings) {
-    let shortcutText = settings.get_string('shortcut-text');
-    let key, mods;
-
-    [, key, mods] = Gtk.accelerator_parse(shortcutText);
-
-    if (Gtk.accelerator_valid(key, mods)) {
-        let shortcut = Gtk.accelerator_name(key, mods);
-        settings.set_strv('debian-updates-indicator-shortcut', [shortcut]);
-    } else {
-        settings.set_strv('debian-updates-indicator-shortcut', []);
+        // Shortcut
+        this._settings.bind('shortcut-text', this._shortcut_entry,
+            'text', Gio.SettingsBindFlags.DEFAULT
+        );
+        // We need to update the shortcut 'strv' when the text is modified
+        this._settings.connect('changed::shortcut-text', () => {
+            this._setShortcut(settings);
+        });
+        this._settings.bind('use-shortcut', this._use_shortcut,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('use-shortcut', this._shortcut_entry,
+            'sensitive', Gio.SettingsBindFlags.DEFAULT
+        );
     }
-}
+
+    /**
+     * This function set Shortcut.
+     *
+     * @function setShortcut
+     * @param {Gio.Settings} settings - Extrension Settings.
+     * @returns {void}
+     */
+    _setShortcut(settings) {
+        let shortcutText = settings.get_string('shortcut-text');
+        let key, mods;
+
+        [, key, mods] = Gtk.accelerator_parse(shortcutText);
+
+        if (Gtk.accelerator_valid(key, mods)) {
+            let shortcut = Gtk.accelerator_name(key, mods);
+            settings.set_strv('debian-updates-indicator-shortcut', [shortcut]);
+        } else {
+            settings.set_strv('debian-updates-indicator-shortcut', []);
+        }
+    }
+});
+
+const DebianUpdatesAdvancedPrefsPage = GObject.registerClass({
+    GTypeName: 'DebianUpdatesAdvancedPrefsPage',
+    Template: import.meta.url.replace('prefs.js', 'ui/prefs_advanced_adw1.ui'),
+    InternalChildren: ['update_cmd_options', 'update_cmd_button', 'output_on_terminal_switch',
+        'terminal_entry', 'field_updatecmd', 'use_custom_cmd_switch', 'field_checkcmd_custom',
+        'reset_button'],
+}, class DebianUpdatesAdvancedPrefsPage extends Adw.PreferencesPage {
+    constructor(settings, params = {}) {
+        super(params);
+
+        this._settings = settings;
+
+        // Advanced settings tab:
+        // Update method
+        this._update_cmd_options.connect('changed', widget => {
+            this._settings.set_enum('update-cmd-options', widget.get_active());
+        });
+
+        this._update_cmd_options.set_active(this._settings.get_enum('update-cmd-options'));
+
+        if (this._settings.get_enum('update-cmd-options') !== 4)
+            this._update_cmd_button.set_enable_expansion(false);
+
+        this._settings.connect('changed::update-cmd-options', () => {
+            if (this._settings.get_enum('update-cmd-options') === 4)
+                this._update_cmd_button.set_enable_expansion(true);
+            else
+                this._update_cmd_button.set_enable_expansion(false);
+        });
+
+        // Custom command for updating
+        this._settings.bind('output-on-terminal', this._output_on_terminal_switch,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('terminal', this._terminal_entry,
+            'text', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('update-cmd', this._field_updatecmd,
+            'text', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('output-on-terminal', this._terminal_entry,
+            'sensitive', Gio.SettingsBindFlags.GET
+        );
+
+        // Check commands
+        this._settings.bind('use-custom-cmd', this._use_custom_cmd_switch,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('check-cmd-custom', this._field_checkcmd_custom,
+            'text', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('use-custom-cmd', this._field_checkcmd_custom,
+            'sensitive', Gio.SettingsBindFlags.DEFAULT
+        );
+
+        // Reset button
+        this._reset_button.connect('clicked', () => {
+            // restore default settings for the relevant keys
+            let keys = [
+                'terminal',
+                'output-on-terminal',
+                'update-cmd',
+                'update-cmd-options',
+                'use-custom-cmd',
+                'check-cmd-custom',
+            ];
+            keys.forEach(val => {
+                this._settings.set_value(val, this._settings.get_default_value(val));
+            });
+            // This one needs to be refreshed manually
+            this._update_cmd_options.set_active(settings.get_enum('update-cmd-options'));
+        });
+    }
+});
+
+const DebianUpdatesPackagesStatusPrefsPage = GObject.registerClass({
+    GTypeName: 'DebianUpdatesPackagesStatusPrefsPage',
+    Template: import.meta.url.replace('prefs.js', 'ui/prefs_packages_status_adw1.ui'),
+    InternalChildren: ['new_packages_switch', 'obsolete_packages_switch', 'residual_packages_switch',
+        'autoremovable_packages_switch'],
+}, class DebianUpdatesPackagesStatusPrefsPage extends Adw.PreferencesPage {
+    constructor(settings, params = {}) {
+        super(params);
+
+        this._settings = settings;
+
+        // Package status tab:
+        this._settings.bind('new-packages', this._new_packages_switch,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('obsolete-packages', this._obsolete_packages_switch,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('residual-packages', this._residual_packages_switch,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('autoremovable-packages', this._autoremovable_packages_switch,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
+    }
+});
+
+const DebianUpdatesIgnoreListPrefsPage = GObject.registerClass({
+    GTypeName: 'DebianUpdatesIgnoreListPrefsPage',
+    Template: import.meta.url.replace('prefs.js', 'ui/prefs_ignore_list_adw1.ui'),
+    InternalChildren: ['ignore_list_group'],
+}, class DebianUpdatesIgnoreListPrefsPage extends Adw.PreferencesPage {
+    constructor(settings, params = {}) {
+        super(params);
+
+        this._settings = settings;
+
+        this._ignoreListGroup = this._ignore_list_group;
+        this._ignoreListBox = new IgnoreListBox(settings);
+        this._ignoreListGroup.add(this._ignoreListBox);
+    }
+});
 
 export default class DebianUpdatesPreferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
         let settings = this.getSettings();
 
-        let builder = Gtk.Builder.new();
-        builder.add_from_file(`${this.path}/${TEMPLATE_ADW}`);
-
-        let basicSettingsPage = builder.get_object('basic_settings_page');
+        let basicSettingsPage = new DebianUpdatesBasicPrefsPage(settings);
         window.add(basicSettingsPage);
-        let advancedSettingsPage = builder.get_object('advanced_settings_page');
+
+        let advancedSettingsPage = new DebianUpdatesAdvancedPrefsPage(settings);
         window.add(advancedSettingsPage);
-        let packagesStatusPage = builder.get_object('packages_status_page');
+
+        let packagesStatusPage = new DebianUpdatesPackagesStatusPrefsPage(settings);
         window.add(packagesStatusPage);
-        let ignoreListPage = builder.get_object('ignore_list_page');
+
+        let ignoreListPage = new DebianUpdatesIgnoreListPrefsPage(settings);
         window.add(ignoreListPage);
 
         window.search_enabled = true;
         window.set_default_size(580, 580);
-
-        bindPrefs(builder, settings);
-
-        let ignoreListGroup = builder.get_object('ignore_list_group');
-        let ignoreListBox = new IgnoreListBox(builder, settings);
-        ignoreListGroup.add(ignoreListBox);
     }
 }
 

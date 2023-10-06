@@ -225,18 +225,35 @@ class IgnoreListRow extends Adw.PreferencesRow {
     }
 });
 
+const NewItemRow = GObject.registerClass({
+    GTypeName: 'NewItemRow',
+}, class NewItemRow extends Adw.PreferencesRow {
+    constructor() {
+        super({
+            action_name: 'ignore-list.add'
+        });
+
+        let imageAdd = new Gtk.Image({
+            icon_name : 'list-add-symbolic',
+            pixel_size: 16,
+            margin_top: 12,
+            margin_bottom: 12,
+            margin_start: 12,
+            margin_end: 12
+        });
+        this.set_child(imageAdd);
+  }
+});
+
 export const IgnoreListBox = GObject.registerClass(
 class IgnoreListBox extends Gtk.ListBox {
-    constructor(builder, extensionSettings) {
+    constructor(extensionSettings) {
         super({
             selection_mode: Gtk.SelectionMode.NONE,
             css_classes: ['boxed-list'],
         });
 
-        let _builder = builder;
         this._extensionSettings = extensionSettings;
-
-        let NewItemRow = _builder.get_object('new_item_row');
 
         let _ignoreListModel = new IgnoreListModel(this._extensionSettings);
 
@@ -248,7 +265,7 @@ class IgnoreListBox extends Gtk.ListBox {
         this.connect('row-activated', (l, row) => row.edit());
         this.bind_model(listModel, item => {
             return item instanceof NewItem
-                ? NewItemRow
+                ? new NewItemRow
                 : new IgnoreListRow(item.string);
         });
 
