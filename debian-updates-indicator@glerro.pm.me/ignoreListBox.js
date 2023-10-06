@@ -24,11 +24,14 @@
  * SPDX-FileCopyrightText: 2023 Gianni Lerro <glerro@pm.me>
  */
 
-/* exported IgnoreListBox */
-
 'use strict';
 
-const {GLib, Gio, GObject, Gtk, Pango, Adw} = imports.gi;
+import Adw from 'gi://Adw';
+import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
+import GObject from 'gi://GObject';
+import Gtk from 'gi://Gtk';
+import Pango from 'gi://Pango';
 
 const NewItem = GObject.registerClass(
 class NewItem extends GObject.Object {
@@ -222,7 +225,7 @@ class IgnoreListRow extends Adw.PreferencesRow {
     }
 });
 
-var IgnoreListBox = GObject.registerClass(
+export const IgnoreListBox = GObject.registerClass(
 class IgnoreListBox extends Gtk.ListBox {
     constructor(builder, extensionSettings) {
         super({

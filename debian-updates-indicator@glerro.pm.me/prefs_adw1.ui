@@ -212,9 +212,10 @@
     <child>
       <object class="AdwPreferencesGroup" id="shortcut_group">
         <child>
-          <object class="AdwActionRow" id="shortcut_row">
+          <object class="AdwActionRow">
             <property name="title" translatable="yes">Shortcut to open the indicator</property>
             <property name="subtitle" translatable="yes"><![CDATA[Syntax: <Shift>, <Ctrl>, <Alt>, <Super>]]></property>
+            <property name="use-markup">false</property>
             <property name="activatable-widget">use_shortcut</property>
             <child>
               <object class="GtkEntry" id="shortcut_entry">

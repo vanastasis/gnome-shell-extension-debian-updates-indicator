@@ -29,401 +29,20 @@
  * SPDX-FileCopyrightText: 2023 Gianni Lerro <glerro@pm.me>
  */
 
-/* exported init, buildPrefsWidget, fillPreferencesWindow */
-
 'use strict';
 
-const Gettext = imports.gettext;
+import Adw from 'gi://Adw';
+import Gio from 'gi://Gio';
+import Gtk from 'gi://Gtk';
 
-const {Gio, Gtk} = imports.gi;
+import {ExtensionPreferences} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
+import {IgnoreListBox} from './ignoreListBox.js';
 
-const Domain = Gettext.domain(Me.metadata['gettext-domain']);
-const {
-    gettext: _,
-} = Domain;
-
-const TEMPLATE_GTK = 'prefs_gtk4.ui';
 const TEMPLATE_ADW = 'prefs_adw1.ui';
 
-let Adw = null;
-try {
-    Adw = imports.gi.Adw;
-} catch (e) { /* Do Nothing */ }
-
-const IgnoreListBox = Adw != null ? Me.imports.ignoreListBox.IgnoreListBox : null;
-
 /**
- * This function connect Dialogs Windows (GTK4 - GS < 42).
- *
- * @function connectDialogs
- * @param {Gtk.Builder} builder - Builder prefs widgets.
- * @param {Gtk.Notebook} notebook - Builder prefs notebook.
- * @returns {void}
- */
-function connectDialogs(builder, notebook) {
-    // Create dialog for the indicator settings
-    builder.get_object('indicator_button').connect('clicked', () => {
-        let dialog = new Gtk.Dialog({
-            title: _('Indicator options'),
-            transient_for: notebook.get_root(),
-            use_header_bar: true,
-            modal: true,
-        });
-
-        let subBox = builder.get_object('indicator_dialog');
-        dialog.get_content_area().append(subBox);
-
-        dialog.connect('response', () => {
-            // remove the settings box so it doesn't get destroyed;
-            dialog.get_content_area().remove(subBox);
-            dialog.destroy();
-        });
-
-        dialog.show();
-    });
-
-    // Create dialog for the notification settings
-    builder.get_object('notifications_button').connect('clicked', () => {
-        let dialog = new Gtk.Dialog({
-            title: _('Notification options'),
-            transient_for: notebook.get_root(),
-            use_header_bar: true,
-            modal: true,
-        });
-
-        let subBox = builder.get_object('notifications_dialog');
-        dialog.get_content_area().append(subBox);
-
-        dialog.connect('response', () => {
-            // remove the settings box so it doesn't get destroyed;
-            dialog.get_content_area().remove(subBox);
-            dialog.destroy();
-        });
-
-        dialog.show();
-    });
-
-    // Create dialog for custom command for updating
-    builder.get_object('update_cmd_button').connect('clicked', () => {
-        let dialog = new Gtk.Dialog({
-            title: _('Custom command for updates'),
-            transient_for: notebook.get_root(),
-            use_header_bar: true,
-            modal: true,
-        });
-
-        let subBox = builder.get_object('custom_command_dialog');
-        dialog.get_content_area().append(subBox);
-
-        dialog.connect('response', () => {
-            // remove the settings box so it doesn't get destroyed;
-            dialog.get_content_area().remove(subBox);
-            dialog.destroy();
-        });
-
-        dialog.show();
-    });
-}
-
-/**
- * This function setup IgnoreList (GTK4 - GS < 42).
- *
- * @function setupIgnoreList
- * @param {Gtk.Builder} builder - Builder prefs widgets.
- * @param {Gtk.Notebook} notebook - Builder prefs notebook.
- * @param {Gio.Settings} settings - Extension settings.
- * @returns {void}
- */
-function setupIgnoreList(builder, notebook, settings) {
-    // Ignore list tab:
-    // Set up the List of packages
-    let column = new Gtk.TreeViewColumn();
-    column.set_title(_('Package name'));
-    builder.get_object('ignore_list_treeview').append_column(column);
-
-    let renderer = new Gtk.CellRendererText();
-    column.pack_start(renderer, null);
-
-    column.set_cell_data_func(renderer, (_column, cell, model, iter) => {
-        cell.markup = model.get_value(iter, 0);
-    });
-
-    let listStore = builder.get_object('ignore_list_store');
-    let treeView  = builder.get_object('ignore_list_treeview');
-    refreshUI(listStore, treeView, settings);
-    settings.connect(
-        'changed::ignore-list',
-        () => {
-            refreshUI(listStore, treeView, settings);
-        }
-    );
-
-    builder.get_object('treeview_selection').connect(
-        'changed',
-        (selection, liststore) => {
-            selectionChanged(selection, liststore);
-        }
-    );
-
-    // Toolbar
-    builder.get_object('ignore_list_toolbutton_add').connect(
-        'clicked',
-        () => {
-            let dialog = new Gtk.Dialog({
-                title: _('Add entry to ignore list'),
-                transient_for: notebook.get_root(),
-                use_header_bar: true,
-                modal: true,
-            });
-
-            let subBox = builder.get_object('ignore_list_add_dialog');
-            dialog.get_content_area().append(subBox);
-
-            // Objects
-            let entry = builder.get_object('ignore_list_add_entry');
-            let saveButton = builder.get_object('ignore_list_add_button_save');
-            let cancelButton = builder.get_object('ignore_list_add_button_cancel');
-
-            // Clean the entry in case it was already used
-            entry.set_text('');
-            entry.connect('icon-release', () => {
-                entry.set_text('');
-            });
-
-            let saveButtonId = saveButton.connect(
-                'clicked',
-                () => {
-                    let name = entry.get_text();
-                    let entries = settings.get_strv('ignore-list');
-                    entries.push(name);
-
-                    // Order alphabetically and remove duplicates
-                    entries.sort();
-                    entries = entries.filter((item, pos, ary) => {
-                        return !pos || item !== ary[pos - 1];
-                    });
-
-                    settings.set_strv('ignore-list', entries);
-
-                    close();
-                }
-            );
-
-            let cancelButtonId = cancelButton.connect(
-                'clicked',
-                close
-            );
-
-            dialog.connect('response', () => {
-                close();
-            });
-
-            dialog.show();
-
-            /**
-             * Add Entry Dialog - Close function.
-             *
-             * @function close
-             */
-            function close() {
-                builder.get_object('ignore_list_add_button_save').disconnect(saveButtonId);
-                builder.get_object('ignore_list_add_button_cancel').disconnect(cancelButtonId);
-
-                // remove the settings box so it doesn't get destroyed
-                dialog.get_content_area().remove(subBox);
-                dialog.destroy();
-            }
-        }
-    );
-
-    builder.get_object('ignore_list_toolbutton_remove').connect(
-        'clicked',
-        () => {
-            removeEntry(settings);
-        }
-    );
-
-    builder.get_object('ignore_list_toolbutton_edit').connect(
-        'clicked',
-        () => {
-            if (selectedEntry < 0)
-                return;
-
-            let dialog = new Gtk.Dialog({
-                title: _('Edit entry'),
-                transient_for: notebook.get_root(),
-                use_header_bar: true,
-                modal: true,
-            });
-
-            let subBox = builder.get_object('ignore_list_edit_dialog');
-            dialog.get_content_area().append(subBox);
-
-            // Objects
-            let entries = settings.get_strv('ignore-list');
-            if (!entries.length)
-                return;
-
-            let entry = builder.get_object('ignore_list_edit_entry');
-            let saveButton = builder.get_object('ignore_list_edit_button_save');
-            let cancelButton = builder.get_object('ignore_list_edit_button_cancel');
-
-            // Clean the entry in case it was already used
-            entry.set_text(entries[selectedEntry]);
-            entry.connect('icon-release', () => {
-                entry.set_text('');
-            });
-
-            let saveButtonId = saveButton.connect(
-                'clicked',
-                () => {
-                    let name = entry.get_text();
-                    entries = settings.get_strv('ignore-list');
-                    entries.push(name);
-
-                    // Order alphabetically and remove duplicates
-                    entries.splice(selectedEntry, 1);
-                    entries.sort();
-                    entries = entries.filter((item, pos, ary) => {
-                        return !pos || item !== ary[pos - 1];
-                    });
-
-                    settings.set_strv('ignore-list', entries);
-
-                    close();
-                }
-            );
-
-            let cancelButtonId = cancelButton.connect(
-                'clicked',
-                close
-            );
-
-            dialog.connect('response', () => {
-                close();
-            });
-
-            dialog.show();
-
-            /**
-             * Edit Entry Dialog - Close function.
-             *
-             * @function close
-             */
-            function close() {
-                builder.get_object('ignore_list_edit_button_save').disconnect(saveButtonId);
-                builder.get_object('ignore_list_edit_button_cancel').disconnect(cancelButtonId);
-
-                // remove the settings box so it doesn't get destroyed
-                dialog.get_content_area().remove(subBox);
-                dialog.destroy();
-            }
-        }
-    );
-}
-
-let selectedEntry = 0;
-
-/**
- * This function is executed when Selection Changed IgnoreList (GTK4 - GS < 42).
- *
- * @function selectionChanged
- * @param {Gtk.Treeselection} selection - Selected Entry.
- * @param {Gtk.ListStore} liststore - Ignore Entry List.
- * @returns {void}
- */
-function selectionChanged(selection, liststore) {
-    let a = selection.get_selected_rows(liststore)[0][0];
-
-    if (a !== undefined)
-        selectedEntry = parseInt(a.to_string());
-}
-
-/**
- * This function remove Entry from IgnoreList (GTK4 - GS < 42).
- *
- * @function removeEntry
- * @param {Gio.Settings} settings - Extension settings.
- * @returns {void}
- */
-function removeEntry(settings) {
-    let entries = settings.get_strv('ignore-list');
-
-    if (!entries.length || selectedEntry < 0)
-        return 0;
-
-    if (entries.length > 0)
-        entries.splice(selectedEntry, 1);
-
-    settings.set_strv('ignore-list', entries);
-
-    return 0;
-}
-
-let list = null;
-
-/**
- * This function Refresh IgnoreList (GTK4 - GS < 42).
- *
- * @function refreshUI
- * @param {Gtk.ListStore} listStore - Ignore Entry List.
- * @param {Gtk.TreeView} treeView - Widget that visualize Ignore Entries List.
- * @param {Gio.Settings} settings - Extension Settings.
- * @returns {void}
- */
-function refreshUI(listStore, treeView, settings) {
-    let restoreForced = selectedEntry;
-    let entries = settings.get_strv('ignore-list');
-
-    if (list !== entries) {
-        if (listStore !== undefined)
-            listStore.clear();
-
-        if (entries.length > 0) {
-            if (entries && typeof entries == 'string')
-                entries = [entries];
-
-            let current = listStore.get_iter_first();
-
-            for (let i in entries) {
-                current = listStore.append();
-                listStore.set_value(current, 0, entries[i]);
-            }
-        }
-
-        list = entries;
-    }
-
-    selectedEntry = restoreForced;
-    changeSelection(treeView, entries);
-}
-
-/**
- * This Change the selected Entry row (GTK4 - GS < 42).
- *
- * @function changeSelection
- * @param {Gtk.TreeView} treeview - Widget that visualize Ignore Entries List.
- * @param {Gtk.Builder} entries - Array of Entries.
- * @returns {void}
- */
-function changeSelection(treeview, entries) {
-    if (selectedEntry < 0 || !entries.length)
-        return;
-
-    let max = entries.length - 1;
-    if (selectedEntry > max)
-        selectedEntry = max;
-
-    let path = selectedEntry;
-    path = Gtk.TreePath.new_from_string(String(path));
-    treeview.get_selection().select_path(path);
-}
-
-/**
- * This function setup Preferences binding (GTK4 - ADW1).
+ * This function setup Preferences binding.
  *
  * @function bindPrefs
  * @param {Gtk.Builder} builder - Builder prefs widgets.
@@ -485,7 +104,7 @@ function bindPrefs(builder, settings) {
     );
     settings.bind('verbosity',
         builder.get_object('verbosity'),
-        Adw != null ? 'selected' : 'active',
+        'selected',
         Gio.SettingsBindFlags.DEFAULT
     );
     settings.bind('notify',
@@ -529,13 +148,13 @@ function bindPrefs(builder, settings) {
     builder.get_object('update_cmd_options').set_active(settings.get_enum('update-cmd-options'));
 
     if (settings.get_enum('update-cmd-options') !== 4)
-        builder.get_object('update_cmd_button')[Adw != null ? 'set_enable_expansion' : 'set_sensitive'](false);
+        builder.get_object('update_cmd_button').set_enable_expansion(false);
 
     settings.connect('changed::update-cmd-options', () => {
         if (settings.get_enum('update-cmd-options') === 4)
-            builder.get_object('update_cmd_button')[Adw != null ? 'set_enable_expansion' : 'set_sensitive'](true);
+            builder.get_object('update_cmd_button').set_enable_expansion(true);
         else
-            builder.get_object('update_cmd_button')[Adw != null ? 'set_enable_expansion' : 'set_sensitive'](false);
+            builder.get_object('update_cmd_button').set_enable_expansion(false);
     });
 
     // Custom command for updating
@@ -620,7 +239,7 @@ function bindPrefs(builder, settings) {
 }
 
 /**
- * This function set Shortcut (GTK4 - ADW1).
+ * This function set Shortcut.
  *
  * @function setShortcut
  * @param {Gio.Settings} settings - Extrension Settings.
@@ -640,55 +259,12 @@ function setShortcut(settings) {
     }
 }
 
-/**
- * This function is called once when the Preferencs Windows is loaded.
- *
- * @function init
- */
-function init() {
-    ExtensionUtils.initTranslations();
-}
-
-/**
- * This function build the Preferencs Windows for Gnome Shell < 42
- *
- * @function buildPrefsWidget
- * @returns {Gtk.Widget} - the prefs widget
- */
-function buildPrefsWidget() {
-    const settings = ExtensionUtils.getSettings();
-
-    // Prepare labels and controls
-    let builder = new Gtk.Builder();
-    builder.add_from_file(`${Me.dir.get_path()}/${TEMPLATE_GTK}`);
-    let notebook = builder.get_object('prefs_widget');
-
-    connectDialogs(builder, notebook);
-    setupIgnoreList(builder, notebook, settings);
-    bindPrefs(builder, settings);
-
-    return notebook;
-}
-
-/**
- * This function build Preferences Window {Adw.PreferencesWindow} and have higher priority to builPrefsWidget().
- * Work with Gnome Shell >= 42
- *
- * @function fillPreferencesWindow
- * @param {Adw.PreferencesWindow} window - the prefs window.
- * @returns {void}
- */
-function fillPreferencesWindow(window) {
-    if (Adw) {
-        const settings = ExtensionUtils.getSettings();
+export default class DebianUpdatesPreferences extends ExtensionPreferences {
+    fillPreferencesWindow(window) {
+        let settings = this.getSettings();
 
         let builder = Gtk.Builder.new();
-        builder.add_from_file(`${Me.dir.get_path()}/${TEMPLATE_ADW}`);
-
-        if (Adw.get_minor_version() >= 2) {
-            let shortcutRow = builder.get_object('shortcut_row');
-            shortcutRow.set_use_markup(false);
-        }
+        builder.add_from_file(`${this.path}/${TEMPLATE_ADW}`);
 
         let basicSettingsPage = builder.get_object('basic_settings_page');
         window.add(basicSettingsPage);
