@@ -75,25 +75,15 @@
     <child>
       <object class="AdwPreferencesGroup" id="updates_menu_group">
         <child>
-          <object class="AdwActionRow">
+          <object class="AdwSwitchRow" id="strip_versions_switch">
             <property name="title" translatable="yes">Strip out version numbers</property>
             <property name="activatable-widget">strip_versions_switch</property>
-            <child>
-              <object class="GtkSwitch" id="strip_versions_switch">
-                <property name="valign">center</property>
-              </object>
-            </child>
           </object>
         </child>
         <child>
-          <object class="AdwActionRow">
+          <object class="AdwSwitchRow" id="urgent_updates_switch">
             <property name="title" translatable="yes">Highlight security/important updates</property>
             <property name="activatable-widget">urgent_updates_switch</property>
-            <child>
-              <object class="GtkSwitch" id="urgent_updates_switch">
-                <property name="valign">center</property>
-              </object>
-            </child>
           </object>
         </child>
       </object>
@@ -104,27 +94,15 @@
           <object class="AdwExpanderRow">
             <property name="title" translatable="yes">Indicator</property>
             <child>
-              <object class="AdwActionRow">
+              <object class="AdwSwitchRow" id="always_visible">
                 <property name="title" translatable="yes">Always show the indicator</property>
                 <property name="activatable-widget">always_visible</property>
-                <child>
-                  <object class="GtkSwitch" id="always_visible">
-                    <property name="valign">center</property>
-                    <property name="halign">end</property>
-                  </object>
-                </child>
               </object>
             </child>
             <child>
-              <object class="AdwActionRow">
+              <object class="AdwSwitchRow" id="show_count">
                 <property name="title" translatable="yes">Show updates count on the indicator</property>
                 <property name="activatable-widget">show_count</property>
-                <child>
-                  <object class="GtkSwitch" id="show_count">
-                    <property name="valign">center</property>
-                    <property name="halign">end</property>
-                  </object>
-                </child>
               </object>
             </child>
             <child>
@@ -152,27 +130,15 @@
           <object class="AdwExpanderRow">
             <property name="title" translatable="yes">Notifications</property>
             <child>
-              <object class="AdwActionRow">
+              <object class="AdwSwitchRow" id="notifications">
                 <property name="title" translatable="yes">Send a notification when new updates are available</property>
                 <property name="activatable-widget">notifications</property>
-                <child>
-                  <object class="GtkSwitch" id="notifications">
-                    <property name="valign">center</property>
-                    <property name="halign">end</property>
-                  </object>
-                </child>
               </object>
             </child>
             <child>
-              <object class="AdwActionRow">
+              <object class="AdwSwitchRow" id="transient_notifications">
                 <property name="title" translatable="yes">Use transient notifications (auto dismiss)</property>
                 <property name="activatable-widget">transient_notifications</property>
-                <child>
-                  <object class="GtkSwitch" id="transient_notifications">
-                    <property name="valign">center</property>
-                    <property name="halign">end</property>
-                  </object>
-                </child>
               </object>
             </child>
             <child>

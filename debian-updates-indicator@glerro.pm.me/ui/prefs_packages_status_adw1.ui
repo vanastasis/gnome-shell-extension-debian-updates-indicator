@@ -28,55 +28,31 @@
   <template class="DebianUpdatesPackagesStatusPrefsPage" parent="AdwPreferencesPage">
     <property name="name">packages_status_page</property>
     <property name="title" translatable="yes">Packages</property>
-    <property name="icon-name">folder-symbolic</property>
+    <property name="icon-name">package-x-generic-symbolic</property>
     <child>
       <object class="AdwPreferencesGroup" id="new_packages_group">
         <child>
-          <object class="AdwActionRow">
+          <object class="AdwSwitchRow"  id="new_packages_switch">
             <property name="title" translatable="yes">New packages in repository</property>
             <property name="subtitle" translatable="yes">Include an item in the indicator with a list of new packages in the repository.</property>
-            <property name="activatable-widget">new_packages_switch</property>
-            <child>
-              <object class="GtkSwitch" id="new_packages_switch">
-                <property name="valign">center</property>
-              </object>
-            </child>
           </object>
         </child>
         <child>
-          <object class="AdwActionRow">
+          <object class="AdwSwitchRow" id="obsolete_packages_switch">
             <property name="title" translatable="yes">Local/Obsolete packages</property>
             <property name="subtitle" translatable="yes">Include an item in the indicator with a list of obsolete or local packages. Obsolete packages are not available in the repository. Local packages are available, but an unavailable version is installed.</property>
-            <property name="activatable-widget">obsolete_packages_switch</property>
-            <child>
-              <object class="GtkSwitch" id="obsolete_packages_switch">
-                <property name="valign">center</property>
-              </object>
-            </child>
           </object>
         </child>
         <child>
-          <object class="AdwActionRow">
+          <object class="AdwSwitchRow"  id="residual_packages_switch">
             <property name="title" translatable="yes">Residual packages</property>
             <property name="subtitle" translatable="yes">Include an item in the indicator with a list of packages that have residual config files. Run &quot;sudo apt purge pkgname&quot; to clean them.</property>
-            <property name="activatable-widget">residual_packages_switch</property>
-            <child>
-              <object class="GtkSwitch" id="residual_packages_switch">
-                <property name="valign">center</property>
-              </object>
-            </child>
           </object>
         </child>
         <child>
-          <object class="AdwActionRow">
+          <object class="AdwSwitchRow" id="autoremovable_packages_switch">
             <property name="title" translatable="yes">Autoremovable packages</property>
             <property name="subtitle" translatable="yes">Include an item in the indicator with a list of autoremovable packages. Run &quot;sudo apt autoremove&quot; to remove them.</property>
-            <property name="activatable-widget">autoremovable_packages_switch</property>
-            <child>
-              <object class="GtkSwitch" id="autoremovable_packages_switch">
-                <property name="valign">center</property>
-              </object>
-            </child>
           </object>
         </child>
       </object>
