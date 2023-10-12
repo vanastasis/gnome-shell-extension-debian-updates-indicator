@@ -36,9 +36,13 @@
             <property name="title" translatable="yes">Reset values for all commands</property>
             <child>
               <object class="GtkButton" id="reset_button">
-                <property name="label" translatable="1">Reset</property>
-                <property name="receives_default">1</property>
-                <property name="halign">end</property>
+                <property name="child">
+                  <object class="AdwButtonContent">
+                    <property name="icon-name">view-refresh-symbolic</property>
+                    <property name="label" translatable="yes">Reset</property>
+                  </object>
+                </property>
+                <property name="receives_default">true</property>
                 <property name="valign">center</property>
                 <style>
                   <class name="destructive-action"/>
