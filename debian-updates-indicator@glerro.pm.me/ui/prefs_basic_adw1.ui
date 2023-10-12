@@ -70,13 +70,11 @@
         <child>
           <object class="AdwSwitchRow" id="strip_versions_switch">
             <property name="title" translatable="yes">Strip out version numbers</property>
-            <property name="activatable-widget">strip_versions_switch</property>
           </object>
         </child>
         <child>
           <object class="AdwSwitchRow" id="urgent_updates_switch">
             <property name="title" translatable="yes">Highlight security/important updates</property>
-            <property name="activatable-widget">urgent_updates_switch</property>
           </object>
         </child>
       </object>
@@ -89,13 +87,11 @@
             <child>
               <object class="AdwSwitchRow" id="always_visible">
                 <property name="title" translatable="yes">Always show the indicator</property>
-                <property name="activatable-widget">always_visible</property>
               </object>
             </child>
             <child>
               <object class="AdwSwitchRow" id="show_count">
                 <property name="title" translatable="yes">Show updates count on the indicator</property>
-                <property name="activatable-widget">show_count</property>
               </object>
             </child>
             <child>
@@ -127,13 +123,11 @@
             <child>
               <object class="AdwSwitchRow" id="notifications">
                 <property name="title" translatable="yes">Send a notification when new updates are available</property>
-                <property name="activatable-widget">notifications</property>
               </object>
             </child>
             <child>
               <object class="AdwSwitchRow" id="transient_notifications">
                 <property name="title" translatable="yes">Use transient notifications (auto dismiss)</property>
-                <property name="activatable-widget">transient_notifications</property>
               </object>
             </child>
             <child>

@@ -84,7 +84,6 @@
             <child>
               <object class="AdwSwitchRow" id="output_on_terminal_switch">
                 <property name="title" translatable="yes">Show output on terminal</property>
-                <property name="activatable-widget">output_on_terminal_switch</property>
               </object>
             </child>
             <child>
@@ -103,7 +102,6 @@
           <object class="AdwSwitchRow" id="use_custom_cmd_switch">
             <property name="title" translatable="yes">Use a custom command to check for updates</property>
             <property name="subtitle" translatable="yes">The default command is &quot;pkcon refresh&quot;, which uses packagekit with the apt backend. You can define a custom command below, to be executed using pkexec.</property>
-            <property name="activatable-widget">use_custom_cmd_switch</property>
           </object>
         </child>
         <child>
