@@ -72,15 +72,10 @@
               </object>
             </child>
             <child>
-                <object class="AdwActionRow">
-                    <property name="title" translatable="yes">Command to update packages &lt;span size=&quot;small&quot;&gt;(You can use sudo instead of pkexec for the terminal)&lt;/span&gt;</property>
-                    <child>
-                      <object class="GtkEntry" id="field_updatecmd">
-                            <property name="width-chars">18</property>
-                            <property name="valign">center</property>
-                      </object>
-                    </child>
-                </object>
+              <object class="AdwEntryRow" id="field_updatecmd">
+                <property name="title" translatable="yes">Command to update packages &lt;span size=&quot;small&quot;&gt;(You can use sudo instead of pkexec for the terminal)&lt;/span&gt;</property>
+                <property name="show-apply-button">true</property>
+              </object>
             </child>
             <child>
               <object class="AdwSwitchRow" id="output_on_terminal_switch">
@@ -89,15 +84,10 @@
               </object>
             </child>
             <child>
-                <object class="AdwActionRow">
-                    <property name="title" translatable="yes">Terminal to use &lt;span size=&quot;small&quot;&gt;(Ex: xterm -e)&lt;/span&gt;</property>
-                    <child>
-                      <object class="GtkEntry" id="terminal_entry">
-                            <property name="width-chars">18</property>
-                            <property name="valign">center</property>
-                      </object>
-                    </child>
-                </object>
+              <object class="AdwEntryRow" id="terminal_entry">
+                <property name="title" translatable="yes">Terminal to use &lt;span size=&quot;small&quot;&gt;(Ex: xterm -e)&lt;/span&gt;</property>
+                <property name="show-apply-button">true</property>
+              </object>
             </child>
           </object>
         </child>
@@ -113,14 +103,9 @@
           </object>
         </child>
         <child>
-          <object class="AdwActionRow">
+          <object class="AdwEntryRow" id="field_checkcmd_custom">
             <property name="title" translatable="yes">Custom command to check for updates</property>
-            <child>
-              <object class="GtkEntry" id="field_checkcmd_custom">
-                <property name="width-chars">18</property>
-                <property name="valign">center</property>
-              </object>
-            </child>
+            <property name="show-apply-button">true</property>
           </object>
         </child>
       </object>
