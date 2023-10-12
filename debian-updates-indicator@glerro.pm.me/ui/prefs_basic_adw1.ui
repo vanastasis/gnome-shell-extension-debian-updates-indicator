@@ -25,19 +25,6 @@
  * SPDX-FileCopyrightText: 2023 Gianni Lerro <glerro@pm.me>
 -->
 <interface domain="gnome-shell-extension-debian-updates-indicator">
-
-  <object class="GtkAdjustment" id="Adjust_interval">
-    <property name="lower">0</property>
-    <property name="upper">99</property>
-    <property name="step_increment">1</property>
-  </object>
-
-  <object class="GtkAdjustment" id="Adjust_expand_list">
-    <property name="lower">0</property>
-    <property name="upper">500</property>
-    <property name="step_increment">1</property>
-  </object>
-
   <template class="DebianUpdatesBasicPrefsPage" parent="AdwPreferencesPage">
     <property name="name">basic-settings-page</property>
     <property name="title" translatable="yes">Basic</property>
@@ -45,19 +32,21 @@
     <child>
       <object class="AdwPreferencesGroup" id="check_updates_group">
         <child>
-          <object class="AdwActionRow">
+          <object class="AdwSpinRow" id="interval">
             <property name="title" translatable="yes">Check for updates every:</property>
             <property name="subtitle" translatable="yes">Automatic checks, 0 to disable</property>
-            <property name="activatable-widget">interval</property>
-            <child>
-              <object class="GtkSpinButton" id="interval">
-                <property name="halign">end</property>
-                <property name="valign">center</property>
-                <property name="adjustment">Adjust_interval</property>
-                <property name="numeric">1</property>
-                <property name="update-policy">if-valid</property>
+            <!-- <property name="activatable-widget">interval</property> -->
+            <property name="numeric">true</property>
+            <property name="update-policy">if-valid</property>
+            <property name="adjustment">
+              <object class="GtkAdjustment">
+                <property name="lower">0</property>
+                <property name="upper">99</property>
+                <property name="value">0</property>
+                <property name="step_increment">1</property>
+                <property name="page-increment">10</property>
               </object>
-            </child>
+            </property>
             <child>
               <object class="GtkComboBoxText" id="interval_unit_combo">
                 <property name="valign">center</property>
@@ -106,18 +95,20 @@
               </object>
             </child>
             <child>
-              <object class="AdwActionRow">
+              <object class="AdwSpinRow" id="auto_expand_list">
                 <property name="title" translatable="yes">Auto-expand updates list</property>
                 <property name="subtitle" translatable="yes">If updates count is less than this number (0 to disable)</property>
-                <property name="activatable-widget">auto_expand_list</property>
-                <child>
-                  <object class="GtkSpinButton" id="auto_expand_list">
-                    <property name="visible">1</property>
-                    <property name="adjustment">Adjust_expand_list</property>
-                    <property name="halign">end</property>
-                    <property name="valign">center</property>
+                <property name="numeric">true</property>
+                <property name="update-policy">if-valid</property>
+                <property name="adjustment">
+                  <object class="GtkAdjustment">
+                    <property name="lower">0</property>
+                    <property name="upper">500</property>
+                    <property name="value">0</property>
+                    <property name="step_increment">1</property>
+                    <property name="page-increment">10</property>
                   </object>
-                </child>
+                </property>
               </object>
             </child>
           </object>
