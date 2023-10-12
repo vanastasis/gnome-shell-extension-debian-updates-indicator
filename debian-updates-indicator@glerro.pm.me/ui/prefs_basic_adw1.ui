@@ -35,7 +35,7 @@
           <object class="AdwSpinRow" id="interval">
             <property name="title" translatable="yes">Check for updates every:</property>
             <property name="subtitle" translatable="yes">Automatic checks, 0 to disable</property>
-            <!-- <property name="activatable-widget">interval</property> -->
+            <property name="activatable-widget">interval_unit</property>
             <property name="numeric">true</property>
             <property name="update-policy">if-valid</property>
             <property name="adjustment">
@@ -48,13 +48,17 @@
               </object>
             </property>
             <child>
-              <object class="GtkComboBoxText" id="interval_unit_combo">
+              <object class="GtkDropDown" id="interval_unit">
                 <property name="valign">center</property>
-                  <items>
-                    <item translatable="yes" id="0">Hours</item>
-                    <item translatable="yes" id="1">Days</item>
-                    <item translatable="yes" id="2">Weeks</item>
-                  </items>
+                <property name="model">
+                  <object class="GtkStringList">
+                    <items>
+                      <item translatable="yes">Hours</item>
+                      <item translatable="yes">Days</item>
+                      <item translatable="yes">Weeks</item>
+                    </items>
+                  </object>
+                </property>
               </object>
             </child>
           </object>

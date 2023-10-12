@@ -56,15 +56,19 @@
             <property name="title" translatable="yes">Update method</property>
             <property name="subtitle" translatable="yes">Method to use to apply the updates.</property>
             <child type="action">
-              <object class="GtkComboBoxText" id="update_cmd_options">
+              <object class="GtkDropDown" id="update_cmd_options">
                 <property name="valign">center</property>
-                  <items>
-                    <item translatable="yes">Launch Gnome Software</item>
-                    <item translatable="yes">Launch Synaptic Package Manager</item>
-                    <item translatable="yes">Launch Gnome PackageKit Update Viewer</item>
-                    <item translatable="yes">Launch Ubuntu Update Manager</item>
-                    <item translatable="yes">Custom</item>
-                  </items>
+                <property name="model">
+                  <object class="GtkStringList">
+                    <items>
+                      <item translatable="yes">Launch Gnome Software</item>
+                      <item translatable="yes">Launch Synaptic Package Manager</item>
+                      <item translatable="yes">Launch Gnome PackageKit Update Viewer</item>
+                      <item translatable="yes">Launch Ubuntu Update Manager</item>
+                      <item translatable="yes">Custom</item>
+                    </items>
+                  </object>
+                </property>
               </object>
             </child>
             <child>

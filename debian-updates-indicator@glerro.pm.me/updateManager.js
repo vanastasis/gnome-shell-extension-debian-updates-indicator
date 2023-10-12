@@ -117,7 +117,7 @@ export const UpdateManager = class UpdateManager {
     }
 
     _updateCMD() {
-        let option = this._extensionSettings.get_enum('update-cmd-options');
+        let option = this._extensionSettings.get_int('update-cmd-options');
         if (option === 1) {
             // Synaptic package manager
             UPDATE_CMD = '/usr/bin/synaptic-pkexec';
@@ -160,7 +160,7 @@ export const UpdateManager = class UpdateManager {
             GLib.source_remove(this._TimeoutId);
 
         // Interval in hours from settings, convert to seconds
-        let unit = this._extensionSettings.get_enum('interval-unit');
+        let unit = this._extensionSettings.get_int('interval-unit');
         let conversion = 0;
 
         switch (unit) {

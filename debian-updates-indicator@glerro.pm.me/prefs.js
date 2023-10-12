@@ -43,7 +43,7 @@ import {IgnoreListBox} from './ignoreListBox.js';
 const DebianUpdatesBasicPrefsPage = GObject.registerClass({
     GTypeName: 'DebianUpdatesBasicPrefsPage',
     Template: import.meta.url.replace('prefs.js', 'ui/prefs_basic_adw1.ui'),
-    InternalChildren: ['check_updates_group', 'interval', 'interval_unit_combo', 'updates_menu_group',
+    InternalChildren: ['check_updates_group', 'interval', 'interval_unit', 'updates_menu_group',
          'strip_versions_switch', 'urgent_updates_switch', 'indicator_group', 'always_visible',
          'show_count', 'auto_expand_list', 'notifications_group', 'notifications', 'transient_notifications',
          'verbosity', 'shortcut_group', 'shortcut_entry', 'use_shortcut'],
@@ -66,10 +66,9 @@ const DebianUpdatesBasicPrefsPage = GObject.registerClass({
         );
 
         // Hours, days or weeks
-        this._interval_unit_combo.connect('changed', widget => {
-            this._settings.set_enum('interval-unit', widget.get_active());
-        });
-        this._interval_unit_combo.set_active(this._settings.get_enum('interval-unit'));
+        settings.bind('interval-unit', this._interval_unit,
+            'selected', Gio.SettingsBindFlags.DEFAULT
+        );
 
         // Indicator settings
         this._settings.bind('always-visible', this._always_visible,
@@ -151,17 +150,15 @@ const DebianUpdatesAdvancedPrefsPage = GObject.registerClass({
 
         // Advanced settings tab:
         // Update method
-        this._update_cmd_options.connect('changed', widget => {
-            this._settings.set_enum('update-cmd-options', widget.get_active());
-        });
+        settings.bind('update-cmd-options', this._update_cmd_options,
+            'selected', Gio.SettingsBindFlags.DEFAULT
+        );
 
-        this._update_cmd_options.set_active(this._settings.get_enum('update-cmd-options'));
-
-        if (this._settings.get_enum('update-cmd-options') !== 4)
+        if (this._settings.get_int('update-cmd-options') !== 4)
             this._update_cmd_button.set_enable_expansion(false);
 
         this._settings.connect('changed::update-cmd-options', () => {
-            if (this._settings.get_enum('update-cmd-options') === 4)
+            if (this._settings.get_int('update-cmd-options') === 4)
                 this._update_cmd_button.set_enable_expansion(true);
             else
                 this._update_cmd_button.set_enable_expansion(false);
@@ -223,7 +220,6 @@ const DebianUpdatesPackagesStatusPrefsPage = GObject.registerClass({
 
         this._settings = settings;
 
-        // Package status tab:
         this._settings.bind('new-packages', this._new_packages_switch,
             'active', Gio.SettingsBindFlags.DEFAULT
         );
