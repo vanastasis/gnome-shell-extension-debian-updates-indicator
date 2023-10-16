@@ -48,9 +48,9 @@ import * as Utils from './utils.js';
 
 /* For error checking */
 export const STATUS = {
-    UNKNOWN:      -1,
-    ERROR:        -2,
-    NO_INTERNET:  -3,
+    UNKNOWN: -1,
+    ERROR: -2,
+    NO_INTERNET: -3,
     INITIALIZING: -4,
 };
 
@@ -60,10 +60,10 @@ let UPDATES_LIST    = [];
 
 /* Various packages statuses */
 export const SCRIPT = {
-    UPGRADES:      0,
-    NEW:           1,
-    OBSOLETE:      2,
-    RESIDUAL:      3,
+    UPGRADES: 0,
+    NEW: 1,
+    OBSOLETE: 2,
+    RESIDUAL: 3,
     AUTOREMOVABLE: 4,
 };
 
