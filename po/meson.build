@@ -8,6 +8,7 @@ i18n.gettext(
     args: [
         '--no-wrap',
         '--width=120',
+        '--keyword=n_:1,2',
         '--package-version=' + meson.project_version(),
         '--add-comments=Translators',
         '--copyright-holder=2023 Gianni Lerro {glerro} ~ <glerro@pm.me>',

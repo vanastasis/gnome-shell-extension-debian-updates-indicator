@@ -65,10 +65,10 @@
                 <property name="model">
                   <object class="GtkStringList">
                     <items>
-                      <item translatable="yes">Launch Gnome Software</item>
-                      <item translatable="yes">Launch Synaptic Package Manager</item>
-                      <item translatable="yes">Launch Gnome PackageKit Update Viewer</item>
-                      <item translatable="yes">Launch Ubuntu Update Manager</item>
+                      <item>Gnome Software</item>
+                      <item>Synaptic Package Manager</item>
+                      <item>Gnome PackageKit Update Viewer</item>
+                      <item>Ubuntu Update Manager</item>
                       <item translatable="yes">Custom</item>
                     </items>
                   </object>
