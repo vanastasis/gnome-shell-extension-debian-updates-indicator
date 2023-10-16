@@ -68,15 +68,10 @@
       <default>false</default>
       <summary>Use a shortcut to open the indicator.</summary>
     </key>
-    <key type="s" name="shortcut-text">
-      <default>"&lt;Super&gt;i"</default>
-      <summary>Keybinding to open the indicator.</summary>
-      <description>If showing, the indicator menu is toggled.</description>
-    </key>
     <key type="as" name="debian-updates-indicator-shortcut">
       <default><![CDATA[['<Super>i']]]></default>
-      <summary>Keybinding to show the dock and the number overlay.</summary>
-      <description>Behavior depends on hotkeys-show-dock and hotkeys-overlay.</description>
+      <summary>Keybinding to open the indicator.</summary>
+      <description>If showing, the indicator menu is toggled.</description>
     </key>
     <key type="b" name="use-custom-cmd">
       <default>false</default>

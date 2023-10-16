@@ -133,7 +133,7 @@
             <child>
               <object class="AdwComboRow" id="verbosity">
                 <property name="title" translatable="yes">How much information to show on notifications</property>
-                <property name="subtitle" translatable="yes">Up to a maximum of 50 package names.</property> -->
+                <property name="subtitle" translatable="yes">Up to a maximum of 50 package names.</property>
                 <property name="model">
                   <object class="GtkStringList">
                     <items>
@@ -152,19 +152,17 @@
     <child>
       <object class="AdwPreferencesGroup" id="shortcut_group">
         <child>
-          <object class="AdwActionRow">
-            <property name="title" translatable="yes">Shortcut to open the indicator</property>
-            <property name="subtitle" translatable="yes"><![CDATA[Syntax: <Shift>, <Ctrl>, <Alt>, <Super>]]></property>
-            <property name="use-markup">false</property>
-            <property name="activatable-widget">use_shortcut</property>
+          <object class="AdwSwitchRow" id="use_shortcut">
+            <property name="title" translatable="yes">Enable shortcut</property>
+          </object>
+        </child>
+        <child>
+          <object class="AdwActionRow" id="shortcut_row">
+            <property name="title" translatable="yes">Shortcut to toggle the menu</property>
+            <property name="activatable-widget">shortcut_label</property>
             <child>
-              <object class="GtkEntry" id="shortcut_entry">
-                <property name="width-chars">18</property>
-                <property name="valign">center</property>
-              </object>
-            </child>
-            <child>
-              <object class="GtkSwitch" id="use_shortcut">
+              <object class="GtkShortcutLabel" id="shortcut_label">
+                <property name="disabled-text" translatable="yes">Select a shortcut</property>
                 <property name="valign">center</property>
               </object>
             </child>

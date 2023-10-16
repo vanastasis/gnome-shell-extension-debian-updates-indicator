@@ -618,7 +618,7 @@ export const DebianUpdatesIndicator = GObject.registerClass({
             Main.wm.addKeybinding('debian-updates-indicator-shortcut',
                 this._extensionSettings,
                 Meta.KeyBindingFlags.NONE,
-                Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+                Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW | Shell.ActionMode.POPUP,
                 this.menu.toggle.bind(this.menu)
             );
             this._shortcutIsSet = true;

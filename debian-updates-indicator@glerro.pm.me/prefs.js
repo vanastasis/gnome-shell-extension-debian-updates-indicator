@@ -35,18 +35,84 @@ import GObject from 'gi://GObject';
 import Adw from 'gi://Adw';
 import Gio from 'gi://Gio';
 import Gtk from 'gi://Gtk';
+import Gdk from 'gi://Gdk';
 
 import {ExtensionPreferences} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
 import {IgnoreListBox} from './ignoreListBox.js';
 
+const DebianUpdatesAddShortcutsWindow = GObject.registerClass({
+    GTypeName: 'DebianUpdatesAddShortcutsWindow',
+    Template: import.meta.url.replace('prefs.js', 'ui/prefs_add_shortcuts_adw1.ui'),
+}, class DebianUpdatesAddShortcutsWindow extends Adw.Window {
+    constructor(settings, params = {}) {
+        super(params);
+
+        this._settings = settings;
+
+        const eventController = new Gtk.EventControllerKey();
+        this.add_controller(eventController);
+
+        eventController.connect('key-pressed', this._onKeyPressed.bind(this));
+    }
+
+    _onKeyPressed(_eck, keyval, keycode, state) {
+        let mask = state & Gtk.accelerator_get_default_mod_mask() & ~Gdk.ModifierType.LOCK_MASK;
+        if (!mask && keyval === Gdk.KEY_Escape) {
+            this.close();
+            return Gdk.EVENT_STOP;
+        }
+
+        if (!mask && keyval === Gdk.KEY_BackSpace) {
+            this._settings.set_strv('debian-updates-indicator-shortcut', ['']);
+            this.close();
+            return Gdk.EVENT_STOP;
+        }
+
+        if (!this._isValidBinding(mask, keycode, keyval) || !this._isValidAccel(mask, keyval))
+            return Gdk.EVENT_STOP;
+
+        this._settings.set_strv('debian-updates-indicator-shortcut', [
+            Gtk.accelerator_name_with_keycode(null, keyval, keycode, mask),
+        ]);
+
+        this.destroy();
+        return Gdk.EVENT_STOP;
+    }
+
+    // Functions from https://gitlab.gnome.org/GNOME/gnome-control-center/-/blob/main/panels/keyboard/keyboard-shortcuts.c
+    _keyvalIsForbidden(keyval) {
+        return [Gdk.KEY_Home, Gdk.KEY_Left, Gdk.KEY_Up, Gdk.KEY_Right, Gdk.KEY_Down, Gdk.KEY_Page_Up,
+            Gdk.KEY_Page_Down, Gdk.KEY_End, Gdk.KEY_Tab, Gdk.KEY_KP_Enter, Gdk.KEY_Return, Gdk.KEY_Mode_switch].includes(keyval);
+    }
+
+    _isValidBinding(mask, keycode, keyval) {
+        return !(mask === 0 || mask === Gdk.SHIFT_MASK && keycode !== 0 &&
+            ((keyval >= Gdk.KEY_a && keyval <= Gdk.KEY_z) ||
+                (keyval >= Gdk.KEY_A && keyval <= Gdk.KEY_Z) ||
+                (keyval >= Gdk.KEY_0 && keyval <= Gdk.KEY_9) ||
+                (keyval >= Gdk.KEY_kana_fullstop && keyval <= Gdk.KEY_semivoicedsound) ||
+                (keyval >= Gdk.KEY_Arabic_comma && keyval <= Gdk.KEY_Arabic_sukun) ||
+                (keyval >= Gdk.KEY_Serbian_dje && keyval <= Gdk.KEY_Cyrillic_HARDSIGN) ||
+                (keyval >= Gdk.KEY_Greek_ALPHAaccent && keyval <= Gdk.KEY_Greek_omega) ||
+                (keyval >= Gdk.KEY_hebrew_doublelowline && keyval <= Gdk.KEY_hebrew_taf) ||
+                (keyval >= Gdk.KEY_Thai_kokai && keyval <= Gdk.KEY_Thai_lekkao) ||
+                (keyval >= Gdk.KEY_Hangul_Kiyeog && keyval <= Gdk.KEY_Hangul_J_YeorinHieuh) ||
+                (keyval === Gdk.KEY_space && mask === 0) || this._keyvalIsForbidden(keyval))
+        );
+    }
+
+    _isValidAccel(mask, keyval) {
+        return Gtk.accelerator_valid(keyval, mask) || (keyval === Gdk.KEY_Tab && mask !== 0);
+    }
+});
+
 const DebianUpdatesBasicPrefsPage = GObject.registerClass({
     GTypeName: 'DebianUpdatesBasicPrefsPage',
     Template: import.meta.url.replace('prefs.js', 'ui/prefs_basic_adw1.ui'),
-    InternalChildren: ['check_updates_group', 'interval', 'interval_unit', 'updates_menu_group',
-         'strip_versions_switch', 'urgent_updates_switch', 'indicator_group', 'always_visible',
-         'show_count', 'auto_expand_list', 'notifications_group', 'notifications', 'transient_notifications',
-         'verbosity', 'shortcut_group', 'shortcut_entry', 'use_shortcut'],
+    InternalChildren: ['interval', 'interval_unit', 'strip_versions_switch', 'urgent_updates_switch',
+        'always_visible', 'show_count', 'auto_expand_list', 'notifications', 'transient_notifications',
+        'verbosity', 'shortcut_row', 'shortcut_label', 'use_shortcut'],
 }, class DebianUpdatesBasicPrefsPage extends Adw.PreferencesPage {
     constructor(settings, params = {}) {
         super(params);
@@ -91,48 +157,30 @@ const DebianUpdatesBasicPrefsPage = GObject.registerClass({
         this._settings.bind('verbosity', this._verbosity,
             'selected', Gio.SettingsBindFlags.DEFAULT
         );
-        settings.bind('notify', this._transient_notifications,
+        this._settings.bind('notify', this._transient_notifications,
             'sensitive', Gio.SettingsBindFlags.DEFAULT
         );
-        settings.bind('notify', this._verbosity,
+        this._settings.bind('notify', this._verbosity,
             'sensitive', Gio.SettingsBindFlags.DEFAULT
         );
 
         // Shortcut
-        this._settings.bind('shortcut-text', this._shortcut_entry,
-            'text', Gio.SettingsBindFlags.DEFAULT
-        );
-        // We need to update the shortcut 'strv' when the text is modified
-        this._settings.connect('changed::shortcut-text', () => {
-            this._setShortcut(settings);
+        this._shortcut_label.set_accelerator(this._settings.get_strv('debian-updates-indicator-shortcut')[0]);
+        this._settings.connect('changed::debian-updates-indicator-shortcut', () => {
+            this._shortcut_label.set_accelerator(this._settings.get_strv('debian-updates-indicator-shortcut')[0]);
         });
+
         this._settings.bind('use-shortcut', this._use_shortcut,
             'active', Gio.SettingsBindFlags.DEFAULT
         );
-        this._settings.bind('use-shortcut', this._shortcut_entry,
+        this._settings.bind('use-shortcut', this._shortcut_row,
             'sensitive', Gio.SettingsBindFlags.DEFAULT
         );
-    }
 
-    /**
-     * This function set Shortcut.
-     *
-     * @function setShortcut
-     * @param {Gio.Settings} settings - Extrension Settings.
-     * @returns {void}
-     */
-    _setShortcut(settings) {
-        let shortcutText = settings.get_string('shortcut-text');
-        let key, mods;
-
-        [, key, mods] = Gtk.accelerator_parse(shortcutText);
-
-        if (Gtk.accelerator_valid(key, mods)) {
-            let shortcut = Gtk.accelerator_name(key, mods);
-            settings.set_strv('debian-updates-indicator-shortcut', [shortcut]);
-        } else {
-            settings.set_strv('debian-updates-indicator-shortcut', []);
-        }
+        this._shortcut_row.connect('activated', () => {
+            this._addShortcutWindow = new DebianUpdatesAddShortcutsWindow(this._settings, {transient_for: this.get_root()});
+            this._addShortcutWindow.present();
+        });
     }
 });
 
@@ -150,7 +198,7 @@ const DebianUpdatesAdvancedPrefsPage = GObject.registerClass({
 
         // Advanced settings tab:
         // Update method
-        settings.bind('update-cmd-options', this._update_cmd_options,
+        this._settings.bind('update-cmd-options', this._update_cmd_options,
             'selected', Gio.SettingsBindFlags.DEFAULT
         );
 
@@ -204,7 +252,7 @@ const DebianUpdatesAdvancedPrefsPage = GObject.registerClass({
                 this._settings.set_value(val, this._settings.get_default_value(val));
             });
             // This one needs to be refreshed manually
-            this._update_cmd_options.set_active(settings.get_enum('update-cmd-options'));
+            this._update_cmd_options.set_active(this._settings.get_enum('update-cmd-options'));
         });
     }
 });
@@ -246,7 +294,7 @@ const DebianUpdatesIgnoreListPrefsPage = GObject.registerClass({
         this._settings = settings;
 
         this._ignoreListGroup = this._ignore_list_group;
-        this._ignoreListBox = new IgnoreListBox(settings);
+        this._ignoreListBox = new IgnoreListBox(this._settings);
         this._ignoreListGroup.add(this._ignoreListBox);
     }
 });
@@ -268,7 +316,7 @@ export default class DebianUpdatesPreferences extends ExtensionPreferences {
         window.add(ignoreListPage);
 
         window.search_enabled = true;
-        window.set_default_size(580, 580);
+        window.set_default_size(585, 625);
     }
 }
 
