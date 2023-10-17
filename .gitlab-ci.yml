@@ -55,7 +55,7 @@ eslint:
     - when: always
   script:
     - export NODE_PATH=$(npm root -g)
-    - npm install -g eslint@^8.0.0
+    - npm install -g eslint@^8.0.0 eslint-plugin-jsdoc@^46.0.0
     - eslint --format junit --output-file eslint-report.xml .
   artifacts:
     reports:
