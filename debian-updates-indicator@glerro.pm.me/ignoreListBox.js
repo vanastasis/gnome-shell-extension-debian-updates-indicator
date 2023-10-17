@@ -24,11 +24,14 @@
  * SPDX-FileCopyrightText: 2023 Gianni Lerro <glerro@pm.me>
  */
 
-/* exported IgnoreListBox */
-
 'use strict';
 
-const {GLib, Gio, GObject, Gtk, Pango, Adw} = imports.gi;
+import Adw from 'gi://Adw';
+import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
+import GObject from 'gi://GObject';
+import Gtk from 'gi://Gtk';
+import Pango from 'gi://Pango';
 
 const NewItem = GObject.registerClass(
 class NewItem extends GObject.Object {
@@ -115,7 +118,7 @@ class IgnoreListModel extends GObject.Object {
         this._names.splice(pos, 1, newName);
         this._items.splice(pos, 1, [newName]);
 
-        // TODO: Split, order alphabetically, remove duplicates and join
+        // TODO: Order alphabetically and remove duplicates
 
         this._extensionSettings.block_signal_handler(this._changedId);
         this._extensionSettings.set_strv('ignore-list', this._names);
@@ -222,18 +225,35 @@ class IgnoreListRow extends Adw.PreferencesRow {
     }
 });
 
-var IgnoreListBox = GObject.registerClass(
+const NewItemRow = GObject.registerClass({
+    GTypeName: 'NewItemRow',
+}, class NewItemRow extends Adw.PreferencesRow {
+    constructor() {
+        super({
+            action_name: 'ignore-list.add',
+        });
+
+        let imageAdd = new Gtk.Image({
+            icon_name: 'list-add-symbolic',
+            pixel_size: 16,
+            margin_top: 12,
+            margin_bottom: 12,
+            margin_start: 12,
+            margin_end: 12,
+        });
+        this.set_child(imageAdd);
+    }
+});
+
+export const IgnoreListBox = GObject.registerClass(
 class IgnoreListBox extends Gtk.ListBox {
-    constructor(builder, extensionSettings) {
+    constructor(extensionSettings) {
         super({
             selection_mode: Gtk.SelectionMode.NONE,
             css_classes: ['boxed-list'],
         });
 
-        let _builder = builder;
         this._extensionSettings = extensionSettings;
-
-        let NewItemRow = _builder.get_object('new_item_row');
 
         let _ignoreListModel = new IgnoreListModel(this._extensionSettings);
 
@@ -245,7 +265,7 @@ class IgnoreListBox extends Gtk.ListBox {
         this.connect('row-activated', (l, row) => row.edit());
         this.bind_model(listModel, item => {
             return item instanceof NewItem
-                ? NewItemRow
+                ? new NewItemRow()
                 : new IgnoreListRow(item.string);
         });
 

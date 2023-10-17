@@ -7,7 +7,7 @@
   "gettext-domain": "gnome-shell-extension-debian-updates-indicator",
   "settings-schema": "org.gnome.shell.extensions.debian-updates-indicator",
   "shell-version": [
-    "40", "41", "42", "43", "44"
+    "45"
   ],
   "donations": {
     "kofi": "glerro"

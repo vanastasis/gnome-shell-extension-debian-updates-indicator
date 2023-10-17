@@ -5,6 +5,9 @@ debian-updates-indicator@glerro.pm.me/monitors.js
 debian-updates-indicator@glerro.pm.me/prefs.js
 debian-updates-indicator@glerro.pm.me/updateManager.js
 debian-updates-indicator@glerro.pm.me/utils.js
-debian-updates-indicator@glerro.pm.me/prefs_adw1.ui
-debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui
+debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui
+debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui
+debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui
+debian-updates-indicator@glerro.pm.me/ui/prefs_ignore_list_adw1.ui
+debian-updates-indicator@glerro.pm.me/ui/prefs_add_shortcuts_adw1.ui
 

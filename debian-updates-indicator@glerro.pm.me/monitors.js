@@ -28,26 +28,18 @@
  * SPDX-FileCopyrightText: 2023 Gianni Lerro <glerro@pm.me>
  */
 
-/* exported NetworkMonitor, DirectoryMonitor */
-
 'use strict';
 
-const Gettext = imports.gettext;
+import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
 
-const {GLib, Gio} = imports.gi;
+import {gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const ExtensionName = Me.metadata.name;
-
-const Domain = Gettext.domain(Me.metadata['gettext-domain']);
-const {
-    gettext: _,
-} = Domain;
-
-var NetworkMonitor = class NetworkMonitor {
+export const NetworkMonitor = class NetworkMonitor {
     constructor(updateManager) {
         this._updateManager = updateManager;
+        this._extension = this._updateManager._extension;
+        this._extensionName = this._extension.metadata.name;
 
         // We check for the network status before trying to update apt-cache
         this._network_monitor = Gio.network_monitor_get_default();
@@ -86,7 +78,7 @@ var NetworkMonitor = class NetworkMonitor {
             this._network_monitor.can_reach_async(this._address, cancellable, this._asyncReadyCallback.bind(this));
         } catch (err) {
             let title = _('Can not connect to %s').format(this._url);
-            log(`${ExtensionName} - ${title} - ${err.message}`);
+            console.log(`${this._extensionName} - ${title} - ${err.message}`);
         }
     }
 
@@ -95,7 +87,7 @@ var NetworkMonitor = class NetworkMonitor {
             this._network_monitor.can_reach_finish(res);
         } catch (err) {
             let title = _('Can not connect to %s').format(this._url);
-            log(`${ExtensionName} - ${title} - ${err.message}`);
+            console.log(`${this._extensionName} - ${title} - ${err.message}`);
         }
 
         if (this._networkTimeoutId) {
@@ -115,7 +107,7 @@ var NetworkMonitor = class NetworkMonitor {
     }
 };
 
-var DirectoryMonitor = class DirectoryMonitor {
+export const DirectoryMonitor = class DirectoryMonitor {
     constructor(updateManager) {
         this._updateManager = updateManager;
 

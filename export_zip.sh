@@ -43,7 +43,7 @@ fi
 
 extensiondir=$installdir/share/gnome-shell/extensions/debian-updates-indicator@glerro.pm.me/
 
-sources=(locale scripts `(ls $extensiondir/*.js)` `(ls $extensiondir/*.ui)`)
+sources=(locale scripts ui `(ls $extensiondir/*.js)`)
 
 gnome-extensions pack --force --out-dir=$srcdir/zip-files ${sources[@]/#/--extra-source=} $extensiondir
 

@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of Debian Linux Updates Indicator.
+ * https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator
+ *
+ * prefs_basic.adw1.ui
+ *
+ * Copyright (c) 2023 Gianni Lerro {glerro} ~ <glerro@pm.me>
+ *
+ * Debian Linux Updates Indicator is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Debian Linux Updates Indicator is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with Debian Linux Updates Indicator. If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ * SPDX-FileCopyrightText: 2023 Gianni Lerro <glerro@pm.me>
+-->
+<interface domain="gnome-shell-extension-debian-updates-indicator">
+  <template class="DebianUpdatesBasicPrefsPage" parent="AdwPreferencesPage">
+    <property name="name">basic-settings-page</property>
+    <property name="title" translatable="yes">Basic</property>
+    <property name="icon-name">folder-symbolic</property>
+    <child>
+      <object class="AdwPreferencesGroup" id="check_updates_group">
+        <child>
+          <object class="AdwSpinRow" id="interval">
+            <property name="title" translatable="yes">Check for updates every:</property>
+            <property name="subtitle" translatable="yes">Automatic checks, 0 to disable</property>
+            <property name="activatable-widget">interval_unit</property>
+            <property name="numeric">true</property>
+            <property name="update-policy">if-valid</property>
+            <property name="adjustment">
+              <object class="GtkAdjustment">
+                <property name="lower">0</property>
+                <property name="upper">99</property>
+                <property name="value">0</property>
+                <property name="step_increment">1</property>
+                <property name="page-increment">10</property>
+              </object>
+            </property>
+            <child>
+              <object class="GtkDropDown" id="interval_unit">
+                <property name="valign">center</property>
+                <property name="model">
+                  <object class="GtkStringList">
+                    <items>
+                      <item translatable="yes">Hours</item>
+                      <item translatable="yes">Days</item>
+                      <item translatable="yes">Weeks</item>
+                    </items>
+                  </object>
+                </property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="AdwPreferencesGroup" id="updates_menu_group">
+        <child>
+          <object class="AdwSwitchRow" id="strip_versions_switch">
+            <property name="title" translatable="yes">Strip out version numbers</property>
+          </object>
+        </child>
+        <child>
+          <object class="AdwSwitchRow" id="urgent_updates_switch">
+            <property name="title" translatable="yes">Highlight security/important updates</property>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="AdwPreferencesGroup" id="indicator_group">
+        <child>
+          <object class="AdwExpanderRow">
+            <property name="title" translatable="yes">Indicator</property>
+            <child>
+              <object class="AdwSwitchRow" id="always_visible">
+                <property name="title" translatable="yes">Always show the indicator</property>
+              </object>
+            </child>
+            <child>
+              <object class="AdwSwitchRow" id="show_count">
+                <property name="title" translatable="yes">Show updates count on the indicator</property>
+              </object>
+            </child>
+            <child>
+              <object class="AdwSpinRow" id="auto_expand_list">
+                <property name="title" translatable="yes">Auto-expand updates list</property>
+                <property name="subtitle" translatable="yes">If updates count is less than this number (0 to disable)</property>
+                <property name="numeric">true</property>
+                <property name="update-policy">if-valid</property>
+                <property name="adjustment">
+                  <object class="GtkAdjustment">
+                    <property name="lower">0</property>
+                    <property name="upper">500</property>
+                    <property name="value">0</property>
+                    <property name="step_increment">1</property>
+                    <property name="page-increment">10</property>
+                  </object>
+                </property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="AdwPreferencesGroup" id="notifications_group">
+        <child>
+          <object class="AdwExpanderRow">
+            <property name="title" translatable="yes">Notifications</property>
+            <child>
+              <object class="AdwSwitchRow" id="notifications">
+                <property name="title" translatable="yes">Send a notification when new updates are available</property>
+              </object>
+            </child>
+            <child>
+              <object class="AdwSwitchRow" id="transient_notifications">
+                <property name="title" translatable="yes">Use transient notifications (auto dismiss)</property>
+              </object>
+            </child>
+            <child>
+              <object class="AdwComboRow" id="verbosity">
+                <property name="title" translatable="yes">How much information to show on notifications</property>
+                <property name="subtitle" translatable="yes">Up to a maximum of 50 package names.</property>
+                <property name="model">
+                  <object class="GtkStringList">
+                    <items>
+                      <item translatable="yes">Count only</item>
+                      <item translatable="yes">New updates names</item>
+                      <item translatable="yes">All updates names</item>
+                    </items>
+                  </object>
+                </property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="AdwPreferencesGroup" id="shortcut_group">
+        <child>
+          <object class="AdwSwitchRow" id="use_shortcut">
+            <property name="title" translatable="yes">Enable shortcut</property>
+          </object>
+        </child>
+        <child>
+          <object class="AdwActionRow" id="shortcut_row">
+            <property name="title" translatable="yes">Shortcut to toggle the menu</property>
+            <property name="activatable-widget">shortcut_label</property>
+            <child>
+              <object class="GtkShortcutLabel" id="shortcut_label">
+                <property name="disabled-text" translatable="yes">Select a shortcut</property>
+                <property name="valign">center</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>
+

@@ -29,684 +29,294 @@
  * SPDX-FileCopyrightText: 2023 Gianni Lerro <glerro@pm.me>
  */
 
-/* exported init, buildPrefsWidget, fillPreferencesWindow */
-
 'use strict';
 
-const Gettext = imports.gettext;
+import GObject from 'gi://GObject';
+import Adw from 'gi://Adw';
+import Gio from 'gi://Gio';
+import Gtk from 'gi://Gtk';
+import Gdk from 'gi://Gdk';
 
-const {Gio, Gtk} = imports.gi;
+import {ExtensionPreferences} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
+import {IgnoreListBox} from './ignoreListBox.js';
 
-const Domain = Gettext.domain(Me.metadata['gettext-domain']);
-const {
-    gettext: _,
-} = Domain;
+const DebianUpdatesAddShortcutsWindow = GObject.registerClass({
+    GTypeName: 'DebianUpdatesAddShortcutsWindow',
+    Template: import.meta.url.replace('prefs.js', 'ui/prefs_add_shortcuts_adw1.ui'),
+}, class DebianUpdatesAddShortcutsWindow extends Adw.Window {
+    constructor(settings, params = {}) {
+        super(params);
 
-const TEMPLATE_GTK = 'prefs_gtk4.ui';
-const TEMPLATE_ADW = 'prefs_adw1.ui';
+        this._settings = settings;
 
-let Adw = null;
-try {
-    Adw = imports.gi.Adw;
-} catch (e) { /* Do Nothing */ }
+        const eventController = new Gtk.EventControllerKey();
+        this.add_controller(eventController);
 
-const IgnoreListBox = Adw != null ? Me.imports.ignoreListBox.IgnoreListBox : null;
-
-/**
- * This function connect Dialogs Windows (GTK4 - GS < 42).
- *
- * @function connectDialogs
- * @param {Gtk.Builder} builder - Builder prefs widgets.
- * @param {Gtk.Notebook} notebook - Builder prefs notebook.
- * @returns {void}
- */
-function connectDialogs(builder, notebook) {
-    // Create dialog for the indicator settings
-    builder.get_object('indicator_button').connect('clicked', () => {
-        let dialog = new Gtk.Dialog({
-            title: _('Indicator options'),
-            transient_for: notebook.get_root(),
-            use_header_bar: true,
-            modal: true,
-        });
-
-        let subBox = builder.get_object('indicator_dialog');
-        dialog.get_content_area().append(subBox);
-
-        dialog.connect('response', () => {
-            // remove the settings box so it doesn't get destroyed;
-            dialog.get_content_area().remove(subBox);
-            dialog.destroy();
-        });
-
-        dialog.show();
-    });
-
-    // Create dialog for the notification settings
-    builder.get_object('notifications_button').connect('clicked', () => {
-        let dialog = new Gtk.Dialog({
-            title: _('Notification options'),
-            transient_for: notebook.get_root(),
-            use_header_bar: true,
-            modal: true,
-        });
-
-        let subBox = builder.get_object('notifications_dialog');
-        dialog.get_content_area().append(subBox);
-
-        dialog.connect('response', () => {
-            // remove the settings box so it doesn't get destroyed;
-            dialog.get_content_area().remove(subBox);
-            dialog.destroy();
-        });
-
-        dialog.show();
-    });
-
-    // Create dialog for custom command for updating
-    builder.get_object('update_cmd_button').connect('clicked', () => {
-        let dialog = new Gtk.Dialog({
-            title: _('Custom command for updates'),
-            transient_for: notebook.get_root(),
-            use_header_bar: true,
-            modal: true,
-        });
-
-        let subBox = builder.get_object('custom_command_dialog');
-        dialog.get_content_area().append(subBox);
-
-        dialog.connect('response', () => {
-            // remove the settings box so it doesn't get destroyed;
-            dialog.get_content_area().remove(subBox);
-            dialog.destroy();
-        });
-
-        dialog.show();
-    });
-}
-
-/**
- * This function setup IgnoreList (GTK4 - GS < 42).
- *
- * @function setupIgnoreList
- * @param {Gtk.Builder} builder - Builder prefs widgets.
- * @param {Gtk.Notebook} notebook - Builder prefs notebook.
- * @param {Gio.Settings} settings - Extension settings.
- * @returns {void}
- */
-function setupIgnoreList(builder, notebook, settings) {
-    // Ignore list tab:
-    // Set up the List of packages
-    let column = new Gtk.TreeViewColumn();
-    column.set_title(_('Package name'));
-    builder.get_object('ignore_list_treeview').append_column(column);
-
-    let renderer = new Gtk.CellRendererText();
-    column.pack_start(renderer, null);
-
-    column.set_cell_data_func(renderer, (_column, cell, model, iter) => {
-        cell.markup = model.get_value(iter, 0);
-    });
-
-    let listStore = builder.get_object('ignore_list_store');
-    let treeView  = builder.get_object('ignore_list_treeview');
-    refreshUI(listStore, treeView, settings);
-    settings.connect(
-        'changed::ignore-list',
-        () => {
-            refreshUI(listStore, treeView, settings);
-        }
-    );
-
-    builder.get_object('treeview_selection').connect(
-        'changed',
-        (selection, liststore) => {
-            selectionChanged(selection, liststore);
-        }
-    );
-
-    // Toolbar
-    builder.get_object('ignore_list_toolbutton_add').connect(
-        'clicked',
-        () => {
-            let dialog = new Gtk.Dialog({
-                title: _('Add entry to ignore list'),
-                transient_for: notebook.get_root(),
-                use_header_bar: true,
-                modal: true,
-            });
-
-            let subBox = builder.get_object('ignore_list_add_dialog');
-            dialog.get_content_area().append(subBox);
-
-            // Objects
-            let entry = builder.get_object('ignore_list_add_entry');
-            let saveButton = builder.get_object('ignore_list_add_button_save');
-            let cancelButton = builder.get_object('ignore_list_add_button_cancel');
-
-            // Clean the entry in case it was already used
-            entry.set_text('');
-            entry.connect('icon-release', () => {
-                entry.set_text('');
-            });
-
-            let saveButtonId = saveButton.connect(
-                'clicked',
-                () => {
-                    let name = entry.get_text();
-                    let entries = settings.get_strv('ignore-list');
-                    entries.push(name);
-
-                    // Order alphabetically and remove duplicates
-                    entries.sort();
-                    entries = entries.filter((item, pos, ary) => {
-                        return !pos || item !== ary[pos - 1];
-                    });
-
-                    settings.set_strv('ignore-list', entries);
-
-                    close();
-                }
-            );
-
-            let cancelButtonId = cancelButton.connect(
-                'clicked',
-                close
-            );
-
-            dialog.connect('response', () => {
-                close();
-            });
-
-            dialog.show();
-
-            /**
-             * Add Entry Dialog - Close function.
-             *
-             * @function close
-             */
-            function close() {
-                builder.get_object('ignore_list_add_button_save').disconnect(saveButtonId);
-                builder.get_object('ignore_list_add_button_cancel').disconnect(cancelButtonId);
-
-                // remove the settings box so it doesn't get destroyed
-                dialog.get_content_area().remove(subBox);
-                dialog.destroy();
-            }
-        }
-    );
-
-    builder.get_object('ignore_list_toolbutton_remove').connect(
-        'clicked',
-        () => {
-            removeEntry(settings);
-        }
-    );
-
-    builder.get_object('ignore_list_toolbutton_edit').connect(
-        'clicked',
-        () => {
-            if (selectedEntry < 0)
-                return;
-
-            let dialog = new Gtk.Dialog({
-                title: _('Edit entry'),
-                transient_for: notebook.get_root(),
-                use_header_bar: true,
-                modal: true,
-            });
-
-            let subBox = builder.get_object('ignore_list_edit_dialog');
-            dialog.get_content_area().append(subBox);
-
-            // Objects
-            let entries = settings.get_strv('ignore-list');
-            if (!entries.length)
-                return;
-
-            let entry = builder.get_object('ignore_list_edit_entry');
-            let saveButton = builder.get_object('ignore_list_edit_button_save');
-            let cancelButton = builder.get_object('ignore_list_edit_button_cancel');
-
-            // Clean the entry in case it was already used
-            entry.set_text(entries[selectedEntry]);
-            entry.connect('icon-release', () => {
-                entry.set_text('');
-            });
-
-            let saveButtonId = saveButton.connect(
-                'clicked',
-                () => {
-                    let name = entry.get_text();
-                    entries = settings.get_strv('ignore-list');
-                    entries.push(name);
-
-                    // Order alphabetically and remove duplicates
-                    entries.splice(selectedEntry, 1);
-                    entries.sort();
-                    entries = entries.filter((item, pos, ary) => {
-                        return !pos || item !== ary[pos - 1];
-                    });
-
-                    settings.set_strv('ignore-list', entries);
-
-                    close();
-                }
-            );
-
-            let cancelButtonId = cancelButton.connect(
-                'clicked',
-                close
-            );
-
-            dialog.connect('response', () => {
-                close();
-            });
-
-            dialog.show();
-
-            /**
-             * Edit Entry Dialog - Close function.
-             *
-             * @function close
-             */
-            function close() {
-                builder.get_object('ignore_list_edit_button_save').disconnect(saveButtonId);
-                builder.get_object('ignore_list_edit_button_cancel').disconnect(cancelButtonId);
-
-                // remove the settings box so it doesn't get destroyed
-                dialog.get_content_area().remove(subBox);
-                dialog.destroy();
-            }
-        }
-    );
-}
-
-let selectedEntry = 0;
-
-/**
- * This function is executed when Selection Changed IgnoreList (GTK4 - GS < 42).
- *
- * @function selectionChanged
- * @param {Gtk.Treeselection} selection - Selected Entry.
- * @param {Gtk.ListStore} liststore - Ignore Entry List.
- * @returns {void}
- */
-function selectionChanged(selection, liststore) {
-    let a = selection.get_selected_rows(liststore)[0][0];
-
-    if (a !== undefined)
-        selectedEntry = parseInt(a.to_string());
-}
-
-/**
- * This function remove Entry from IgnoreList (GTK4 - GS < 42).
- *
- * @function removeEntry
- * @param {Gio.Settings} settings - Extension settings.
- * @returns {void}
- */
-function removeEntry(settings) {
-    let entries = settings.get_strv('ignore-list');
-
-    if (!entries.length || selectedEntry < 0)
-        return 0;
-
-    if (entries.length > 0)
-        entries.splice(selectedEntry, 1);
-
-    settings.set_strv('ignore-list', entries);
-
-    return 0;
-}
-
-let list = null;
-
-/**
- * This function Refresh IgnoreList (GTK4 - GS < 42).
- *
- * @function refreshUI
- * @param {Gtk.ListStore} listStore - Ignore Entry List.
- * @param {Gtk.TreeView} treeView - Widget that visualize Ignore Entries List.
- * @param {Gio.Settings} settings - Extension Settings.
- * @returns {void}
- */
-function refreshUI(listStore, treeView, settings) {
-    let restoreForced = selectedEntry;
-    let entries = settings.get_strv('ignore-list');
-
-    if (list !== entries) {
-        if (listStore !== undefined)
-            listStore.clear();
-
-        if (entries.length > 0) {
-            if (entries && typeof entries == 'string')
-                entries = [entries];
-
-            let current = listStore.get_iter_first();
-
-            for (let i in entries) {
-                current = listStore.append();
-                listStore.set_value(current, 0, entries[i]);
-            }
-        }
-
-        list = entries;
+        eventController.connect('key-pressed', this._onKeyPressed.bind(this));
     }
 
-    selectedEntry = restoreForced;
-    changeSelection(treeView, entries);
-}
-
-/**
- * This Change the selected Entry row (GTK4 - GS < 42).
- *
- * @function changeSelection
- * @param {Gtk.TreeView} treeview - Widget that visualize Ignore Entries List.
- * @param {Gtk.Builder} entries - Array of Entries.
- * @returns {void}
- */
-function changeSelection(treeview, entries) {
-    if (selectedEntry < 0 || !entries.length)
-        return;
-
-    let max = entries.length - 1;
-    if (selectedEntry > max)
-        selectedEntry = max;
-
-    let path = selectedEntry;
-    path = Gtk.TreePath.new_from_string(String(path));
-    treeview.get_selection().select_path(path);
-}
-
-/**
- * This function setup Preferences binding (GTK4 - ADW1).
- *
- * @function bindPrefs
- * @param {Gtk.Builder} builder - Builder prefs widgets.
- * @param {Gio.Settings} settings - Extension settings.
- * @returns {void}
- */
-function bindPrefs(builder, settings) {
-    // Basic settings tab:
-    // Check updates
-    settings.bind('check-interval',
-        builder.get_object('interval'),
-        'value',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('strip-versions',
-        builder.get_object('strip_versions_switch'),
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('show-critical-updates',
-        builder.get_object('urgent_updates_switch'),
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-
-    // Hours, days or weeks
-    builder.get_object('interval_unit_combo').connect('changed', widget => {
-        settings.set_enum('interval-unit', widget.get_active());
-    });
-    builder.get_object('interval_unit_combo').set_active(settings.get_enum('interval-unit'));
-
-    // Indicator settings
-    settings.bind('always-visible',
-        builder.get_object('always_visible'),
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('show-count',
-        builder.get_object('show_count'),
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('auto-expand-list',
-        builder.get_object('auto_expand_list'),
-        'value',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-
-    // Notification settings
-    settings.bind('notify',
-        builder.get_object('notifications'),
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('transient',
-        builder.get_object('transient_notifications'),
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('verbosity',
-        builder.get_object('verbosity'),
-        Adw != null ? 'selected' : 'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('notify',
-        builder.get_object('transient_notifications'),
-        'sensitive',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('notify',
-        builder.get_object('verbosity'),
-        'sensitive',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-
-    // Shortcut
-    settings.bind('shortcut-text',
-        builder.get_object('shortcut_entry'),
-        'text',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    // We need to update the shortcut 'strv' when the text is modified
-    settings.connect('changed::shortcut-text', () => {
-        setShortcut(settings);
-    });
-    settings.bind('use-shortcut',
-        builder.get_object('use_shortcut'),
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('use-shortcut',
-        builder.get_object('shortcut_entry'),
-        'sensitive',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-
-    // Advanced settings tab:
-    // Update method
-    builder.get_object('update_cmd_options').connect('changed', widget => {
-        settings.set_enum('update-cmd-options', widget.get_active());
-    });
-
-    builder.get_object('update_cmd_options').set_active(settings.get_enum('update-cmd-options'));
-
-    if (settings.get_enum('update-cmd-options') !== 4)
-        builder.get_object('update_cmd_button')[Adw != null ? 'set_enable_expansion' : 'set_sensitive'](false);
-
-    settings.connect('changed::update-cmd-options', () => {
-        if (settings.get_enum('update-cmd-options') === 4)
-            builder.get_object('update_cmd_button')[Adw != null ? 'set_enable_expansion' : 'set_sensitive'](true);
-        else
-            builder.get_object('update_cmd_button')[Adw != null ? 'set_enable_expansion' : 'set_sensitive'](false);
-    });
-
-    // Custom command for updating
-    settings.bind('output-on-terminal',
-        builder.get_object('output_on_terminal_switch'),
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('terminal',
-        builder.get_object('terminal_entry'),
-        'text',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('update-cmd',
-        builder.get_object('field_updatecmd'),
-        'text',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('output-on-terminal',
-        builder.get_object('terminal_entry'),
-        'sensitive',
-        Gio.SettingsBindFlags.GET
-    );
-
-    // Check commands
-    settings.bind('use-custom-cmd',
-        builder.get_object('use_custom_cmd_switch'),
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('check-cmd-custom',
-        builder.get_object('field_checkcmd_custom'),
-        'text',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('use-custom-cmd',
-        builder.get_object('field_checkcmd_custom'),
-        'sensitive',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-
-    // Reset button
-    builder.get_object('reset_button').connect('clicked', () => {
-        // restore default settings for the relevant keys
-        let keys = [
-            'terminal',
-            'output-on-terminal',
-            'update-cmd',
-            'update-cmd-options',
-            'use-custom-cmd',
-            'check-cmd-custom',
-        ];
-        keys.forEach(val => {
-            settings.set_value(val, settings.get_default_value(val));
-        });
-        // This one needs to be refreshed manually
-        builder.get_object('update_cmd_options').set_active(settings.get_enum('update-cmd-options'));
-    });
-
-
-    // Package status tab:
-    settings.bind('new-packages',
-        builder.get_object('new_packages_switch'),
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('obsolete-packages',
-        builder.get_object('obsolete_packages_switch'),
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('residual-packages',
-        builder.get_object('residual_packages_switch'),
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-    settings.bind('autoremovable-packages',
-        builder.get_object('autoremovable_packages_switch'),
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-}
-
-/**
- * This function set Shortcut (GTK4 - ADW1).
- *
- * @function setShortcut
- * @param {Gio.Settings} settings - Extrension Settings.
- * @returns {void}
- */
-function setShortcut(settings) {
-    let shortcutText = settings.get_string('shortcut-text');
-    let key, mods;
-
-    [, key, mods] = Gtk.accelerator_parse(shortcutText);
-
-    if (Gtk.accelerator_valid(key, mods)) {
-        let shortcut = Gtk.accelerator_name(key, mods);
-        settings.set_strv('debian-updates-indicator-shortcut', [shortcut]);
-    } else {
-        settings.set_strv('debian-updates-indicator-shortcut', []);
-    }
-}
-
-/**
- * This function is called once when the Preferencs Windows is loaded.
- *
- * @function init
- */
-function init() {
-    ExtensionUtils.initTranslations();
-}
-
-/**
- * This function build the Preferencs Windows for Gnome Shell < 42
- *
- * @function buildPrefsWidget
- * @returns {Gtk.Widget} - the prefs widget
- */
-function buildPrefsWidget() {
-    const settings = ExtensionUtils.getSettings();
-
-    // Prepare labels and controls
-    let builder = new Gtk.Builder();
-    builder.add_from_file(`${Me.dir.get_path()}/${TEMPLATE_GTK}`);
-    let notebook = builder.get_object('prefs_widget');
-
-    connectDialogs(builder, notebook);
-    setupIgnoreList(builder, notebook, settings);
-    bindPrefs(builder, settings);
-
-    return notebook;
-}
-
-/**
- * This function build Preferences Window {Adw.PreferencesWindow} and have higher priority to builPrefsWidget().
- * Work with Gnome Shell >= 42
- *
- * @function fillPreferencesWindow
- * @param {Adw.PreferencesWindow} window - the prefs window.
- * @returns {void}
- */
-function fillPreferencesWindow(window) {
-    if (Adw) {
-        const settings = ExtensionUtils.getSettings();
-
-        let builder = Gtk.Builder.new();
-        builder.add_from_file(`${Me.dir.get_path()}/${TEMPLATE_ADW}`);
-
-        if (Adw.get_minor_version() >= 2) {
-            let shortcutRow = builder.get_object('shortcut_row');
-            shortcutRow.set_use_markup(false);
+    _onKeyPressed(_eck, keyval, keycode, state) {
+        let mask = state & Gtk.accelerator_get_default_mod_mask() & ~Gdk.ModifierType.LOCK_MASK;
+        if (!mask && keyval === Gdk.KEY_Escape) {
+            this.close();
+            return Gdk.EVENT_STOP;
         }
 
-        let basicSettingsPage = builder.get_object('basic_settings_page');
+        if (!mask && keyval === Gdk.KEY_BackSpace) {
+            this._settings.set_strv('debian-updates-indicator-shortcut', ['']);
+            this.close();
+            return Gdk.EVENT_STOP;
+        }
+
+        if (!this._isValidBinding(mask, keycode, keyval) || !this._isValidAccel(mask, keyval))
+            return Gdk.EVENT_STOP;
+
+        this._settings.set_strv('debian-updates-indicator-shortcut', [
+            Gtk.accelerator_name_with_keycode(null, keyval, keycode, mask),
+        ]);
+
+        this.destroy();
+        return Gdk.EVENT_STOP;
+    }
+
+    // Functions from https://gitlab.gnome.org/GNOME/gnome-control-center/-/blob/main/panels/keyboard/keyboard-shortcuts.c
+    _keyvalIsForbidden(keyval) {
+        return [Gdk.KEY_Home, Gdk.KEY_Left, Gdk.KEY_Up, Gdk.KEY_Right, Gdk.KEY_Down, Gdk.KEY_Page_Up,
+            Gdk.KEY_Page_Down, Gdk.KEY_End, Gdk.KEY_Tab, Gdk.KEY_KP_Enter, Gdk.KEY_Return, Gdk.KEY_Mode_switch].includes(keyval);
+    }
+
+    _isValidBinding(mask, keycode, keyval) {
+        return !(mask === 0 || mask === Gdk.SHIFT_MASK && keycode !== 0 &&
+            ((keyval >= Gdk.KEY_a && keyval <= Gdk.KEY_z) ||
+                (keyval >= Gdk.KEY_A && keyval <= Gdk.KEY_Z) ||
+                (keyval >= Gdk.KEY_0 && keyval <= Gdk.KEY_9) ||
+                (keyval >= Gdk.KEY_kana_fullstop && keyval <= Gdk.KEY_semivoicedsound) ||
+                (keyval >= Gdk.KEY_Arabic_comma && keyval <= Gdk.KEY_Arabic_sukun) ||
+                (keyval >= Gdk.KEY_Serbian_dje && keyval <= Gdk.KEY_Cyrillic_HARDSIGN) ||
+                (keyval >= Gdk.KEY_Greek_ALPHAaccent && keyval <= Gdk.KEY_Greek_omega) ||
+                (keyval >= Gdk.KEY_hebrew_doublelowline && keyval <= Gdk.KEY_hebrew_taf) ||
+                (keyval >= Gdk.KEY_Thai_kokai && keyval <= Gdk.KEY_Thai_lekkao) ||
+                (keyval >= Gdk.KEY_Hangul_Kiyeog && keyval <= Gdk.KEY_Hangul_J_YeorinHieuh) ||
+                (keyval === Gdk.KEY_space && mask === 0) || this._keyvalIsForbidden(keyval))
+        );
+    }
+
+    _isValidAccel(mask, keyval) {
+        return Gtk.accelerator_valid(keyval, mask) || (keyval === Gdk.KEY_Tab && mask !== 0);
+    }
+});
+
+const DebianUpdatesBasicPrefsPage = GObject.registerClass({
+    GTypeName: 'DebianUpdatesBasicPrefsPage',
+    Template: import.meta.url.replace('prefs.js', 'ui/prefs_basic_adw1.ui'),
+    InternalChildren: ['interval', 'interval_unit', 'strip_versions_switch', 'urgent_updates_switch',
+        'always_visible', 'show_count', 'auto_expand_list', 'notifications', 'transient_notifications',
+        'verbosity', 'shortcut_row', 'shortcut_label', 'use_shortcut'],
+}, class DebianUpdatesBasicPrefsPage extends Adw.PreferencesPage {
+    constructor(settings, params = {}) {
+        super(params);
+
+        this._settings = settings;
+
+        // Basic settings tab:
+        // Check updates
+        this._settings.bind('check-interval', this._interval,
+            'value', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('strip-versions', this._strip_versions_switch,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('show-critical-updates', this._urgent_updates_switch,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
+
+        // Hours, days or weeks
+        settings.bind('interval-unit', this._interval_unit,
+            'selected', Gio.SettingsBindFlags.DEFAULT
+        );
+
+        // Indicator settings
+        this._settings.bind('always-visible', this._always_visible,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('show-count', this._show_count,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('auto-expand-list', this._auto_expand_list,
+            'value', Gio.SettingsBindFlags.DEFAULT
+        );
+
+        // Notification settings
+        this._settings.bind('notify', this._notifications,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('transient', this._transient_notifications,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('verbosity', this._verbosity,
+            'selected', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('notify', this._transient_notifications,
+            'sensitive', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('notify', this._verbosity,
+            'sensitive', Gio.SettingsBindFlags.DEFAULT
+        );
+
+        // Shortcut
+        this._shortcut_label.set_accelerator(this._settings.get_strv('debian-updates-indicator-shortcut')[0]);
+        this._settings.connect('changed::debian-updates-indicator-shortcut', () => {
+            this._shortcut_label.set_accelerator(this._settings.get_strv('debian-updates-indicator-shortcut')[0]);
+        });
+
+        this._settings.bind('use-shortcut', this._use_shortcut,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('use-shortcut', this._shortcut_row,
+            'sensitive', Gio.SettingsBindFlags.DEFAULT
+        );
+
+        this._shortcut_row.connect('activated', () => {
+            this._addShortcutWindow = new DebianUpdatesAddShortcutsWindow(this._settings, {transient_for: this.get_root()});
+            this._addShortcutWindow.present();
+        });
+    }
+});
+
+const DebianUpdatesAdvancedPrefsPage = GObject.registerClass({
+    GTypeName: 'DebianUpdatesAdvancedPrefsPage',
+    Template: import.meta.url.replace('prefs.js', 'ui/prefs_advanced_adw1.ui'),
+    InternalChildren: ['update_cmd_options', 'update_cmd_button', 'output_on_terminal_switch',
+        'terminal_entry', 'field_updatecmd', 'use_custom_cmd_switch', 'field_checkcmd_custom',
+        'reset_button'],
+}, class DebianUpdatesAdvancedPrefsPage extends Adw.PreferencesPage {
+    constructor(settings, params = {}) {
+        super(params);
+
+        this._settings = settings;
+
+        // Advanced settings tab:
+        // Update method
+        this._settings.bind('update-cmd-options', this._update_cmd_options,
+            'selected', Gio.SettingsBindFlags.DEFAULT
+        );
+
+        if (this._settings.get_int('update-cmd-options') !== 4)
+            this._update_cmd_button.set_enable_expansion(false);
+
+        this._settings.connect('changed::update-cmd-options', () => {
+            if (this._settings.get_int('update-cmd-options') === 4)
+                this._update_cmd_button.set_enable_expansion(true);
+            else
+                this._update_cmd_button.set_enable_expansion(false);
+        });
+
+        // Custom command for updating
+        this._settings.bind('output-on-terminal', this._output_on_terminal_switch,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('terminal', this._terminal_entry,
+            'text', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('update-cmd', this._field_updatecmd,
+            'text', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('output-on-terminal', this._terminal_entry,
+            'sensitive', Gio.SettingsBindFlags.GET
+        );
+
+        // Check commands
+        this._settings.bind('use-custom-cmd', this._use_custom_cmd_switch,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('check-cmd-custom', this._field_checkcmd_custom,
+            'text', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('use-custom-cmd', this._field_checkcmd_custom,
+            'sensitive', Gio.SettingsBindFlags.DEFAULT
+        );
+
+        // Reset button
+        this._reset_button.connect('clicked', () => {
+            // restore default settings for the relevant keys
+            let keys = [
+                'terminal',
+                'output-on-terminal',
+                'update-cmd',
+                'update-cmd-options',
+                'use-custom-cmd',
+                'check-cmd-custom',
+            ];
+            keys.forEach(val => {
+                this._settings.set_value(val, this._settings.get_default_value(val));
+            });
+            // This one needs to be refreshed manually
+            this._update_cmd_options.set_active(this._settings.get_enum('update-cmd-options'));
+        });
+    }
+});
+
+const DebianUpdatesPackagesStatusPrefsPage = GObject.registerClass({
+    GTypeName: 'DebianUpdatesPackagesStatusPrefsPage',
+    Template: import.meta.url.replace('prefs.js', 'ui/prefs_packages_status_adw1.ui'),
+    InternalChildren: ['new_packages_switch', 'obsolete_packages_switch', 'residual_packages_switch',
+        'autoremovable_packages_switch'],
+}, class DebianUpdatesPackagesStatusPrefsPage extends Adw.PreferencesPage {
+    constructor(settings, params = {}) {
+        super(params);
+
+        this._settings = settings;
+
+        this._settings.bind('new-packages', this._new_packages_switch,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('obsolete-packages', this._obsolete_packages_switch,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('residual-packages', this._residual_packages_switch,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('autoremovable-packages', this._autoremovable_packages_switch,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
+    }
+});
+
+const DebianUpdatesIgnoreListPrefsPage = GObject.registerClass({
+    GTypeName: 'DebianUpdatesIgnoreListPrefsPage',
+    Template: import.meta.url.replace('prefs.js', 'ui/prefs_ignore_list_adw1.ui'),
+    InternalChildren: ['ignore_list_group'],
+}, class DebianUpdatesIgnoreListPrefsPage extends Adw.PreferencesPage {
+    constructor(settings, params = {}) {
+        super(params);
+
+        this._settings = settings;
+
+        this._ignoreListGroup = this._ignore_list_group;
+        this._ignoreListBox = new IgnoreListBox(this._settings);
+        this._ignoreListGroup.add(this._ignoreListBox);
+    }
+});
+
+export default class DebianUpdatesPreferences extends ExtensionPreferences {
+    fillPreferencesWindow(window) {
+        let settings = this.getSettings();
+
+        let basicSettingsPage = new DebianUpdatesBasicPrefsPage(settings);
         window.add(basicSettingsPage);
-        let advancedSettingsPage = builder.get_object('advanced_settings_page');
+
+        let advancedSettingsPage = new DebianUpdatesAdvancedPrefsPage(settings);
         window.add(advancedSettingsPage);
-        let packagesStatusPage = builder.get_object('packages_status_page');
+
+        let packagesStatusPage = new DebianUpdatesPackagesStatusPrefsPage(settings);
         window.add(packagesStatusPage);
-        let ignoreListPage = builder.get_object('ignore_list_page');
+
+        let ignoreListPage = new DebianUpdatesIgnoreListPrefsPage(settings);
         window.add(ignoreListPage);
 
         window.search_enabled = true;
-        window.set_default_size(580, 580);
-
-        bindPrefs(builder, settings);
-
-        let ignoreListGroup = builder.get_object('ignore_list_group');
-        let ignoreListBox = new IgnoreListBox(builder, settings);
-        ignoreListGroup.add(ignoreListBox);
+        window.set_default_size(585, 625);
     }
 }
 
