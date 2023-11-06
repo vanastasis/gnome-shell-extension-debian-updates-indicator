@@ -132,6 +132,9 @@ This extension is based on APT Update Indicator by Fran Glais.
 
 Many thanks go out to them for their work.
 
+## Donating 💳️
+If you like my work and want to support it, consider [donating](https://ko-fi.com/glerro). 🙂️ Thanks!
+
 ## License
 Debian Updates Indicator - Copyright (c) 2023 Gianni Lerro {glerro} ~ <glerro@pm.me>
 
