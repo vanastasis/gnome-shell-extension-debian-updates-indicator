@@ -27,8 +27,8 @@ build:
   artifacts:
     expire_in: 1 day
     paths:
-     - zip-files/
-     - descriptions/
+      - zip-files/
+      - descriptions/
 
 upload:
   stage: upload
