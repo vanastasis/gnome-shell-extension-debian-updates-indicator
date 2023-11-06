@@ -9,31 +9,16 @@ root = true
 charset = utf-8
 end_of_line = lf
 insert_final_newline = true
+trim_trailing_whitespace = true
+max_line_length = 120
 indent_style = space
 indent_size = 4
-trim_trailing_whitespace = true
 
-# Quote type override for al Js files: single quote.
+# Quote type override for al js files: single quote.
 [*.js]
 quote_type = single
 
-# Indentation override for all Json files: 2 space indents.
-[*.json]
+# Indentation override for all ui, build, xml, yml, json files: 2 space indents.
+[*.{ui, build, xml, yml, json}]
 indent_style = space
 indent_size = 2
-
-# Indentation override for all UI files: 2 space indents.
-[*.ui]
-indent_style = space
-indent_size = 2
-
-# Indentation override for all Xml files: 2 space indents.
-[*.xml]
-indent_style = space
-indent_size = 2
-
-# Indentation override for all Yml files: 2 space indents.
-[*.yml]
-indent_style = space
-indent_size = 2
-
