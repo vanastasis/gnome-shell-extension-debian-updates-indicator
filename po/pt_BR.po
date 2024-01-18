@@ -1,7 +1,7 @@
-# SOME DESCRIPTIVE TITLE.
+# Brazilian Portuguese translations for gnome-shell-extension-debian-updates-indicator package.
 # Copyright (C) YEAR 2023 Gianni Lerro {glerro} ~ <glerro@pm.me>
 # This file is distributed under the same license as the gnome-shell-extension-debian-updates-indicator package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Kemel Zaidan <kemelzaidan@gmail.com>, 2023.
 #
 msgid ""
 msgstr ""
