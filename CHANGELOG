@@ -1,4 +1,8 @@
-2024-18-01 Gianni Lerro <glerro@pm.me>
+2024-03-13 Gianni Lerro <glerro@pm.me>
+ * Release version 6.
+ * Add compatibility to Gnome Shell 46.
+
+2024-01-18 Gianni Lerro <glerro@pm.me>
  * Release version 5.
  * Add Brazilian Portuguese translation.
 

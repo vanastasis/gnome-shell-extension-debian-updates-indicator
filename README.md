@@ -17,7 +17,7 @@ This extension add an indicator to Gnome Shell for monitoring Debian Linux based
 * In the menu it is also possible check for updates, apply the updates and see when the last check was made.
 * It is customizable in many parts via extension settings.
 * Show a notification when there are new updates.
-* Support Gnome Shell Versions 40, 41, 42, 43, 44, 45.
+* Support Gnome Shell Versions 40, 41, 42, 43, 44, 45, 46.
 * Translatable.
 
 ## Installation
@@ -136,7 +136,7 @@ Many thanks go out to them for their work.
 If you like my work and want to support it, consider [donating](https://ko-fi.com/glerro). 🙂️ Thanks!
 
 ## License
-Debian Updates Indicator - Copyright (c) 2023 Gianni Lerro {glerro} ~ <glerro@pm.me>
+Debian Updates Indicator - Copyright (c) 2023-2024 Gianni Lerro {glerro} ~ <glerro@pm.me>
 
 Debian Updates Indicator is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the
