@@ -1,0 +1,334 @@
+# Russian translations for gnome-shell-extension-debian-updates-indicator package.
+# Copyright (C) 2024 2023 Gianni Lerro {glerro} ~ <glerro@pm.me>
+# This file is distributed under the same license as the gnome-shell-extension-debian-updates-indicator package.
+# Automatically generated, 2024.
+# Roman Aysin <aysin.roman@yandex.ru>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-shell-extension-debian-updates-indicator 6\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/glerro/gnome-shell-extension-"
+"debian-updates-indicator/issues\n"
+"POT-Creation-Date: 2024-04-04 23:38+0300\n"
+"PO-Revision-Date: 2024-04-04 23:47+0300\n"
+"Last-Translator: Roman Aysin <aysin.roman@yandex.ru>\n"
+"Language-Team: Russian\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Gtranslator 46.0\n"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:165
+msgid "New in repository"
+msgstr "Новые пакеты"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:168
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:42
+msgid "Local/Obsolete packages"
+msgstr "Устаревшие/Локально установленные пакеты"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:171
+msgid "Residual config files"
+msgstr "Установленные (остались файлы настроек)"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:174
+msgid "Autoremovable"
+msgstr "Ненужные пакеты"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:178
+msgid "Apply updates"
+msgstr "Применить обновления"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:179
+#: debian-updates-indicator@glerro.pm.me/indicator.js:265
+msgid "Check now"
+msgstr "Проверить сейчас"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:185
+msgid "Settings"
+msgstr "Параметры"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:262
+msgid "Checking"
+msgstr "Идёт проверка"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:324
+#, javascript-format
+msgid "%d update pending"
+msgid_plural "%d updates pending"
+msgstr[0] "%d обновление в ожидании"
+msgstr[1] "%d обновления в ожидании"
+msgstr[2] "%d обновлений в ожидании"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:355
+msgid "Error"
+msgstr "Ошибка"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:359
+msgid "No internet"
+msgstr "Нет подключения к интернету"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:362
+msgid "Initializing"
+msgstr "Запуск"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:366
+msgid "Up to date"
+msgstr "Обновлено"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:402
+#: debian-updates-indicator@glerro.pm.me/indicator.js:408
+#, fuzzy
+msgid "New Update"
+msgid_plural "New Updates"
+msgstr[0] "Новое обновление"
+msgstr[1] "Новые обновления"
+msgstr[2] "Новые обновления"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:409
+#, javascript-format
+msgid "There is %d update pending"
+msgid_plural "There are %d updates pending"
+msgstr[0] "Доступно %d обновление в ожидании"
+msgstr[1] "Доступно %d обновления в ожидании"
+msgstr[2] "Доступно %d обновлений в ожидании"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:598
+msgid "Update now"
+msgstr "Обновить сейчас"
+
+#: debian-updates-indicator@glerro.pm.me/monitors.js:80
+#: debian-updates-indicator@glerro.pm.me/monitors.js:89
+#, javascript-format
+msgid "Can not connect to %s"
+msgstr "Ошибка подключения к %s"
+
+#: debian-updates-indicator@glerro.pm.me/updateManager.js:641
+msgid "Last check: "
+msgstr "Последняя проверка: "
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:30
+msgid "Basic"
+msgstr "Основные"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:36
+msgid "Check for updates every:"
+msgstr "Проверять обновления каждые:"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:37
+msgid "Automatic checks, 0 to disable"
+msgstr "Автоматические проверки, 0 - отключить"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:56
+msgid "Hours"
+msgstr "Часа(ов)"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:57
+msgid "Days"
+msgstr "Дня(ей)"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:58
+msgid "Weeks"
+msgstr "Недель(ей)"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:72
+msgid "Strip out version numbers"
+msgstr "Не показывать номера версий"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:77
+msgid "Highlight security/important updates"
+msgstr "Выделить важные обновления"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:86
+msgid "Indicator"
+msgstr "Значок на панели"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:89
+msgid "Always show the indicator"
+msgstr "Всегда  показывать значок на панели"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:94
+msgid "Show updates count on the indicator"
+msgstr "Показывать количество обновлений"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:99
+msgid "Auto-expand updates list"
+msgstr "Раскрывать список обновлений"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:100
+msgid "If updates count is less than this number (0 to disable)"
+msgstr "Если количество обновлений меньше этого числа, 0 - отключить"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:122
+msgid "Notifications"
+msgstr "Уведомления"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:125
+msgid "Send a notification when new updates are available"
+msgstr "Уведомлять когда доступны новые обновления"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:130
+msgid "Use transient notifications (auto dismiss)"
+msgstr "Показывать всплывающие уведомления"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:135
+msgid "How much information to show on notifications"
+msgstr "Что показывать в уведомлениях"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:136
+msgid "Up to a maximum of 50 package names."
+msgstr "Максимально до 50 названий пакетов."
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:140
+msgid "Count only"
+msgstr "Только количество"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:141
+msgid "New updates names"
+msgstr "Названия новых пакетов"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:142
+msgid "All updates names"
+msgstr "Названия всех пакетов"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:156
+msgid "Enable shortcut"
+msgstr "Использовать комбинации клавиш"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:161
+msgid "Shortcut to toggle the menu"
+msgstr "Комбинация клавиш для Показать меню"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:165
+msgid "Select a shortcut"
+msgstr "Выберите комбинацию клавиш"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:30
+msgid "Advanced"
+msgstr "Дополнительные"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:36
+msgid "Reset values for all commands"
+msgstr "Вернуть значения по умолчанию для команд"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:42
+msgid "Reset"
+msgstr "Сбросить"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:60
+msgid "Update method"
+msgstr "Способ обновления"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:61
+msgid "Method to use to apply the updates."
+msgstr "Использовать для применения обновлений"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:72
+msgid "Custom"
+msgstr "Свой"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:80
+msgid ""
+"Command to update packages <span size=\"small\">(You can use sudo instead of "
+"pkexec for the terminal)</span>"
+msgstr ""
+"Команда для обновления пакетов <span size=\"small\">(Можно использовать sudo "
+"вместо pkexec для терминала)</span>"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:86
+msgid "Show output on terminal"
+msgstr "Показывать вывод в терминале"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:91
+msgid "Terminal to use <span size=\"small\">(Ex: xterm -e)</span>"
+msgstr "Терминал для вывода <span size=\"small\">(Например: xterm -e)</span>"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:103
+msgid "Use a custom command to check for updates"
+msgstr "Использовать свою команду для проверки обновлений"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:104
+msgid ""
+"The default command is \"pkcon refresh\", which uses packagekit with the apt "
+"backend. You can define a custom command below, to be executed using pkexec."
+msgstr ""
+"Команда по умолчанию \"pkcon refresh\" использует packagekit (apt как "
+"бэкенд). Можно указать свою команду ниже, которая будет выполнена, используя "
+"pkexec "
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:109
+msgid "Custom command to check for updates"
+msgstr "Своя команда для проверки обновлений"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:30
+msgid "Packages"
+msgstr "Пакеты"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:36
+msgid "New packages in repository"
+msgstr "Новые пакеты в репозитории"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:37
+msgid ""
+"Include an item in the indicator with a list of new packages in the "
+"repository."
+msgstr ""
+"Показывать пункт в меню значка на панели со списком новых пакетов в "
+"репозитории."
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:43
+msgid ""
+"Include an item in the indicator with a list of obsolete or local packages. "
+"Obsolete packages are not available in the repository. Local packages are "
+"available, but an unavailable version is installed."
+msgstr ""
+"Показывать пункт в меню значка на панели со списком устаревших или локально "
+"установленных пакетов. Устаревшие пакеты недоступны в репозитории. Локально "
+"установленные доступны, но установлена недоступная версия."
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:48
+msgid "Residual packages"
+msgstr "Установленные пакеты (остались файлы настроек)"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:49
+msgid ""
+"Include an item in the indicator with a list of packages that have residual "
+"config files. Run \"sudo apt purge pkgname\" to clean them."
+msgstr ""
+"Показывать пункт в меню значка на панели со списком установленных пакетов, у "
+"которых остались файлы настроек. Можно выполнить команду \"sudo apt purge "
+"pkgname\" для их удаления."
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:54
+msgid "Autoremovable packages"
+msgstr "Ненужные пакеты"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:55
+msgid ""
+"Include an item in the indicator with a list of autoremovable packages. Run "
+"\"sudo apt autoremove\" to remove them."
+msgstr ""
+"Показывать пункт в меню значка на панели со списком ненужных пакетов "
+"(требовались для некоторых других пакетов, но после удаления этих пакетов "
+"стали больше не нужны). Можно выполнить команду \"sudo apt autoremove\" для "
+"их удаления."
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_ignore_list_adw1.ui:30
+msgid "Ignore"
+msgstr "Исключения"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_ignore_list_adw1.ui:34
+msgid "Packages in this list will be excluded from the updates."
+msgstr "Пакеты из этого списка не будут автоматически обновляться."
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_ignore_list_adw1.ui:35
+msgid ""
+"As an example, this is useful for packages that are downgraded manually."
+msgstr "Это полезно, например, если вы вручную указали версию для пакета."
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_add_shortcuts_adw1.ui:37
+msgid "Press Esc to exit or Backspace to clear"
+msgstr "Нажмите Esc для отмены или Backspace для отключения комбинации клавиш"
