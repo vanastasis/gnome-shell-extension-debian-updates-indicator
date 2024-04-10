@@ -578,7 +578,7 @@ export const DebianUpdatesIndicator = GObject.registerClass({
      * */
 
     _showNotification(title, message) {
-        if (this._notifSource === undefined) {
+        if (this._notifSource === undefined || this._notifSource === null) {
             // We have to prepare this only once
             this._notifSource = new MessageTray.SystemNotificationSource();
             this._notifSource.createIcon = () => {
