@@ -544,8 +544,10 @@ export const UpdateManager = class UpdateManager {
         // Since this runs async, the indicator might have been destroyed!
         if (this._indicator) {
             // Update indicator
-            if (index === SCRIPT.UPGRADES && this._extensionSettings.get_boolean('show-critical-updates')) {
-                this._checkUrgency();
+            // TODO: check
+            if (index === SCRIPT.UPGRADES /* && this._extensionSettings.get_boolean('show-critical-updates') */) {
+                this._filterHeldPackages();
+                // this._checkUrgency();
             } else {
                 this._indicator.updatePackagesStatus(index);
                 this._indicator._urgentList = [];
@@ -653,6 +655,68 @@ export const UpdateManager = class UpdateManager {
                 return false;
             return true;
         });
+    }
+
+    _filterHeldPackages() {
+        console.log(`${this._extensionName} - Get Held Packages`);
+        let heldPackagesList = [];
+        let outputList;
+
+        let script = [
+            'apt-mark',
+            'showhold',
+        ];
+
+        let cancelId = 0;
+
+        // TODO: Use promise catch
+        try {
+            let proc = new Gio.Subprocess({argv: script, flags: Gio.SubprocessFlags.STDOUT_PIPE});
+            proc.init(this._cancellable);
+
+            if (this._cancellable instanceof Gio.Cancellable)
+                cancelId = this._cancellable.connect(() => proc.force_exit());
+
+            outputList = new Promise((resolve, reject) => {
+                proc.communicate_utf8_async(null, this._cancellable, (process, result) => {
+                    try {
+                        let [, output] = process.communicate_utf8_finish(result);
+                        resolve(output);
+                    } catch (err) {
+                        reject(err);
+                    }
+                });
+            });
+        } catch (err) {
+            console.log(`${this._extensionName} - Failed to run apt-mark showhold - ${err.message}`);
+            this._indicator.showChecking(false);
+            this._indicator.updateStatus(STATUS.ERROR);
+        } finally {
+            if (cancelId > 0)
+                this._cancellable.disconnect(cancelId);
+
+            outputList.then(outL => {
+                heldPackagesList = outL.split('\n');
+                heldPackagesList.pop(); // Last item is empty
+
+                this._indicator._updateList = this._indicator._updateList.filter(pkg => {
+                    // only get the package name, in case the version is included
+                    let pkgname = pkg.split('\t', 2)[0];
+                    if (heldPackagesList.indexOf(pkgname) !== -1)
+                        return false;
+                    return true;
+                });
+
+                // TODO: To remove
+                heldPackagesList.forEach(entry => {
+                    log(entry);
+                });
+
+                this._indicator.updatePackagesStatus(SCRIPT.UPGRADES);
+                if (this._extensionSettings.get_boolean('show-critical-updates'))
+                    this._checkUrgency();
+            });
+        }
     }
 
     destroy() {
