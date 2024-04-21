@@ -1,3 +1,7 @@
+2024-04-21 Gianni Lerro <glerro@pm.me>
+ * Release version 9.
+ * Add French translation.
+
 2024-04-10 Gianni Lerro <glerro@pm.me>
  * Release version 8.
  * Fix a bug in _showNotification function.
