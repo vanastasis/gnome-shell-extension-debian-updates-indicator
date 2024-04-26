@@ -1,3 +1,8 @@
+2024-04-26 Gianni Lerro <glerro@pm.me>
+ * Release version 2.2.2.
+ * Switch from version to version-name in metadata.json (v2.0.0 from GS45, v1.0.0 pre GS45).
+ * Update French translation.
+
 2024-04-21 Gianni Lerro <glerro@pm.me>
  * Release version 9.
  * Add French translation.
