@@ -34,7 +34,7 @@ msgstr "Fichier de configuration résiduel"
 
 #: debian-updates-indicator@glerro.pm.me/indicator.js:174
 msgid "Autoremovable"
-msgstr "Autoretirable"
+msgstr "Supprimable automatiquement"
 
 #: debian-updates-indicator@glerro.pm.me/indicator.js:178
 msgid "Apply updates"
@@ -57,8 +57,8 @@ msgstr "En cours de vérification"
 #, javascript-format
 msgid "%d update pending"
 msgid_plural "%d updates pending"
-msgstr[0] "Mise à jour %d en attente"
-msgstr[1] "Mises à jour %d en attente"
+msgstr[0] "%d mise à jour en attente"
+msgstr[1] "%d mises à jour en attente"
 
 #: debian-updates-indicator@glerro.pm.me/indicator.js:355
 msgid "Error"
@@ -210,7 +210,7 @@ msgstr "Réinitialiser les valeurs pour toutes les commandes"
 
 #: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:42
 msgid "Reset"
-msgstr "Reset"
+msgstr "Réinitialiser"
 
 #: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:60
 msgid "Update method"
@@ -274,7 +274,7 @@ msgstr "Inclure un élément dans l'indicateur avec une liste de paquets qui ont
 
 #: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:54
 msgid "Autoremovable packages"
-msgstr "Paquets auto-amovibles"
+msgstr "Paquets automatiquement supprimables"
 
 #: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:55
 msgid "Include an item in the indicator with a list of autoremovable packages. Run \"sudo apt autoremove\" to remove them."
