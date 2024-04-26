@@ -110,6 +110,10 @@
       <default>true</default>
       <summary>Distinguishes security/important updates from regular updates</summary>
     </key>
+    <key type="b" name="strip-helded-updates">
+      <default>false</default>
+      <summary>Remove helded packages from checkupdates output</summary>
+    </key>
     <key type="i" name="auto-expand-list">
       <default>0</default>
       <summary>Auto-open list submenu when updates count is lower than this number</summary>

@@ -311,6 +311,12 @@ export const UpdateManager = class UpdateManager {
             },
         ], [
             this._extensionSettings,
+            'changed::strip-helded-updates',
+            () => {
+                this._launchScript(SCRIPT.UPGRADES);
+            },
+        ], [
+            this._extensionSettings,
             'changed::ignore-list',
             () => {
                 // We add a timeout in case many entries are deleted
@@ -544,10 +550,11 @@ export const UpdateManager = class UpdateManager {
         // Since this runs async, the indicator might have been destroyed!
         if (this._indicator) {
             // Update indicator
-            // TODO: check
-            if (index === SCRIPT.UPGRADES /* && this._extensionSettings.get_boolean('show-critical-updates') */) {
+            // TODO:
+            if (index === SCRIPT.UPGRADES && this._extensionSettings.get_boolean('strip-helded-updates')) {
                 this._filterHeldPackages();
-                // this._checkUrgency();
+            } else if (index === SCRIPT.UPGRADES && this._extensionSettings.get_boolean('show-critical-updates')) {
+                this._checkUrgency();
             } else {
                 this._indicator.updatePackagesStatus(index);
                 this._indicator._urgentList = [];

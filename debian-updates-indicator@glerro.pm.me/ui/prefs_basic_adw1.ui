@@ -77,6 +77,11 @@
             <property name="title" translatable="yes">Highlight security/important updates</property>
           </object>
         </child>
+        <child>
+          <object class="AdwSwitchRow" id="strip_helded_switch">
+            <property name="title" translatable="yes">Strip out helded updates</property>
+          </object>
+        </child>
       </object>
     </child>
     <child>

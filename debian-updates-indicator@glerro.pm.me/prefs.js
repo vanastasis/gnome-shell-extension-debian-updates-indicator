@@ -112,7 +112,7 @@ const DebianUpdatesBasicPrefsPage = GObject.registerClass({
     Template: import.meta.url.replace('prefs.js', 'ui/prefs_basic_adw1.ui'),
     InternalChildren: ['interval', 'interval_unit', 'strip_versions_switch', 'urgent_updates_switch',
         'always_visible', 'show_count', 'auto_expand_list', 'notifications', 'transient_notifications',
-        'verbosity', 'shortcut_row', 'shortcut_label', 'use_shortcut'],
+        'verbosity', 'shortcut_row', 'shortcut_label', 'use_shortcut', 'strip_helded_switch'],
 }, class DebianUpdatesBasicPrefsPage extends Adw.PreferencesPage {
     constructor(settings, params = {}) {
         super(params);
@@ -128,6 +128,9 @@ const DebianUpdatesBasicPrefsPage = GObject.registerClass({
             'active', Gio.SettingsBindFlags.DEFAULT
         );
         this._settings.bind('show-critical-updates', this._urgent_updates_switch,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('strip-helded-updates', this._strip_helded_switch,
             'active', Gio.SettingsBindFlags.DEFAULT
         );
 
