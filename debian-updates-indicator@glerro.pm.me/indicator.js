@@ -43,8 +43,12 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
+import * as Config from 'resource:///org/gnome/shell/misc/config.js';
 
 import * as Utils from './utils.js';
+
+/* Gnome Shell Version */
+const SHELL_MAJOR = parseInt(Config.PACKAGE_VERSION.split('.')[0]);
 
 /* For error checking */
 export const STATUS = {
@@ -578,32 +582,55 @@ export const DebianUpdatesIndicator = GObject.registerClass({
      * */
 
     _showNotification(title, message) {
-        if (this._notifSource === undefined || this._notifSource === null) {
+        if (this._notifySource === undefined || this._notifySource === null) {
             // We have to prepare this only once
-            this._notifSource = new MessageTray.SystemNotificationSource();
-            this._notifSource.createIcon = () => {
-                return new St.Icon({icon_name: 'package-x-generic-symbolic'});
-            };
+            if (SHELL_MAJOR > 45) {
+                this._notifySource = new MessageTray.Source({
+                    title: 'Gnome Shell Extension',
+                    iconName: 'org.gnome.Shell.Extensions-symbolic',
+                });
+            } else {
+                this._notifySource = new MessageTray.Source('Gnome Shell Extension', 'package-x-generic-symbolic');
+            }
+
             // Take care of not leaving unneeded sources
-            this._notifSource.connect('destroy', () => {
-                this._notifSource = null;
-            });
-            Main.messageTray.add(this._notifSource);
+            this._notifySource.connectObject('destroy', () => (this._notifySource = null), this);
+            Main.messageTray.add(this._notifySource);
         }
         let notification = null;
         // We do not want to have multiple notifications stacked
         // instead we will update previous
-        if (this._notifSource.notifications.length === 0) {
-            notification = new MessageTray.Notification(this._notifSource, title, message);
+        if (this._notifySource.notifications.length === 0) {
+            if (SHELL_MAJOR > 45) {
+                notification = new MessageTray.Notification({
+                    source: this._notifySource,
+                    title,
+                    body: message,
+                    iconName: 'package-x-generic-symbolic',
+                    isTransient: this._extensionSettings.get_boolean('transient'),
+                    resident: false,
+                });
+            } else {
+                notification = new MessageTray.Notification(this._notifySource, title, message);
+                notification.setTransient(this._extensionSettings.get_boolean('transient'));
+            }
             notification.addAction(_('Update now'), () => {
                 this._updateManager._applyUpdates();
             });
         } else {
-            notification = this._notifSource.notifications[0];
-            notification.update(title, message, {clear: true});
+            notification = this._notifySource.notifications[0];
+            if (SHELL_MAJOR > 45) {
+                notification.title = title;
+                notification.body = message;
+            } else {
+                notification.update(title, message, {clear: true});
+            }
         }
-        notification.setTransient(this._extensionSettings.get_boolean('transient'));
-        this._notifSource.showNotification(notification);
+
+        if (SHELL_MAJOR > 45)
+            this._notifySource.addNotification(notification);
+        else
+            this._notifySource.showNotification(notification);
     }
 
     _toggleShortcut() {
