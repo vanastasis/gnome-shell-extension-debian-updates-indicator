@@ -1,3 +1,7 @@
+2024-05-08 Gianni Lerro <glerro@pm.me>
+ * Release version 2.3.0.
+ * Fix notification issue in GS46.
+
 2024-04-26 Gianni Lerro <glerro@pm.me>
  * Release version 2.2.2.
  * Switch from version to version-name in metadata.json (v2.0.0 from GS45, v1.0.0 pre GS45).

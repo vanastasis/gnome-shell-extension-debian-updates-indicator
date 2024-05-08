@@ -2,7 +2,7 @@
   "name": "Debian Linux Updates Indicator",
   "description": "Updates indicator for Debian Linux based distributions.\n\nCheck for updates and shows also the following packages status (as in Synaptic):\n\u26ab Available updates.\n\u26ab New packages in repository.\n\u26ab Local/Obsolete packages.\n\u26ab Residual config files.\n\u26ab Autoremovable packages.",
   "uuid": "debian-updates-indicator@glerro.pm.me",
-  "version-name": "2.2.2",
+  "version-name": "2.3.0",
   "url": "https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator",
   "gettext-domain": "gnome-shell-extension-debian-updates-indicator",
   "settings-schema": "org.gnome.shell.extensions.debian-updates-indicator",
