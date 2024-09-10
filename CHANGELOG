@@ -1,3 +1,7 @@
+2024-09-10 Gianni Lerro <glerro@pm.me>
+ * Release version 2.4.0.
+ * Add compatibility to Gnome Shell 47.
+
 2024-05-08 Gianni Lerro <glerro@pm.me>
  * Release version 2.3.0.
  * Fix notification issue in GS46.
