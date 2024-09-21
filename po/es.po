@@ -6,10 +6,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gnome-shell-extension-debian-updates-indicator 2.4.0\n"
+"Project-Id-Version: gnome-shell-extension-debian-updates-indicator 1.2.2\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator/issues\n"
 "POT-Creation-Date: 2024-09-21 22:16+0200\n"
-"PO-Revision-Date: 2024-09-20 19:36-0600\n"
+"PO-Revision-Date: 2024-09-21 16:01-0600\n"
 "Last-Translator: Jehu Marcos Herrera Puentes <jehuherrerap@hotmail.com>\n"
 "Language-Team: Mexican Spanish\n"
 "Language: es_MX\n"
@@ -127,7 +127,7 @@ msgstr "Editar entrada"
 
 #: debian-updates-indicator@glerro.pm.me/updateManager.js:644
 msgid "Last check: "
-msgstr "Última búsqueda:"
+msgstr "Última búsqueda: "
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:58
 msgid "Basic"
@@ -405,59 +405,52 @@ msgstr ""
 "Por ejemplo, esto es útil para los paquetes que se desactualizan manualmente."
 
 #: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:364
-#, fuzzy
 msgid "Command to update packages"
-msgstr "Comando personalizado para buscar actualizaciones"
+msgstr "Comando para actualizar paquetes"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:374
-#, fuzzy
 msgid "You can use sudo instead of pkexec for the terminal."
-msgstr ""
-"Comando para actualizar paquetes <span size=\"small\">(Puede usar sudo en "
-"lugar de pkexec para la terminal)</span>"
+msgstr "Puede usar sudo en lugar de pkexec en la terminal"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:453
 msgid "Terminal to use"
-msgstr ""
+msgstr "Terminal para usar"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:465
 msgid "Ex: xterm -e"
-msgstr ""
+msgstr "Ej: xterm -e"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:516
 #: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:570
 msgid "Clear entry"
-msgstr ""
+msgstr "Limpiar terminal"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:536
 #: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:590
 msgid "Cancel"
-msgstr ""
+msgstr "Cancelar"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:544
 #: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:598
 msgid "Save"
-msgstr ""
+msgstr "Guardar"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:975
-#, fuzzy
 msgid "Basic settings"
-msgstr "Configuración"
+msgstr "Configuración básica"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:1226
-#, fuzzy
 msgid "Advanced settings"
-msgstr "Avanzado"
+msgstr "Configuración avanzada"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:1479
-#, fuzzy
 msgid "Package status"
-msgstr "Paquetes"
+msgstr "Estado del paquete"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:1501
-#, fuzzy
 msgid ""
 "Packages in this list will be excluded from the updates. As an example, this "
 "is useful for packages that are downgraded manually."
 msgstr ""
-"Por ejemplo, esto es útil para los paquetes que se desactualizan manualmente."
+"Los paquetes en esta lista se excluirán de las actualizaciones. Por ejemplo, "
+"esto es útil para los paquetes que se desactualizan manualmente."
