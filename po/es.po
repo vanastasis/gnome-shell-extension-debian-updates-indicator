@@ -1,0 +1,384 @@
+# Spanish translations for gnome-shell-extension-debian-updates-indicator package.
+# Copyright (C) 2024 2023 Gianni Lerro {glerro} ~ <glerro@pm.me>
+# This file is distributed under the same license as the gnome-shell-extension-debian-updates-indicator package.
+# Automatically generated, 2024.
+# Jehu Marcos Herrera Puentes <jehuherrerap@hotmail.com>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-shell-extension-debian-updates-indicator 2.4.0\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/glerro/gnome-shell-extension-"
+"debian-updates-indicator/issues\n"
+"POT-Creation-Date: 2024-09-20 17:53-0600\n"
+"PO-Revision-Date: 2024-09-20 19:36-0600\n"
+"Last-Translator: Jehu Marcos Herrera Puentes <jehuherrerap@hotmail.com>\n"
+"Language-Team: Mexican Spanish\n"
+"Language: es_MX\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Gtranslator 46.1\n"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:169
+msgid "New in repository"
+msgstr "Nuevo en el repositorio"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:172
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:365
+msgid "Local/Obsolete packages"
+msgstr "Paquetes locales/obsoletos"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:175
+msgid "Residual config files"
+msgstr "Archivos residuales"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:178
+msgid "Autoremovable"
+msgstr "Autodesinstalable"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:182
+msgid "Apply updates"
+msgstr "Instalar actualizaciones"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:183
+#: debian-updates-indicator@glerro.pm.me/indicator.js:269
+msgid "Check now"
+msgstr "Buscar actualizaciones"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:189
+msgid "Settings"
+msgstr "Configuración"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:266
+msgid "Checking"
+msgstr "Buscando actualizaciones"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:328
+#, javascript-format
+msgid "%d update pending"
+msgid_plural "%d updates pending"
+msgstr[0] "%d actualización pendiente"
+msgstr[1] "%d actualizaciones pendientes"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:359
+msgid "Error"
+msgstr "Error"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:363
+msgid "No internet"
+msgstr "No hay internet"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:366
+msgid "Initializing"
+msgstr "Inicializando"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:370
+msgid "Up to date"
+msgstr "Sistema al día"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:406
+#: debian-updates-indicator@glerro.pm.me/indicator.js:412
+msgid "New Update"
+msgid_plural "New Updates"
+msgstr[0] "Actualización disponible"
+msgstr[1] "Actualizaciones disponibles"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:413
+#, javascript-format
+msgid "There is %d update pending"
+msgid_plural "There are %d updates pending"
+msgstr[0] "Hay %d actualización pendiente"
+msgstr[1] "Hay %d actualizaciones pendientes"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:602
+msgid "Update now"
+msgstr "Actualizar ahora"
+
+#: debian-updates-indicator@glerro.pm.me/monitors.js:88
+#: debian-updates-indicator@glerro.pm.me/monitors.js:97
+#, javascript-format
+msgid "Can not connect to %s"
+msgstr "No se pudo conectar a %s"
+
+#: debian-updates-indicator@glerro.pm.me/prefs.js:70
+msgid "Indicator options"
+msgstr "Indicador"
+
+#: debian-updates-indicator@glerro.pm.me/prefs.js:91
+msgid "Notification options"
+msgstr "Notificaciones"
+
+#: debian-updates-indicator@glerro.pm.me/prefs.js:112
+msgid "Custom command for updates"
+msgstr "Comando personalizado para buscar actualizaciones"
+
+#: debian-updates-indicator@glerro.pm.me/prefs.js:144
+msgid "Package name"
+msgstr "Paquetes"
+
+#: debian-updates-indicator@glerro.pm.me/prefs.js:176
+msgid "Add entry to ignore list"
+msgstr "Añadir entrada a la lista de ignorados"
+
+#: debian-updates-indicator@glerro.pm.me/prefs.js:256
+msgid "Edit entry"
+msgstr "Editar entrada"
+
+#: debian-updates-indicator@glerro.pm.me/updateManager.js:644
+msgid "Last check: "
+msgstr "Última búsqueda:"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:58
+msgid "Basic"
+msgstr "Básico"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:64
+msgid "Check for updates every:"
+msgstr "Buscar actualizaciones cada:"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:65
+msgid "Automatic checks, 0 to disable"
+msgstr "Búsqueda automática, 0 para desactivar"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:80
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:684
+msgid "Hours"
+msgstr "Horas"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:81
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:685
+msgid "Days"
+msgstr "Días"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:82
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:686
+msgid "Weeks"
+msgstr "Semanas"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:94
+msgid "Strip out version numbers"
+msgstr "Ocultar los números de versión"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:105
+msgid "Highlight security/important updates"
+msgstr "Resaltar actualizaciones de seguridad/importantes"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:120
+msgid "Indicator"
+msgstr "Indicador"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:123
+msgid "Always show the indicator"
+msgstr "Mostrar siempre el indicador"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:135
+msgid "Show updates count on the indicator"
+msgstr "Mostrar número de actualizaciones en el indicador"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:147
+msgid "Auto-expand updates list"
+msgstr "Auto-expandir lista de actualizaciones"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:148
+msgid "If updates count is less than this number (0 to disable)"
+msgstr ""
+"SI el número de actualizaciones es menor que este número (0 para desactivar)"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:168
+msgid "Notifications"
+msgstr "Notificaciones"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:171
+msgid "Send a notification when new updates are available"
+msgstr "Mostrar una notificación cuando hay actualizaciones disponibles"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:183
+msgid "Use transient notifications (auto dismiss)"
+msgstr "Utilizar notificaciones transitorias (se ocultan automáticamente)"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:195
+msgid "How much information to show on notifications"
+msgstr "Cuanta información se mostrará en las notificaciones"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:196
+msgid "Up to a maximum of 50 package names."
+msgstr "Se muestra un máximo de 50 paquetes actualizables."
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:200
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:315
+msgid "Count only"
+msgstr "Solo número de actualizaciones"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:201
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:316
+msgid "New updates names"
+msgstr "Solo mostrar las nuevas actualizaciones"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:202
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:317
+msgid "All updates names"
+msgstr "Mostrar todas las actualizaciones"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:216
+msgid "Shortcut to open the indicator"
+msgstr "Atajo para mostrar el indicador"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:217
+msgid "Syntax: <Shift>, <Ctrl>, <Alt>, <Super>"
+msgstr "Sintaxis: <Shift>, <Ctrl>, <Alt>, <Super>"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:238
+msgid "Advanced"
+msgstr "Avanzado"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:244
+msgid "Reset values for all commands"
+msgstr "Restablecer todos los valores"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:264
+msgid "Update method"
+msgstr "Método de actualización"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:265
+msgid "Method to use to apply the updates."
+msgstr "Método que se usará para instalar actualizaciones"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:270
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:1105
+msgid "Launch Gnome Software"
+msgstr "Ejecutar Gnome Software"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:271
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:1106
+msgid "Launch Synaptic Package Manager"
+msgstr "Ejecutar Synaptic"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:272
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:1107
+msgid "Launch Gnome PackageKit Update Viewer"
+msgstr "Ejecutar Gnome PackageKit Update Viewer"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:273
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:1108
+msgid "Launch Ubuntu Update Manager"
+msgstr "Ejecutar Ubuntu Update Manager"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:274
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:1109
+msgid "Custom"
+msgstr "Personalizado"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:280
+msgid ""
+"Command to update packages <span size=\"small\">(You can use sudo instead of "
+"pkexec for the terminal)</span>"
+msgstr ""
+"Comando para actualizar paquetes <span size=\"small\">(Puede usar sudo en "
+"lugar de pkexec para la terminal)</span>"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:291
+msgid "Show output on terminal"
+msgstr "Mostrar la salida en la temrinal"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:303
+msgid "Terminal to use <span size=\"small\">(Ex: xterm -e)</span>"
+msgstr "Terminal a usar <span size=\"small\">(Ej: xterm -e)</span>"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:320
+msgid "Use a custom command to check for updates"
+msgstr "Usar un comando personalizado para buscar actualizaciones"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:321
+msgid ""
+"The default command is \"pkcon refresh\", which uses packagekit with the apt "
+"backend. You can define a custom command below, to be executed using pkexec."
+msgstr ""
+"El comando por defecto es \"pkcon refresh\", que usa packagekit con el "
+"backend de apt. Puede definir un comando personalizado a continuación para "
+"que se ejecute usando pkexec."
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:332
+msgid "Custom command to check for updates"
+msgstr "Comando personalizado para buscar actualizaciones"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:347
+msgid "Packages"
+msgstr "Paquetes"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:353
+msgid "New packages in repository"
+msgstr "Nuevos paquetes en el repositorio"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:354
+msgid ""
+"Include an item in the indicator with a list of new packages in the "
+"repository."
+msgstr ""
+"Incluir un elemento en el indicador con una lista de nuevos paquetes en el "
+"repositorio."
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:366
+msgid ""
+"Include an item in the indicator with a list of obsolete or local packages. "
+"Obsolete packages are not available in the repository. Local packages are "
+"available, but an unavailable version is installed."
+msgstr ""
+"Incluir un elemento en el indicador con una lista de paquetes obsoletos o "
+"locales. Los paquetes obsoletos no están disponibles en el repositorio. Los "
+"paquetes locales están disponibles, pero se ha instalado una versión no "
+"disponible."
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:377
+msgid "Residual packages"
+msgstr "Paquetes residuales"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:378
+msgid ""
+"Include an item in the indicator with a list of packages that have residual "
+"config files. Run \"sudo apt purge pkgname\" to clean them."
+msgstr ""
+"Incluir un elemento en el indicador con una lista de paquetes que tienen "
+"archivos de configuración residuales. Ejecute \"sudo apt purge paquete\" "
+"para limpiarlos."
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:389
+msgid "Autoremovable packages"
+msgstr "Paquetes autodesinstalables"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:390
+msgid ""
+"Include an item in the indicator with a list of autoremovable packages. Run "
+"\"sudo apt autoremove\" to remove them."
+msgstr ""
+"Incluir un elemento en el indicador con una lista de paquetes "
+"autodesinstalables. Ejecute \"sudo apt autoremove\" para eliminarlos."
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:405
+msgid "Ignore"
+msgstr "Ignorar"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:409
+msgid "Packages in this list will be excluded from the updates."
+msgstr "Los paquetes en esta lista se excluirán al actualizar"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:410
+msgid ""
+"As an example, this is useful for packages that are downgraded manually."
+msgstr ""
+"Por ejemplo, esto es útil para los paquetes que se desactualizan manualmente."
+
+#~ msgid "Enable shortcut"
+#~ msgstr "Habilitar atajo"
+
+#~ msgid "Shortcut to toggle the menu"
+#~ msgstr "Atajo para mostrar el menú"
+
+#~ msgid "Select a shortcut"
+#~ msgstr "Seleccionar atajo"
+
+#~ msgid "Reset"
+#~ msgstr "Restablecer"
+
+#~ msgid "Press Esc to exit or Backspace to clear"
+#~ msgstr "Pulse Esc para salir o Retroceso para borrar"
