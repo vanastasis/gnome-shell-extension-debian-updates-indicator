@@ -7,9 +7,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-debian-updates-indicator 2.4.0\n"
-"Report-Msgid-Bugs-To: https://gitlab.gnome.org/glerro/gnome-shell-extension-"
-"debian-updates-indicator/issues\n"
-"POT-Creation-Date: 2024-09-20 17:53-0600\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator/issues\n"
+"POT-Creation-Date: 2024-09-21 22:16+0200\n"
 "PO-Revision-Date: 2024-09-20 19:36-0600\n"
 "Last-Translator: Jehu Marcos Herrera Puentes <jehuherrerap@hotmail.com>\n"
 "Language-Team: Mexican Spanish\n"
@@ -26,6 +25,7 @@ msgstr "Nuevo en el repositorio"
 
 #: debian-updates-indicator@glerro.pm.me/indicator.js:172
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:365
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:1337
 msgid "Local/Obsolete packages"
 msgstr "Paquetes locales/obsoletos"
 
@@ -134,10 +134,12 @@ msgid "Basic"
 msgstr "Básico"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:64
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:645
 msgid "Check for updates every:"
 msgstr "Buscar actualizaciones cada:"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:65
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:657
 msgid "Automatic checks, 0 to disable"
 msgstr "Búsqueda automática, 0 para desactivar"
 
@@ -157,51 +159,63 @@ msgid "Weeks"
 msgstr "Semanas"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:94
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:726
 msgid "Strip out version numbers"
 msgstr "Ocultar los números de versión"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:105
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:765
 msgid "Highlight security/important updates"
 msgstr "Resaltar actualizaciones de seguridad/importantes"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:120
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:815
 msgid "Indicator"
 msgstr "Indicador"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:123
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:85
 msgid "Always show the indicator"
 msgstr "Mostrar siempre el indicador"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:135
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:124
 msgid "Show updates count on the indicator"
 msgstr "Mostrar número de actualizaciones en el indicador"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:147
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:178
 msgid "Auto-expand updates list"
 msgstr "Auto-expandir lista de actualizaciones"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:148
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:163
 msgid "If updates count is less than this number (0 to disable)"
 msgstr ""
 "SI el número de actualizaciones es menor que este número (0 para desactivar)"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:168
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:869
 msgid "Notifications"
 msgstr "Notificaciones"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:171
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:238
 msgid "Send a notification when new updates are available"
 msgstr "Mostrar una notificación cuando hay actualizaciones disponibles"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:183
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:260
 msgid "Use transient notifications (auto dismiss)"
 msgstr "Utilizar notificaciones transitorias (se ocultan automáticamente)"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:195
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:289
 msgid "How much information to show on notifications"
 msgstr "Cuanta información se mostrará en las notificaciones"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:196
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:301
 msgid "Up to a maximum of 50 package names."
 msgstr "Se muestra un máximo de 50 paquetes actualizables."
 
@@ -221,10 +235,12 @@ msgid "All updates names"
 msgstr "Mostrar todas las actualizaciones"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:216
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:921
 msgid "Shortcut to open the indicator"
 msgstr "Atajo para mostrar el indicador"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:217
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:932
 msgid "Syntax: <Shift>, <Ctrl>, <Alt>, <Super>"
 msgstr "Sintaxis: <Shift>, <Ctrl>, <Alt>, <Super>"
 
@@ -233,14 +249,22 @@ msgid "Advanced"
 msgstr "Avanzado"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:244
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:1015
 msgid "Reset values for all commands"
 msgstr "Restablecer todos los valores"
 
+#: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:247
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:1025
+msgid "Reset"
+msgstr "Restablecer"
+
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:264
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:1060
 msgid "Update method"
 msgstr "Método de actualización"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:265
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:1072
 msgid "Method to use to apply the updates."
 msgstr "Método que se usará para instalar actualizaciones"
 
@@ -278,6 +302,7 @@ msgstr ""
 "lugar de pkexec para la terminal)</span>"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:291
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:414
 msgid "Show output on terminal"
 msgstr "Mostrar la salida en la temrinal"
 
@@ -286,10 +311,12 @@ msgid "Terminal to use <span size=\"small\">(Ex: xterm -e)</span>"
 msgstr "Terminal a usar <span size=\"small\">(Ej: xterm -e)</span>"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:320
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:1165
 msgid "Use a custom command to check for updates"
 msgstr "Usar un comando personalizado para buscar actualizaciones"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:321
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:1149
 msgid ""
 "The default command is \"pkcon refresh\", which uses packagekit with the apt "
 "backend. You can define a custom command below, to be executed using pkexec."
@@ -299,6 +326,7 @@ msgstr ""
 "que se ejecute usando pkexec."
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:332
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:1202
 msgid "Custom command to check for updates"
 msgstr "Comando personalizado para buscar actualizaciones"
 
@@ -307,10 +335,12 @@ msgid "Packages"
 msgstr "Paquetes"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:353
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:1282
 msgid "New packages in repository"
 msgstr "Nuevos paquetes en el repositorio"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:354
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:1266
 msgid ""
 "Include an item in the indicator with a list of new packages in the "
 "repository."
@@ -319,6 +349,7 @@ msgstr ""
 "repositorio."
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:366
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:1321
 msgid ""
 "Include an item in the indicator with a list of obsolete or local packages. "
 "Obsolete packages are not available in the repository. Local packages are "
@@ -330,10 +361,12 @@ msgstr ""
 "disponible."
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:377
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:1392
 msgid "Residual packages"
 msgstr "Paquetes residuales"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:378
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:1376
 msgid ""
 "Include an item in the indicator with a list of packages that have residual "
 "config files. Run \"sudo apt purge pkgname\" to clean them."
@@ -343,10 +376,12 @@ msgstr ""
 "para limpiarlos."
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:389
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:1447
 msgid "Autoremovable packages"
 msgstr "Paquetes autodesinstalables"
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:390
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:1431
 msgid ""
 "Include an item in the indicator with a list of autoremovable packages. Run "
 "\"sudo apt autoremove\" to remove them."
@@ -355,6 +390,7 @@ msgstr ""
 "autodesinstalables. Ejecute \"sudo apt autoremove\" para eliminarlos."
 
 #: debian-updates-indicator@glerro.pm.me/prefs_adw1.ui:405
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:1556
 msgid "Ignore"
 msgstr "Ignorar"
 
@@ -368,17 +404,60 @@ msgid ""
 msgstr ""
 "Por ejemplo, esto es útil para los paquetes que se desactualizan manualmente."
 
-#~ msgid "Enable shortcut"
-#~ msgstr "Habilitar atajo"
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:364
+#, fuzzy
+msgid "Command to update packages"
+msgstr "Comando personalizado para buscar actualizaciones"
 
-#~ msgid "Shortcut to toggle the menu"
-#~ msgstr "Atajo para mostrar el menú"
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:374
+#, fuzzy
+msgid "You can use sudo instead of pkexec for the terminal."
+msgstr ""
+"Comando para actualizar paquetes <span size=\"small\">(Puede usar sudo en "
+"lugar de pkexec para la terminal)</span>"
 
-#~ msgid "Select a shortcut"
-#~ msgstr "Seleccionar atajo"
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:453
+msgid "Terminal to use"
+msgstr ""
 
-#~ msgid "Reset"
-#~ msgstr "Restablecer"
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:465
+msgid "Ex: xterm -e"
+msgstr ""
 
-#~ msgid "Press Esc to exit or Backspace to clear"
-#~ msgstr "Pulse Esc para salir o Retroceso para borrar"
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:516
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:570
+msgid "Clear entry"
+msgstr ""
+
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:536
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:590
+msgid "Cancel"
+msgstr ""
+
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:544
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:598
+msgid "Save"
+msgstr ""
+
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:975
+#, fuzzy
+msgid "Basic settings"
+msgstr "Configuración"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:1226
+#, fuzzy
+msgid "Advanced settings"
+msgstr "Avanzado"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:1479
+#, fuzzy
+msgid "Package status"
+msgstr "Paquetes"
+
+#: debian-updates-indicator@glerro.pm.me/prefs_gtk4.ui:1501
+#, fuzzy
+msgid ""
+"Packages in this list will be excluded from the updates. As an example, this "
+"is useful for packages that are downgraded manually."
+msgstr ""
+"Por ejemplo, esto es útil para los paquetes que se desactualizan manualmente."

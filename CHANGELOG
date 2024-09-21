@@ -1,3 +1,8 @@
+2024-09-21 Gianni Lerro <glerro@pm.me>
+ * Release version 1.2.2.
+ * Add Spanish translation.
+ * Update all other translation.
+
 2024-04-26 Gianni Lerro <glerro@pm.me>
  * Release version 1.2.1.
  * Switch from version to version-name in metadata.json (v2.0.0 from GS45, v1.0.0 pre GS45).
