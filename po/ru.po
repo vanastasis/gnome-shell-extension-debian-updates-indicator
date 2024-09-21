@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-debian-updates-indicator 6\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator/issues\n"
-"POT-Creation-Date: 2024-04-04 23:38+0300\n"
+"POT-Creation-Date: 2024-09-21 22:00+0200\n"
 "PO-Revision-Date: 2024-04-04 23:47+0300\n"
 "Last-Translator: Roman Aysin <aysin.roman@yandex.ru>\n"
 "Language-Team: Russian\n"
@@ -20,41 +20,41 @@ msgstr ""
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Gtranslator 46.0\n"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:165
+#: debian-updates-indicator@glerro.pm.me/indicator.js:169
 msgid "New in repository"
 msgstr "Новые пакеты"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:168
+#: debian-updates-indicator@glerro.pm.me/indicator.js:172
 #: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:42
 msgid "Local/Obsolete packages"
 msgstr "Устаревшие/Локально установленные пакеты"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:171
+#: debian-updates-indicator@glerro.pm.me/indicator.js:175
 msgid "Residual config files"
 msgstr "Установленные (остались файлы настроек)"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:174
+#: debian-updates-indicator@glerro.pm.me/indicator.js:178
 msgid "Autoremovable"
 msgstr "Ненужные пакеты"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:178
+#: debian-updates-indicator@glerro.pm.me/indicator.js:182
 msgid "Apply updates"
 msgstr "Применить обновления"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:179
-#: debian-updates-indicator@glerro.pm.me/indicator.js:265
+#: debian-updates-indicator@glerro.pm.me/indicator.js:183
+#: debian-updates-indicator@glerro.pm.me/indicator.js:269
 msgid "Check now"
 msgstr "Проверить сейчас"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:185
+#: debian-updates-indicator@glerro.pm.me/indicator.js:189
 msgid "Settings"
 msgstr "Параметры"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:262
+#: debian-updates-indicator@glerro.pm.me/indicator.js:266
 msgid "Checking"
 msgstr "Идёт проверка"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:324
+#: debian-updates-indicator@glerro.pm.me/indicator.js:328
 #, javascript-format
 msgid "%d update pending"
 msgid_plural "%d updates pending"
@@ -62,24 +62,24 @@ msgstr[0] "%d обновление в ожидании"
 msgstr[1] "%d обновления в ожидании"
 msgstr[2] "%d обновлений в ожидании"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:355
+#: debian-updates-indicator@glerro.pm.me/indicator.js:359
 msgid "Error"
 msgstr "Ошибка"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:359
+#: debian-updates-indicator@glerro.pm.me/indicator.js:363
 msgid "No internet"
 msgstr "Нет подключения к интернету"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:362
+#: debian-updates-indicator@glerro.pm.me/indicator.js:366
 msgid "Initializing"
 msgstr "Запуск"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:366
+#: debian-updates-indicator@glerro.pm.me/indicator.js:370
 msgid "Up to date"
 msgstr "Обновлено"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:402
-#: debian-updates-indicator@glerro.pm.me/indicator.js:408
+#: debian-updates-indicator@glerro.pm.me/indicator.js:406
+#: debian-updates-indicator@glerro.pm.me/indicator.js:412
 #, fuzzy
 msgid "New Update"
 msgid_plural "New Updates"
@@ -87,7 +87,7 @@ msgstr[0] "Новое обновление"
 msgstr[1] "Новые обновления"
 msgstr[2] "Новые обновления"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:409
+#: debian-updates-indicator@glerro.pm.me/indicator.js:413
 #, javascript-format
 msgid "There is %d update pending"
 msgid_plural "There are %d updates pending"
@@ -95,7 +95,7 @@ msgstr[0] "Доступно %d обновление в ожидании"
 msgstr[1] "Доступно %d обновления в ожидании"
 msgstr[2] "Доступно %d обновлений в ожидании"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:598
+#: debian-updates-indicator@glerro.pm.me/indicator.js:617
 msgid "Update now"
 msgstr "Обновить сейчас"
 
@@ -327,6 +327,10 @@ msgstr "Пакеты из этого списка не будут автомат
 msgid ""
 "As an example, this is useful for packages that are downgraded manually."
 msgstr "Это полезно, например, если вы вручную указали версию для пакета."
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_add_shortcuts_adw1.ui:36
+msgid "Press shortcut keys..."
+msgstr ""
 
 #: debian-updates-indicator@glerro.pm.me/ui/prefs_add_shortcuts_adw1.ui:37
 msgid "Press Esc to exit or Backspace to clear"

@@ -7,9 +7,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-debian-updates-indicator 2.4.0\n"
-"Report-Msgid-Bugs-To: https://gitlab.gnome.org/glerro/gnome-shell-extension-"
-"debian-updates-indicator/issues\n"
-"POT-Creation-Date: 2024-09-20 15:52-0600\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/glerro/gnome-shell-extension-"debian-updates-indicator/issues\n"
+"POT-Creation-Date: 2024-09-21 22:00+0200\n"
 "PO-Revision-Date: 2024-09-20 17:15-0600\n"
 "Last-Translator: Jehu Marcos Herrera Puentes <jehuherrerap@hotmail.com>\n"
 "Language-Team: Mexican Spanish\n"
@@ -324,6 +323,10 @@ msgid ""
 "As an example, this is useful for packages that are downgraded manually."
 msgstr ""
 "Por ejemplo, esto es útil para los paquetes que se desactualizan manualmente."
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_add_shortcuts_adw1.ui:36
+msgid "Press shortcut keys..."
+msgstr ""
 
 #: debian-updates-indicator@glerro.pm.me/ui/prefs_add_shortcuts_adw1.ui:37
 msgid "Press Esc to exit or Backspace to clear"

@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: gnome-shell-extension-debian-updates-indicator 3\n"
+"Project-Id-Version: gnome-shell-extension-debian-updates-indicator 2.4.0\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator/issues\n"
-"POT-Creation-Date: 2023-10-16 21:08+0200\n"
+"POT-Creation-Date: 2024-09-21 22:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,76 +18,76 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:165
+#: debian-updates-indicator@glerro.pm.me/indicator.js:169
 msgid "New in repository"
 msgstr ""
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:168
+#: debian-updates-indicator@glerro.pm.me/indicator.js:172
 #: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:42
 msgid "Local/Obsolete packages"
 msgstr ""
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:171
+#: debian-updates-indicator@glerro.pm.me/indicator.js:175
 msgid "Residual config files"
 msgstr ""
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:174
+#: debian-updates-indicator@glerro.pm.me/indicator.js:178
 msgid "Autoremovable"
 msgstr ""
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:178
+#: debian-updates-indicator@glerro.pm.me/indicator.js:182
 msgid "Apply updates"
 msgstr ""
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:179 debian-updates-indicator@glerro.pm.me/indicator.js:265
+#: debian-updates-indicator@glerro.pm.me/indicator.js:183 debian-updates-indicator@glerro.pm.me/indicator.js:269
 msgid "Check now"
 msgstr ""
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:185
+#: debian-updates-indicator@glerro.pm.me/indicator.js:189
 msgid "Settings"
 msgstr ""
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:262
+#: debian-updates-indicator@glerro.pm.me/indicator.js:266
 msgid "Checking"
 msgstr ""
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:324
+#: debian-updates-indicator@glerro.pm.me/indicator.js:328
 #, javascript-format
 msgid "%d update pending"
 msgid_plural "%d updates pending"
 msgstr[0] ""
 msgstr[1] ""
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:355
+#: debian-updates-indicator@glerro.pm.me/indicator.js:359
 msgid "Error"
 msgstr ""
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:359
+#: debian-updates-indicator@glerro.pm.me/indicator.js:363
 msgid "No internet"
 msgstr ""
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:362
+#: debian-updates-indicator@glerro.pm.me/indicator.js:366
 msgid "Initializing"
 msgstr ""
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:366
+#: debian-updates-indicator@glerro.pm.me/indicator.js:370
 msgid "Up to date"
 msgstr ""
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:402 debian-updates-indicator@glerro.pm.me/indicator.js:408
+#: debian-updates-indicator@glerro.pm.me/indicator.js:406 debian-updates-indicator@glerro.pm.me/indicator.js:412
 msgid "New Update"
 msgid_plural "New Updates"
 msgstr[0] ""
 msgstr[1] ""
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:409
+#: debian-updates-indicator@glerro.pm.me/indicator.js:413
 #, javascript-format
 msgid "There is %d update pending"
 msgid_plural "There are %d updates pending"
 msgstr[0] ""
 msgstr[1] ""
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:598
+#: debian-updates-indicator@glerro.pm.me/indicator.js:617
 msgid "Update now"
 msgstr ""
 
