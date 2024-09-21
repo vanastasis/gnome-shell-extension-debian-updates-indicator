@@ -96,13 +96,13 @@ meson compile -C _build gnome-shell-extension-debian-updates-indicator-pot
 
 Add the [language code](https://www.gnu.org/software/gettext/manual/html_node/Language-Codes.html) for your translation in /po/LINGUAS file.
 
-Create the /po/<language code.po> file:
+Create the /po/\<language code\>.po file:
 
 ```bash
 meson compile -C _build gnome-shell-extension-debian-updates-indicator-update-po
 ```
 
-Open /po/<language code>.po whith Gtranslator or a similar program, translate all messages and save.
+Open /po/\<language code\>.po whith Gtranslator or a similar program, translate all messages and save.
 
 To test your translation, install the extension and restart GNOME Shell:
 
@@ -117,7 +117,8 @@ after that, or logout and login again.
 When you're happy with your translation, commit the changes and push them to your fork:
 
 ```bash
-git commit -a -m "New translations (<language>)"
+git add po/LINGUAS po/<language code>.po
+git commit -m "New translations (<language>)"
 git push
 ```
 
