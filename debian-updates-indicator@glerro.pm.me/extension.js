@@ -36,13 +36,13 @@ import * as UpdateManager from './updateManager.js';
 
 export default class DebianUpdatesExtension extends Extension {
     enable() {
-        console.log(`Enabling ${this.metadata.name} - Version ${this.metadata.version}`);
+        console.log(`Enabling ${this.metadata.name} - Version ${this.metadata['version-name']}`);
 
         this._updateManager = new UpdateManager.UpdateManager(this);
     }
 
     disable() {
-        console.log(`Disabling ${this.metadata.name} - Version ${this.metadata.version}`);
+        console.log(`Disabling ${this.metadata.name} - Version ${this.metadata['version-name']}`);
 
         if (this._updateManager !== null) {
             this._updateManager.destroy();
