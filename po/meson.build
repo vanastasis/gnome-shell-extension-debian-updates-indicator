@@ -11,7 +11,7 @@ i18n.gettext(
         '--keyword=n_:1,2',
         '--package-version=' + meson.project_version(),
         '--add-comments=Translators',
-        '--copyright-holder=2023 Gianni Lerro {glerro} ~ <glerro@pm.me>',
+        '--copyright-holder=2023-2025 Gianni Lerro {glerro} ~ <glerro@pm.me>',
         '--msgid-bugs-address=https://gitlab.gnome.org/glerro/' + meson.project_name() + '/issues',
     ],
     preset: 'glib',

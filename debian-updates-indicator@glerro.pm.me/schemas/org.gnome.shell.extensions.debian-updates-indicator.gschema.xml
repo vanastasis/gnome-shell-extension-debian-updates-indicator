@@ -5,7 +5,7 @@
  *
  * org.gnome.shell.extension.debian-updates-indicator.gschema.xml
  *
- * Copyright (c) 2023-2024 Gianni Lerro {glerro} ~ <glerro@pm.me>
+ * Copyright (c) 2023-2025 Gianni Lerro {glerro} ~ <glerro@pm.me>
  *
  * Debian Linux Updates Indicator is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published by the
@@ -25,7 +25,7 @@
  * *****************************************************************************
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
- * SPDX-FileCopyrightText: 2023-2024 Gianni Lerro <glerro@pm.me>
+ * SPDX-FileCopyrightText: 2023-2025 Gianni Lerro <glerro@pm.me>
 -->
 <schemalist gettext-domain="gnome-shell-extension-debian-updates-indicator">
   <schema id="org.gnome.shell.extensions.debian-updates-indicator" path="/org/gnome/shell/extensions/debian-updates-indicator/" >

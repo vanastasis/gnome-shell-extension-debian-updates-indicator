@@ -137,7 +137,7 @@ Many thanks go out to them for their work.
 If you like my work and want to support it, consider [donating](https://ko-fi.com/glerro). 🙂️ Thanks!
 
 ## License
-Debian Updates Indicator - Copyright (c) 2023-2024 Gianni Lerro {glerro} ~ <glerro@pm.me>
+Debian Updates Indicator - Copyright (c) 2023-2025 Gianni Lerro {glerro} ~ <glerro@pm.me>
 
 Debian Updates Indicator is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the
