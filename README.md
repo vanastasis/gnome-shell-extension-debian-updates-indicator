@@ -17,7 +17,7 @@ This extension add an indicator to Gnome Shell for monitoring Debian Linux based
 * In the menu it is also possible check for updates, apply the updates and see when the last check was made.
 * It is customizable in many parts via extension settings.
 * Show a notification when there are new updates.
-* Support Gnome Shell Versions 40, 41, 42, 43, 44, 45, 46, 47, 48.
+* Support Gnome Shell Versions 40, 41, 42, 43, 44, 45, 46, 47, 48, 49.
 * Translatable.
 
 ## Installation
