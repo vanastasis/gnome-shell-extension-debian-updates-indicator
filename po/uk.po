@@ -1,0 +1,335 @@
+# Ukrainian translations for gnome-shell-extension-debian-updates-indicator package.
+# Copyright (C) 2025 2023-2025 Gianni Lerro {glerro} ~ <glerro@pm.me>
+# This file is distributed under the same license as the gnome-shell-extension-debian-updates-indicator package.
+# Automatically generated, 2025.
+# Oleg Slusar <eternityonly1@gmail.com>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-shell-extension-debian-updates-indicator 2.5.0\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/glerro/gnome-shell-extension-"
+"debian-updates-indicator/issues\n"
+"POT-Creation-Date: 2025-08-21 07:39+0300\n"
+"PO-Revision-Date: 2025-08-22 06:53+0300\n"
+"Last-Translator: Oleg Slusar <eternityonly1@gmail.com>\n"
+"Language-Team: Ukrainian <eternityonly1@gmail.com>\n"
+"Language: uk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Gtranslator 48.0\n"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:169
+msgid "New in repository"
+msgstr "Нові пакети в репозиторії"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:172
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:41
+msgid "Local/Obsolete packages"
+msgstr "Локальні/Застарілі пакети"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:175
+msgid "Residual config files"
+msgstr "Встановлені (залишились файли налаштувань)"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:178
+msgid "Autoremovable"
+msgstr "Непотрібні пакети (автовидалення)"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:182
+msgid "Apply updates"
+msgstr "Застосувати оновлення"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:183
+#: debian-updates-indicator@glerro.pm.me/indicator.js:269
+msgid "Check now"
+msgstr "Перевірити зараз"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:189
+msgid "Settings"
+msgstr "Налаштування"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:266
+msgid "Checking"
+msgstr "Перевірка"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:328
+#, javascript-format
+msgid "%d update pending"
+msgid_plural "%d updates pending"
+msgstr[0] "%d оновлення очікує"
+msgstr[1] "%d оновлення очікують"
+msgstr[2] "%d оновлень очікує"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:359
+msgid "Error"
+msgstr "Помилка"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:363
+msgid "No internet"
+msgstr "Відсутнє з'єднання з мережею"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:366
+msgid "Initializing"
+msgstr "Перевірка"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:370
+msgid "Up to date"
+msgstr "Оновлено"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:406
+#: debian-updates-indicator@glerro.pm.me/indicator.js:412
+msgid "New Update"
+msgid_plural "New Updates"
+msgstr[0] "Нових оновлень"
+msgstr[1] "Нове оновлення"
+msgstr[2] "Нових оновлень"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:413
+#, javascript-format
+msgid "There is %d update pending"
+msgid_plural "There are %d updates pending"
+msgstr[0] "Доступно %d оновлення, що очікує"
+msgstr[1] "Доступно %d оновлення, що очікують"
+msgstr[2] "Доступно %d оновлень, що очікує"
+
+#: debian-updates-indicator@glerro.pm.me/indicator.js:617
+msgid "Update now"
+msgstr "Оновити зараз"
+
+#: debian-updates-indicator@glerro.pm.me/monitors.js:80
+#: debian-updates-indicator@glerro.pm.me/monitors.js:89
+#, javascript-format
+msgid "Can not connect to %s"
+msgstr "Неможливо зʼєднатися з %s"
+
+#: debian-updates-indicator@glerro.pm.me/updateManager.js:641
+msgid "Last check: "
+msgstr "Остання перевірка: "
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:29
+msgid "Basic"
+msgstr "Основні"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:35
+msgid "Check for updates every:"
+msgstr "Перевіряти оновлення кожні: "
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:36
+msgid "Automatic checks, 0 to disable"
+msgstr "Автоматичні перевірки, 0 - відключити"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:55
+msgid "Hours"
+msgstr "Годин(а)"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:56
+msgid "Days"
+msgstr "Дні(в)"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:57
+msgid "Weeks"
+msgstr "Тиждень(ів)"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:71
+msgid "Strip out version numbers"
+msgstr "Не показувати номери версій"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:76
+msgid "Highlight security/important updates"
+msgstr "Позначати оновлення безпеки/важливі оновлення"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:85
+msgid "Indicator"
+msgstr "Індикатор на панелі"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:88
+msgid "Always show the indicator"
+msgstr "Завжди показувати індикатор"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:93
+msgid "Show updates count on the indicator"
+msgstr "Показувати кількість оновлень"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:98
+msgid "Auto-expand updates list"
+msgstr "Розгортати перелік оновлень"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:99
+msgid "If updates count is less than this number (0 to disable)"
+msgstr "Якщо кількість оновлень менше цієї кількості (0 для відключення)"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:121
+msgid "Notifications"
+msgstr "Сповіщення"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:124
+msgid "Send a notification when new updates are available"
+msgstr "Показати сповіщення коли доступні нові оновлення"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:129
+msgid "Use transient notifications (auto dismiss)"
+msgstr "Показати миттєві сповіщення"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:134
+msgid "How much information to show on notifications"
+msgstr "Як багато інформації показувати на сповіщеннях"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:135
+msgid "Up to a maximum of 50 package names."
+msgstr "Максимально до 50 назв пакетів."
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:139
+msgid "Count only"
+msgstr "Тільки кількість"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:140
+msgid "New updates names"
+msgstr "Назви нових оновлень"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:141
+msgid "All updates names"
+msgstr "Назви всіх оновлень"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:155
+msgid "Enable shortcut"
+msgstr "Увімкнути клавіатурне скорочення"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:160
+msgid "Shortcut to toggle the menu"
+msgstr "Клавіатурне скорочення для активації меню"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:164
+msgid "Select a shortcut"
+msgstr "Вибрати скорочення"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:29
+msgid "Advanced"
+msgstr "Додаткові"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:35
+msgid "Reset values for all commands"
+msgstr "Повернути значення команд за замовчуванням"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:41
+msgid "Reset"
+msgstr "Скинути"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:59
+msgid "Update method"
+msgstr "Спосіб оновлень"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:60
+msgid "Method to use to apply the updates."
+msgstr "Використовувати для застосування оновлень."
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:71
+msgid "Custom"
+msgstr "Власний"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:79
+msgid ""
+"Command to update packages <span size=\"small\">(You can use sudo instead of "
+"pkexec for the terminal)</span>"
+msgstr ""
+"Команда для оновлення пакетів <span size=\"small\">(Ви можете "
+"використовувати sudo замість pkexec для терміналу)</span>"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:85
+msgid "Show output on terminal"
+msgstr "Показати вивід в терміналі"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:90
+msgid "Terminal to use <span size=\"small\">(Ex: xterm -e)</span>"
+msgstr "Термінал для виводу <span size=\"small\">(Наприклад: xterm -e)</span>"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:102
+msgid "Use a custom command to check for updates"
+msgstr "Використовувати власну команду для перевірки оновлень"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:103
+msgid ""
+"The default command is \"pkcon refresh\", which uses packagekit with the apt "
+"backend. You can define a custom command below, to be executed using pkexec."
+msgstr ""
+"Команда за замовчуванням \"pkcon refresh\" використовує packagekit з "
+"бекендом apt. Ви можете вказати власну команду нижче, для виконання з "
+"використанням pkexec."
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:108
+msgid "Custom command to check for updates"
+msgstr "Власна команда для первірки оновлень"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:29
+msgid "Packages"
+msgstr "Пакети"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:35
+msgid "New packages in repository"
+msgstr "Нові пакети в репозиторії"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:36
+msgid ""
+"Include an item in the indicator with a list of new packages in the "
+"repository."
+msgstr ""
+"Відображати пункт в меню індикатора на панелі з переліком нових пакетів в "
+"репозиторії."
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:42
+msgid ""
+"Include an item in the indicator with a list of obsolete or local packages. "
+"Obsolete packages are not available in the repository. Local packages are "
+"available, but an unavailable version is installed."
+msgstr ""
+"Відображати пункт в меню індикатора на панелі з переліком застарілих або "
+"локальних пакетів. Застарілі пакети недоступні в репозиторії. Локальні "
+"пакети доступні, але недоступна версія яка є встановленою."
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:47
+msgid "Residual packages"
+msgstr "Встановлені пакети (залишились файли налаштування)"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:48
+msgid ""
+"Include an item in the indicator with a list of packages that have residual "
+"config files. Run \"sudo apt purge pkgname\" to clean them."
+msgstr ""
+"Відображати пункт в меню індикатора на панелі з переліком пакетів, для яких "
+"залишились файли налаштувань. Виконайте команду \"sudo apt purge pkgname\" "
+"для їх видалення."
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:53
+msgid "Autoremovable packages"
+msgstr "Непотрібні пакети (автовидалення)"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:54
+msgid ""
+"Include an item in the indicator with a list of autoremovable packages. Run "
+"\"sudo apt autoremove\" to remove them."
+msgstr ""
+"Відображати пункт в меню індикатора на панелі з переліком непотрібних "
+"пакетів (автовидалення)."
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_ignore_list_adw1.ui:29
+msgid "Ignore"
+msgstr "Виключення"
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_ignore_list_adw1.ui:33
+msgid "Packages in this list will be excluded from the updates."
+msgstr "Пакети, що знаходяться в цьому переліку будуть виключені з оновлень."
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_ignore_list_adw1.ui:34
+msgid ""
+"As an example, this is useful for packages that are downgraded manually."
+msgstr "Це корисно, наприклад, для пакетів версія яких була знижена вручну."
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_add_shortcuts_adw1.ui:35
+msgid "Press shortcut keys..."
+msgstr "Натисніть комбінацію клавіш..."
+
+#: debian-updates-indicator@glerro.pm.me/ui/prefs_add_shortcuts_adw1.ui:36
+msgid "Press Esc to exit or Backspace to clear"
+msgstr "Натисніть Esc для виходу або Backspace для очистки"
