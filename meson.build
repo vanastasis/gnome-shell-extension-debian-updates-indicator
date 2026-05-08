@@ -1,6 +1,6 @@
 project('gnome-shell-extension-debian-updates-indicator',
     version: '2.6.0',
-    meson_version: '>= 0.53.0',
+    meson_version: '>= 1.1.0',
     license: 'GPL3')
 
 ext_uuid = 'debian-updates-indicator@glerro.pm.me'
