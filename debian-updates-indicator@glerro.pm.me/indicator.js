@@ -5,7 +5,7 @@
  *
  * indicator.js
  *
- * Copyright (c) 2023-2025 Gianni Lerro {glerro} ~ <glerro@pm.me>
+ * Copyright (c) 2023-2026 Gianni Lerro {glerro} ~ <glerro@pm.me>
  *
  * Debian Linux Updates Indicator is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published by the
@@ -25,7 +25,7 @@
  * *****************************************************************************
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
- * SPDX-FileCopyrightText: 2023-2025 Gianni Lerro <glerro@pm.me>
+ * SPDX-FileCopyrightText: 2023-2026 Gianni Lerro <glerro@pm.me>
  */
 
 'use strict';
@@ -90,8 +90,6 @@ export const DebianUpdatesIndicator = GObject.registerClass({
         this._extensionName = this._extension.metadata.name;
 
         super._init(0.0, `${this._extensionName}`, false);
-
-        this._clipboard = St.Clipboard.get_default();
 
         this._updateIcon = new St.Icon({
             icon_name: 'package-x-generic-symbolic',
@@ -549,14 +547,6 @@ export const DebianUpdatesIndicator = GObject.registerClass({
         let item = new PopupMenu.PopupMenuItem('');
         item.add_style_class_name('debian-updates-indicator-item');
         item.label.set_text(text);
-
-        // Remove tab character and then double spaces
-        text = text.replace('\t', ' ');
-        text = text.replace(/\s\s+/g, ' ');
-        item.connect('activate', () => {
-            this._clipboard.set_text(St.ClipboardType.CLIPBOARD, text);
-            this._clipboard.set_text(St.ClipboardType.PRIMARY, text);
-        });
 
         return item;
     }
