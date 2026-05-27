@@ -5,7 +5,7 @@
  *
  * updateManager.js
  *
- * Copyright (c) 2023-2025 Gianni Lerro {glerro} ~ <glerro@pm.me>
+ * Copyright (c) 2023-2026 Gianni Lerro {glerro} ~ <glerro@pm.me>
  *
  * Debian Linux Updates Indicator is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published by the
@@ -26,7 +26,7 @@
  * *****************************************************************************
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
- * SPDX-FileCopyrightText: 2023-2025 Gianni Lerro <glerro@pm.me>
+ * SPDX-FileCopyrightText: 2023-2026 Gianni Lerro <glerro@pm.me>
  */
 
 'use strict';
@@ -43,10 +43,13 @@ import * as Monitors from './monitors.js';
 import * as Utils from './utils.js';
 
 /* Options */
-const STOCK_CHECK_CMD  = '/usr/bin/pkcon refresh';
-const STOCK_UPDATE_CMD = '/usr/bin/gnome-software --mode updates';
-let CHECK_CMD          = STOCK_CHECK_CMD;
-let UPDATE_CMD         = STOCK_UPDATE_CMD;
+const STOCK_CHECK_CMD_OLD = '/usr/bin/pkcon refresh';
+const STOCK_CHECK_CMD_NEW = '/usr/bin/pkgcli refresh';
+const STOCK_UPDATE_CMD    = '/usr/bin/gnome-software --mode updates';
+
+let STOCK_CHECK_CMD = STOCK_CHECK_CMD_OLD;
+let CHECK_CMD       = STOCK_CHECK_CMD;
+let UPDATE_CMD      = STOCK_UPDATE_CMD;
 
 /* Various packages statuses */
 const SCRIPT = Indicator.SCRIPT;
@@ -62,6 +65,12 @@ export const UpdateManager = class UpdateManager {
 
         this._TimeoutId = null;
         this._initialTimeoutId = null;
+
+        let [parseok] = GLib.shell_parse_argv(CHECK_CMD);
+        if (!parseok) {
+            STOCK_CHECK_CMD = STOCK_CHECK_CMD_NEW;
+            CHECK_CMD = STOCK_CHECK_CMD;
+        }
 
         // Create a Gio.Cancellable for use with Gio.SubProcess
         this._cancellable = new Gio.Cancellable();
