@@ -553,7 +553,8 @@ export const UpdateManager = class UpdateManager {
         // Since this runs async, the indicator might have been destroyed!
         if (this._indicator) {
             // Update indicator
-            if (index === SCRIPT.UPGRADES && this._extensionSettings.get_boolean('show-critical-updates')) {
+            let [parseok] = GLib.shell_parse_argv(STOCK_CHECK_CMD_OLD);
+            if (index === SCRIPT.UPGRADES && this._extensionSettings.get_boolean('show-critical-updates') && parseok) {
                 this._checkUrgency();
             } else {
                 this._indicator.updatePackagesStatus(index);
