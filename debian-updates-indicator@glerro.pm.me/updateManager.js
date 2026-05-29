@@ -66,8 +66,7 @@ export const UpdateManager = class UpdateManager {
         this._TimeoutId = null;
         this._initialTimeoutId = null;
 
-        let [parseok] = GLib.shell_parse_argv(CHECK_CMD);
-        if (!parseok) {
+        if (!GLib.file_test(CHECK_CMD, GLib.FileTest.EXISTS)) {
             STOCK_CHECK_CMD = STOCK_CHECK_CMD_NEW;
             CHECK_CMD = STOCK_CHECK_CMD;
         }
@@ -553,8 +552,8 @@ export const UpdateManager = class UpdateManager {
         // Since this runs async, the indicator might have been destroyed!
         if (this._indicator) {
             // Update indicator
-            let [parseok] = GLib.shell_parse_argv(STOCK_CHECK_CMD_OLD);
-            if (index === SCRIPT.UPGRADES && this._extensionSettings.get_boolean('show-critical-updates') && parseok) {
+            let commandExists = GLib.file_test(STOCK_CHECK_CMD_OLD, GLib.FileTest.EXISTS);
+            if (index === SCRIPT.UPGRADES && this._extensionSettings.get_boolean('show-critical-updates') && commandExists) {
                 this._checkUrgency();
             } else {
                 this._indicator.updatePackagesStatus(index);
