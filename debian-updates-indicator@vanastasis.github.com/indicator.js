@@ -184,6 +184,7 @@ export const DebianUpdatesIndicator = GObject.registerClass({
         // "Apply updates", Check now" and "Last Check" menu items
         this.applyUpdatesMenuItem = new PopupMenu.PopupMenuItem(_('Apply updates'));
         this.removeUnusedMenuItem = new PopupMenu.PopupMenuItem(_('Remove unused packages'));
+        this.removeUnusedMenuItem.setSensitive(false);
         this.checkNowMenuItem = new PopupMenu.PopupMenuItem(_('Check now'));
         this.lastCheckMenuItem = new PopupMenu.PopupMenuItem('');
         this.lastCheckMenuItem.reactive = false;
@@ -537,8 +538,11 @@ export const DebianUpdatesIndicator = GObject.registerClass({
     }
 
     _updateAutoremovablePackagesStatus() {
+        const hasUnused = this._autoremovablePackagesList.length > 0;
+        this.removeUnusedMenuItem.setSensitive(hasUnused &&
+            !this._updateManager._upgradeProcess_sourceId && !this._updateManager._cleanupProcess);
         this.autoremovablePackagesExpander.menu.removeAll();
-        if (this._autoremovablePackagesList.length === 0) {
+        if (!hasUnused || !this._extensionSettings.get_boolean('autoremovable-packages')) {
             this.autoremovablePackagesExpander.visible = false;
         } else {
             for (let i = 0; i < this._autoremovablePackagesList.length; i++) {

@@ -264,12 +264,9 @@ export const UpdateManager = class UpdateManager {
     }
 
     _autoremovablePackagesBinding() {
-        if (this._extensionSettings.get_boolean('autoremovable-packages')) {
-            this._launchScript(SCRIPT.AUTOREMOVABLE);
-        } else {
-            this._indicator._autoremovablePackagesList = [];
-            this._indicator._updateAutoremovablePackagesStatus();
-        }
+        // This preference controls list visibility, not cleanup availability.
+        this._indicator._updateAutoremovablePackagesStatus();
+        this._launchScript(SCRIPT.AUTOREMOVABLE);
     }
 
     _bindSettings() {
@@ -458,7 +455,8 @@ export const UpdateManager = class UpdateManager {
 
     // Cleanup never runs as part of the update presets.
     _removeUnusedPackages() {
-        if (!this._indicator || !this._extensionSettings)
+        if (!this._indicator || !this._extensionSettings ||
+            this._indicator._autoremovablePackagesList.length === 0)
             return;
         if (this._upgradeProcess_sourceId || this._cleanupProcess) {
             Main.notify(this._extensionName, _('Another package operation is running.'));
@@ -495,7 +493,7 @@ export const UpdateManager = class UpdateManager {
         const proc = Gio.Subprocess.new(argv, Gio.SubprocessFlags.NONE);
         this._cleanupProcess = proc; // Shared manual-operation guard.
         this._upgradeProcess_sourceId = 1;
-        this._indicator.removeUnusedMenuItem.reactive = false;
+        this._indicator.removeUnusedMenuItem.setSensitive(false);
         this._dirMonitor.stop();
         proc.wait_check_async(this._cancellable, (child, result) => {
             let error = null;
@@ -508,7 +506,8 @@ export const UpdateManager = class UpdateManager {
                 return;
             this._cleanupProcess = null;
             this._upgradeProcess_sourceId = null;
-            this._indicator.removeUnusedMenuItem.reactive = true;
+            // Keep cleanup disabled until the fresh package scan finishes.
+            this._indicator.removeUnusedMenuItem.setSensitive(false);
             if (error)
                 Main.notifyError(this._extensionName, error.message);
             this._dontUpdateDate = true;
@@ -592,6 +591,9 @@ export const UpdateManager = class UpdateManager {
     _launchScript(index) {
         if (!this._indicator || this._cleanupProcess)
             return;
+        if (index === SCRIPT.AUTOREMOVABLE)
+            this._indicator.removeUnusedMenuItem.setSensitive(false);
+
         let scriptNames = [
             'get-updates',
             'new',
@@ -606,7 +608,7 @@ export const UpdateManager = class UpdateManager {
         let script = [
             '/bin/bash',
             `${path}/scripts/${scriptNames[index]}.sh`,
-            this._initializing ? '1' : '0',
+            this._initializing && index !== SCRIPT.AUTOREMOVABLE ? '1' : '0',
             `${path}/Temp/`,
         ];
 
@@ -683,8 +685,8 @@ export const UpdateManager = class UpdateManager {
                     this._launchScript(SCRIPT.OBSOLETE);
                 if (this._extensionSettings.get_boolean('residual-packages'))
                     this._launchScript(SCRIPT.RESIDUAL);
-                if (this._extensionSettings.get_boolean('autoremovable-packages'))
-                    this._launchScript(SCRIPT.AUTOREMOVABLE);
+                // Always detect unused packages, even when their list is hidden.
+                this._launchScript(SCRIPT.AUTOREMOVABLE);
                 this._initializing = false;
 
                 this._dirMonitor.start();
