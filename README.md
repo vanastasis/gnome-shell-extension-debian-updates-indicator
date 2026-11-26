@@ -18,7 +18,9 @@ A GNOME Shell extension for monitoring APT package updates on Debian and Debian-
 - Manual or scheduled checks, configurable commands and an ignore list.
 - Existing translations and GSettings preferences retained.
 
-## Installation from source
+## Manual installation only
+
+This JAVA Computers fork is distributed directly through GitHub and is not available through the GNOME Extensions website. Install it manually from source using the instructions below.
 
 Install the build tools and required package-management utilities on Debian:
 
