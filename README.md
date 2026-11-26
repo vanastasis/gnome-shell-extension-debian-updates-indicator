@@ -4,16 +4,23 @@
 
 A GNOME Shell panel extension for monitoring and managing APT package updates on Debian and Debian-based Linux distributions.
 
-**Version:** `2.7.0.3` | **GNOME Shell:** 51 | **Licence:** GPL-3.0-or-later
+**Version:** `2.7.0.4` | **GNOME Shell:** 51 | **Licence:** GPL-3.0-or-later
 
-## What's new in 2.7.0.3
+## What's new in 2.7.0.4
 
-- **Remove unused packages:** separate, manually triggered menu action immediately below Apply updates.
-- **APT and APT-get presets:** use the desktop-configured terminal (`xdg-terminal-exec`) or Debian's `x-terminal-emulator` alternative.
-- **Nala – XFCE Terminal:** presets for both updates and cleanup, with graphical Polkit authentication.
-- Nala full upgrades automatically confirm prompts and disable automatic autoremove. Cleanup requires manual package confirmation; no automatic `-y` is supplied.
-- Built-in terminal presets display an exit status and a press-any-key prompt before closing. Package lists refresh when the launcher finishes; a terminal that detaches may finish tracking earlier.
-- Independent custom commands and terminal preferences, operation guards and error notifications.
+### Improvements
+
+- Clarify cleanup menu availability when no unused packages are detected.
+- Document independent update and cleanup operations.
+- Retain APT, APT-get and Nala terminal integration.
+- Include the latest local source improvements.
+- Refresh project documentation and extension metadata.
+- Retain GNOME Shell 51 compatibility.
+
+### Distribution
+
+- Installable GitHub release ZIP and SHA256 checksum.
+- Separate GNOME Extensions submission ZIP.
 
 ## Features
 
@@ -73,6 +80,10 @@ meson setup --prefix="$HOME/.local" _build
 meson compile -C _build
 meson install -C _build
 ```
+
+## Publish a release (maintainers)
+
+From the repository root, run `./publish-release.sh VERSION release-notes.md` after reviewing local changes. The script stages tracked edits and builds from the staged source, installs locally, pushes to GitHub and creates a release with the GitHub ZIP and checksum. Stage any new source files explicitly first. The separate EGO ZIP is generated for manual submission.
 
 ## Changes and support
 

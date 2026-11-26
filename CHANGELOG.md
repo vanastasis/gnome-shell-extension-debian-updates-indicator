@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.7.0.4 — 2026-11-26
+
+### Improvements
+
+- Clarify cleanup menu availability when no unused packages are detected.
+- Document independent update and cleanup operations.
+- Retain APT, APT-get and Nala terminal integration.
+- Include the latest local source improvements.
+- Refresh project documentation and extension metadata.
+- Retain GNOME Shell 51 compatibility.
+
+### Distribution
+
+- Installable GitHub release ZIP and SHA256 checksum.
+- Separate GNOME Extensions submission ZIP.
+
 ## 2.7.0.3 — 2026-11-26
 
 - Add a separate Remove unused packages panel action and independent cleanup preferences.
