@@ -12,7 +12,7 @@ i18n.gettext(
         '--package-version=' + meson.project_version(),
         '--add-comments=Translators',
         '--copyright-holder=2023-2026 Gianni Lerro {glerro} ~ <glerro@pm.me>',
-        '--msgid-bugs-address=https://gitlab.gnome.org/glerro/' + meson.project_name() + '/issues',
+        '--msgid-bugs-address=https://github.com/vanastasis/' + meson.project_name() + '/issues',
     ],
     preset: 'glib',
     install_dir: locale_dir,

@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-debian-updates-indicator 8\n"
-"Report-Msgid-Bugs-To: https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator/issues\n"
+"Report-Msgid-Bugs-To: https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator/issues\n"
 "POT-Creation-Date: 2024-09-21 22:00+0200\n"
 "PO-Revision-Date: 2024-04-19 16:10+0200\n"
 "Last-Translator: ArTuPSly\n"
@@ -19,214 +19,214 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 3.4.2\n"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:169
+#: debian-updates-indicator@vanastasis.github.com/indicator.js:169
 msgid "New in repository"
 msgstr "Nouveau dans le dépôt"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:172
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:42
+#: debian-updates-indicator@vanastasis.github.com/indicator.js:172
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_packages_status_adw1.ui:42
 msgid "Local/Obsolete packages"
 msgstr "Paquets locaux ou obsolètes"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:175
+#: debian-updates-indicator@vanastasis.github.com/indicator.js:175
 msgid "Residual config files"
 msgstr "Fichier de configuration résiduel"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:178
+#: debian-updates-indicator@vanastasis.github.com/indicator.js:178
 msgid "Autoremovable"
 msgstr "Supprimable automatiquement"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:182
+#: debian-updates-indicator@vanastasis.github.com/indicator.js:182
 msgid "Apply updates"
 msgstr "Appliquer les mises à jour"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:183
-#: debian-updates-indicator@glerro.pm.me/indicator.js:269
+#: debian-updates-indicator@vanastasis.github.com/indicator.js:183
+#: debian-updates-indicator@vanastasis.github.com/indicator.js:269
 msgid "Check now"
 msgstr "Vérifier maintenant"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:189
+#: debian-updates-indicator@vanastasis.github.com/indicator.js:189
 msgid "Settings"
 msgstr "Paramètres"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:266
+#: debian-updates-indicator@vanastasis.github.com/indicator.js:266
 msgid "Checking"
 msgstr "En cours de vérification"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:328
+#: debian-updates-indicator@vanastasis.github.com/indicator.js:328
 #, javascript-format
 msgid "%d update pending"
 msgid_plural "%d updates pending"
 msgstr[0] "%d mise à jour en attente"
 msgstr[1] "%d mises à jour en attente"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:359
+#: debian-updates-indicator@vanastasis.github.com/indicator.js:359
 msgid "Error"
 msgstr "Erreur"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:363
+#: debian-updates-indicator@vanastasis.github.com/indicator.js:363
 msgid "No internet"
 msgstr "Aucune connexion internet"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:366
+#: debian-updates-indicator@vanastasis.github.com/indicator.js:366
 msgid "Initializing"
 msgstr "En cours d'initialisation"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:370
+#: debian-updates-indicator@vanastasis.github.com/indicator.js:370
 msgid "Up to date"
 msgstr "À jour"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:406
-#: debian-updates-indicator@glerro.pm.me/indicator.js:412
+#: debian-updates-indicator@vanastasis.github.com/indicator.js:406
+#: debian-updates-indicator@vanastasis.github.com/indicator.js:412
 msgid "New Update"
 msgid_plural "New Updates"
 msgstr[0] "Nouvelle mise à jour"
 msgstr[1] "Nouvelles mises à jour"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:413
+#: debian-updates-indicator@vanastasis.github.com/indicator.js:413
 #, javascript-format
 msgid "There is %d update pending"
 msgid_plural "There are %d updates pending"
 msgstr[0] "Il y a une mise à jour %d en attente"
 msgstr[1] "Il y a des mises à jour %d en attente"
 
-#: debian-updates-indicator@glerro.pm.me/indicator.js:617
+#: debian-updates-indicator@vanastasis.github.com/indicator.js:617
 msgid "Update now"
 msgstr "Mettre à jour maintenant"
 
-#: debian-updates-indicator@glerro.pm.me/monitors.js:80
-#: debian-updates-indicator@glerro.pm.me/monitors.js:89
+#: debian-updates-indicator@vanastasis.github.com/monitors.js:80
+#: debian-updates-indicator@vanastasis.github.com/monitors.js:89
 #, javascript-format
 msgid "Can not connect to %s"
 msgstr "Connexion à %s impossible"
 
-#: debian-updates-indicator@glerro.pm.me/updateManager.js:641
+#: debian-updates-indicator@vanastasis.github.com/updateManager.js:641
 msgid "Last check: "
 msgstr "Dernière vérification : "
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:30
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_basic_adw1.ui:30
 msgid "Basic"
 msgstr "Basique"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:36
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_basic_adw1.ui:36
 msgid "Check for updates every:"
 msgstr "Vérifier les mises à jour toutes les :"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:37
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_basic_adw1.ui:37
 msgid "Automatic checks, 0 to disable"
 msgstr "Vérifications automatiques, 0 pour désactiver"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:56
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_basic_adw1.ui:56
 msgid "Hours"
 msgstr "Heures"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:57
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_basic_adw1.ui:57
 msgid "Days"
 msgstr "Jours"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:58
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_basic_adw1.ui:58
 msgid "Weeks"
 msgstr "Semaines"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:72
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_basic_adw1.ui:72
 msgid "Strip out version numbers"
 msgstr "Supprimer les numéros de version"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:77
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_basic_adw1.ui:77
 msgid "Highlight security/important updates"
 msgstr "Mettre en évidence les mises à jour de sécurité/importantes"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:86
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_basic_adw1.ui:86
 msgid "Indicator"
 msgstr "Indicateur"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:89
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_basic_adw1.ui:89
 msgid "Always show the indicator"
 msgstr "Toujours afficher l'indicateur"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:94
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_basic_adw1.ui:94
 msgid "Show updates count on the indicator"
 msgstr "Afficher le nombre de mises à jour sur l'indicateur"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:99
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_basic_adw1.ui:99
 msgid "Auto-expand updates list"
 msgstr "Développer automatiquement la liste des mises à jour"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:100
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_basic_adw1.ui:100
 msgid "If updates count is less than this number (0 to disable)"
 msgstr ""
 "Si le nombre de mises à jour est inférieur à ce nombre (0 pour désactiver)"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:122
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_basic_adw1.ui:122
 msgid "Notifications"
 msgstr "Notifications"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:125
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_basic_adw1.ui:125
 msgid "Send a notification when new updates are available"
 msgstr ""
 "Envoyer une notification quand de nouvelles mises à jour sont disponibles"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:130
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_basic_adw1.ui:130
 msgid "Use transient notifications (auto dismiss)"
 msgstr "Utiliser les notifications temporaires (rejet automatique)"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:135
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_basic_adw1.ui:135
 msgid "How much information to show on notifications"
 msgstr "Quantité d'informations à afficher sur les notifications"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:136
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_basic_adw1.ui:136
 msgid "Up to a maximum of 50 package names."
 msgstr "Jusqu’à 50 noms de paquets maximum."
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:140
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_basic_adw1.ui:140
 msgid "Count only"
 msgstr "Nombre seulement"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:141
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_basic_adw1.ui:141
 msgid "New updates names"
 msgstr "Nouveaux noms de mises à jour"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:142
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_basic_adw1.ui:142
 msgid "All updates names"
 msgstr "Tous les noms de mises à jour"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:156
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_basic_adw1.ui:156
 msgid "Enable shortcut"
 msgstr "Activer le raccourci"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:161
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_basic_adw1.ui:161
 msgid "Shortcut to toggle the menu"
 msgstr "Raccourci pour activer/désactiver le menu"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_basic_adw1.ui:165
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_basic_adw1.ui:165
 msgid "Select a shortcut"
 msgstr "Sélectionnez un raccourci"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:30
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui:30
 msgid "Advanced"
 msgstr "Avancé"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:36
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui:36
 msgid "Reset values for all commands"
 msgstr "Réinitialiser les valeurs pour toutes les commandes"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:42
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui:42
 msgid "Reset"
 msgstr "Réinitialiser"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:60
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui:60
 msgid "Update method"
 msgstr "Méthode de mise à jour"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:61
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui:61
 msgid "Method to use to apply the updates."
 msgstr "Méthode à utiliser pour appliquer les mises à jour."
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:72
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui:72
 msgid "Custom"
 msgstr "Personnalisé"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:80
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui:80
 msgid ""
 "Command to update packages <span size=\"small\">(You can use sudo instead of "
 "pkexec for the terminal)</span>"
@@ -234,19 +234,19 @@ msgstr ""
 "Commande pour mettre à jour les paquets <span size=\"small\">(Vous pouvez "
 "utiliser sudo au lieu de pkexec pour le terminal)</span>"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:86
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui:86
 msgid "Show output on terminal"
 msgstr "Afficher la sortie sur le terminal"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:91
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui:91
 msgid "Terminal to use <span size=\"small\">(Ex: xterm -e)</span>"
 msgstr "Terminal à utiliser <span size=\"small\">(Ex: xterm -e)</span>"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:103
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui:103
 msgid "Use a custom command to check for updates"
 msgstr "Utiliser une commande personnalisée pour vérifier les mises à jour"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:104
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui:104
 msgid ""
 "The default command is \"pkcon refresh\", which uses packagekit with the apt "
 "backend. You can define a custom command below, to be executed using pkexec."
@@ -255,19 +255,19 @@ msgstr ""
 "backend apt. Vous pouvez définir une commande personnalisée ci-dessous, à "
 "exécuter en utilisant pkexec."
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_advanced_adw1.ui:109
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui:109
 msgid "Custom command to check for updates"
 msgstr "Utiliser une commande personnalisée pour vérifier les mises à jour"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:30
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_packages_status_adw1.ui:30
 msgid "Packages"
 msgstr "Paquets"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:36
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_packages_status_adw1.ui:36
 msgid "New packages in repository"
 msgstr "Nouveaux paquets dans le dépôt"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:37
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_packages_status_adw1.ui:37
 msgid ""
 "Include an item in the indicator with a list of new packages in the "
 "repository."
@@ -275,7 +275,7 @@ msgstr ""
 "Inclure un élément dans l'indicateur avec une liste de nouveaux paquets dans "
 "le dépôt."
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:43
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_packages_status_adw1.ui:43
 msgid ""
 "Include an item in the indicator with a list of obsolete or local packages. "
 "Obsolete packages are not available in the repository. Local packages are "
@@ -285,11 +285,11 @@ msgstr ""
 "locaux. Les paquets obsolètes ne sont pas disponibles dans le dépôt. Des "
 "paquets locaux sont disponibles, mais une version indisponible est installée."
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:48
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_packages_status_adw1.ui:48
 msgid "Residual packages"
 msgstr "Paquets résiduels"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:49
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_packages_status_adw1.ui:49
 msgid ""
 "Include an item in the indicator with a list of packages that have residual "
 "config files. Run \"sudo apt purge pkgname\" to clean them."
@@ -298,11 +298,11 @@ msgstr ""
 "fichiers de configuration résiduels. Exécutez « sudo apt purge pkgname » "
 "pour les nettoyer."
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:54
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_packages_status_adw1.ui:54
 msgid "Autoremovable packages"
 msgstr "Paquets automatiquement supprimables"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_packages_status_adw1.ui:55
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_packages_status_adw1.ui:55
 msgid ""
 "Include an item in the indicator with a list of autoremovable packages. Run "
 "\"sudo apt autoremove\" to remove them."
@@ -310,24 +310,24 @@ msgstr ""
 "Inclure un élément dans l'indicateur avec une liste de paquets auto-"
 "amovibles. Exécutez \"sudo apt autoremove\" pour les supprimer."
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_ignore_list_adw1.ui:30
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_ignore_list_adw1.ui:30
 msgid "Ignore"
 msgstr "Ignorer"
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_ignore_list_adw1.ui:34
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_ignore_list_adw1.ui:34
 msgid "Packages in this list will be excluded from the updates."
 msgstr "Les paquets de cette liste seront exclus des mises à jour."
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_ignore_list_adw1.ui:35
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_ignore_list_adw1.ui:35
 msgid ""
 "As an example, this is useful for packages that are downgraded manually."
 msgstr ""
 "Par exemple, cela est utile pour les paquets qui sont déclassés manuellement."
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_add_shortcuts_adw1.ui:36
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_add_shortcuts_adw1.ui:36
 msgid "Press shortcut keys..."
 msgstr "Appuyez sur les touches de raccourci..."
 
-#: debian-updates-indicator@glerro.pm.me/ui/prefs_add_shortcuts_adw1.ui:37
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_add_shortcuts_adw1.ui:37
 msgid "Press Esc to exit or Backspace to clear"
 msgstr "Appuyez sur Échap pour quitter ou Retour arrière pour effacer"

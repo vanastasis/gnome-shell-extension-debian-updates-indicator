@@ -1,0 +1,24 @@
+# Changelog
+
+## 2.7.0-JAVA.1 — 2026-11-26
+
+### Functional changes from upstream 2.7.0
+
+- `indicator.js`: use `Clutter.Orientation.HORIZONTAL` for `St.BoxLayout` on GNOME Shell 48+ (GNOME 51 removes the legacy `vertical` property); retain `vertical: false` on GNOME 45–47.
+- `updateManager.js`: initialise distinct `_initTimeoutId` and `_checkTimeoutId` instead of the unused `_TimeoutId`; cancel and clear both when rescheduling; use a one-shot initial callback (`GLib.SOURCE_REMOVE`) and a repeating periodic callback (`GLib.SOURCE_CONTINUE`).
+- `updateManager.js`: apply the configured hours/days/weeks unit to recurring checks instead of always treating the interval as hours; guard network checks and timer callbacks against a destroyed indicator/monitor.
+- `metadata.json`: add GNOME Shell 51 to the declared 45–51 compatibility range; set version-name `2.7.0-JAVA.1`.
+- Eighteen other runtime source files matched the imported upstream Git blobs exactly before branding changes. No APT scripts, preference UI or schema behavior changed.
+
+### Fork identity and packaging
+
+- New UUID `debian-updates-indicator@vanastasis.github.com`; existing GSettings schema ID/path and gettext domain retained. Disable the upstream UUID before enabling this fork.
+- Update project name, project URLs, issue tracker, installation instructions and translation source paths to the GitHub fork. Remove upstream donation link from active metadata and README. Preserve original copyright and licence notices, original authors and translator credit.
+- Align Meson project version with the fork release; remove the installed archive's generated numeric extension version (not present in upstream source). Exclude generated package lists, compiled schemas and translations from the source package; build these locally.
+- Update project maintainer metadata and AUTHORS; retire the upstream GitLab-specific CI configuration on this GitHub fork.
+- Report GNOME Shell 51 as maintainer-tested on Thinker; GNOME 45–50 are declared compatible but not retested. GNOME 44 and earlier are not supported by this release.
+
+### Verification
+
+- The supplied working archive was compared to the GitHub-imported upstream `main` source. The two functional JavaScript changes were reconstructed against exact upstream Git blob hashes.
+- JavaScript module syntax, Bash syntax, JSON and XML parsing passed for the rebranded payload. Live GNOME runtime and Meson build require verification on the maintainer's machine. The UUID rename has not been runtime-tested.

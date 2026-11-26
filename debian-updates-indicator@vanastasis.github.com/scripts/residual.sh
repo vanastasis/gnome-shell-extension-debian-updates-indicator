@@ -1,9 +1,10 @@
 #!/bin/bash
 ##################################################################################
 # This file is part of Debian Linux Updates Indicator.
-# https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator
+# https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator
+# Modified for JAVA Computers (Thinker), 2026-11-26.
 #
-# urgency.sh
+# residual.sh
 #
 # Copyright (c) 2023-2026 Gianni Lerro {glerro} ~ <glerro@pm.me>
 #
@@ -30,19 +31,29 @@
 
 ######################################
 #                                    #
-#           List updates and         #
-#        check for their urgency     #
+#   Check for residual config files  #
 #                                    #
 ######################################
 
-# List updates               | Print "Results" section | Keep only urgent ones
-LANG=en pkcon -p get-updates | sed '1,/Results/d'      | grep 'Security\|Important'
+ONLY_PRINT=$1
+TEMP_FOLDER=$2
+# Paths and files
+path=${TEMP_FOLDER}
 
-# Urgent statuses:
-#     Security, Important
+# Create the directory if it doesn't exist
+mkdir -p ${path}
 
-# Low priority:
-#     Bug fix, Normal, Trivial, Enhancement
+file=${path}residual-config.list
+if [ "$ONLY_PRINT" -lt 1 ]; then
+  dpkg -l | grep '^rc'| awk '{print $2}' > ${file}
+fi
 
-# Source: https://github.com/hughsie/PackageKit/blob/master/po/en_GB.po
+# Print!
+if [ -f ${file} ]; then
+  num=`cat ${file} | wc -l`
+  if [ "$num" -gt 500 ]; then
+    echo "** Too many! Showing only 500 **"
+  fi
+  head -500 $file
+fi
 

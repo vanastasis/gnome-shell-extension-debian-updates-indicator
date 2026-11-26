@@ -1,7 +1,8 @@
 /* -*- Mode: js; indent-tabs-mode: nil; js-basic-offset: 4; tab-width: 4; -*- */
 /*
  * This file is part of Debian Linux Updates Indicator.
- * https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator
+ * https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator
+ * Modified for JAVA Computers (Thinker), 2026-11-26.
  *
  * updateManager.js
  *
@@ -63,7 +64,8 @@ export const UpdateManager = class UpdateManager {
         this._extensionName = this._extension.metadata.name;
         this._extensionPath = this._extension.path;
 
-        this._TimeoutId = null;
+        this._initTimeoutId = null;
+        this._checkTimeoutId = null;
         this._initialTimeoutId = null;
 
         if (!GLib.file_test(CHECK_CMD, GLib.FileTest.EXISTS)) {
@@ -164,8 +166,14 @@ export const UpdateManager = class UpdateManager {
         this._isAutomaticCheck = false;
 
         // Remove the periodic check before adding a new one
-        if (this._TimeoutId)
-            GLib.source_remove(this._TimeoutId);
+        if (this._initTimeoutId) {
+            GLib.source_remove(this._initTimeoutId);
+            this._initTimeoutId = null;
+        }
+        if (this._checkTimeoutId) {
+            GLib.source_remove(this._checkTimeoutId);
+            this._checkTimeoutId = null;
+        }
 
         // Interval in hours from settings, convert to seconds
         let unit = this._extensionSettings.get_int('interval-unit');
@@ -206,28 +214,39 @@ export const UpdateManager = class UpdateManager {
                 GLib.PRIORITY_DEFAULT,
                 CHECK_INTERVAL,
                 () => {
+                    this._initTimeoutId = null;
+                    if (!this._indicator)
+                        return GLib.SOURCE_REMOVE;
                     this._isAutomaticCheck = true;
                     this._checkNetwork();
                     this._checkInterval();
-                    return true;
+                    return GLib.SOURCE_REMOVE;
                 });
         }
     }
 
     _checkInterval() {
         // Remove the periodic check before adding a new one
-        if (this._TimeoutId)
-            GLib.source_remove(this._TimeoutId);
+        if (this._checkTimeoutId) {
+            GLib.source_remove(this._checkTimeoutId);
+            this._checkTimeoutId = null;
+        }
 
-        let CHECK_INTERVAL = this._extensionSettings.get_int('check-interval') * 60 * 60;
+        let unit = this._extensionSettings.get_int('interval-unit');
+        let conversion = unit === 1 ? 60 * 60 * 24 : unit === 2 ? 60 * 60 * 24 * 7 : 60 * 60;
+        let CHECK_INTERVAL = this._extensionSettings.get_int('check-interval') * conversion;
         if (CHECK_INTERVAL) {
             this._checkTimeoutId = GLib.timeout_add_seconds(
                 GLib.PRIORITY_DEFAULT,
                 CHECK_INTERVAL,
                 () => {
+                    if (!this._indicator) {
+                        this._checkTimeoutId = null;
+                        return GLib.SOURCE_REMOVE;
+                    }
                     this._isAutomaticCheck = true;
                     this._checkNetwork();
-                    return true;
+                    return GLib.SOURCE_CONTINUE;
                 });
         }
     }
@@ -420,6 +439,8 @@ export const UpdateManager = class UpdateManager {
      */
 
     _checkNetwork() {
+        if (!this._indicator || !this._netMonitor)
+            return;
         this._indicator.showChecking(true);
         this._netMonitor.networkTimeout();
     }

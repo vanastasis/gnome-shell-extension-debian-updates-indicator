@@ -1,7 +1,7 @@
 #!/bin/bash
 ##################################################################################
 # This file is part of Debian Linux Updates Indicator.
-# https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator
+# https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator
 #
 # local:install.sh
 #

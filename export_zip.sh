@@ -1,7 +1,7 @@
 #!/bin/bash
 ##################################################################################
 # This file is part of Debian Linux Updates Indicator.
-# https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator
+# https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator
 #
 # export_zip.sh
 #
@@ -41,7 +41,7 @@ if [ ! -d $srcdir/zip-files ]; then
     mkdir $srcdir/zip-files
 fi
 
-extensiondir=$installdir/share/gnome-shell/extensions/debian-updates-indicator@glerro.pm.me/
+extensiondir=$installdir/share/gnome-shell/extensions/debian-updates-indicator@vanastasis.github.com/
 
 sources=(locale scripts ui `(ls $extensiondir/*.js)`)
 

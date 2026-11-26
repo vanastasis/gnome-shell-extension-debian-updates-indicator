@@ -1,0 +1,18 @@
+{
+  "description": "Updates indicator for Debian Linux based distributions.\n\nCheck for updates and shows also the following packages status (as in Synaptic):\n⚫ Available updates.\n⚫ New packages in repository.\n⚫ Local/Obsolete packages.\n⚫ Residual config files.\n⚫ Autoremovable packages.\n\nMaintained by JAVA Computers (Thinker). GNOME Shell 51 compatibility tested by the maintainer on Debian.",
+  "gettext-domain": "gnome-shell-extension-debian-updates-indicator",
+  "name": "Debian Linux Updates Indicator — JAVA Computers",
+  "settings-schema": "org.gnome.shell.extensions.debian-updates-indicator",
+  "shell-version": [
+    "45",
+    "46",
+    "47",
+    "48",
+    "49",
+    "50",
+    "51"
+  ],
+  "url": "https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator",
+  "uuid": "debian-updates-indicator@vanastasis.github.com",
+  "version-name": "2.7.0-JAVA.1"
+}

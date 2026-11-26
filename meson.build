@@ -1,9 +1,9 @@
 project('gnome-shell-extension-debian-updates-indicator',
-    version: '2.7.0',
+    version: '2.7.0-JAVA.1',
     meson_version: '>= 1.1.0',
     license: 'GPL3')
 
-ext_uuid = 'debian-updates-indicator@glerro.pm.me'
+ext_uuid = 'debian-updates-indicator@vanastasis.github.com'
 
 data_dir = get_option('datadir')
 

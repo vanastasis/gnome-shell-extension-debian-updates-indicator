@@ -1,8 +1,10 @@
+/* -*- Mode: js; indent-tabs-mode: nil; js-basic-offset: 4; tab-width: 4; -*- */
 /*
  * This file is part of Debian Linux Updates Indicator.
- * https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator
+ * https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator
+ * Modified for JAVA Computers (Thinker), 2026-11-26.
  *
- * stylesheet.css
+ * extension.js
  *
  * Copyright (c) 2023-2026 Gianni Lerro {glerro} ~ <glerro@pm.me>
  *
@@ -27,29 +29,26 @@
  * SPDX-FileCopyrightText: 2023-2026 Gianni Lerro <glerro@pm.me>
  */
 
-.debian-updates-indicator-item {
-    font-family: monospace;
-    font-size: 0.9em;
-}
+'use strict';
 
-.debian-updates-indicator-item-header {
-    font-size: 1em;
-    font-weight: bold;
-}
+import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 
-.debian-updates-indicator-urgent-item {
-    font-family: monospace;
-    font-size: 0.9em;
-    color: rgba(255, 60, 60, 1);
-}
+import * as UpdateManager from './updateManager.js';
 
-.debian-updates-indicator-urgent-item-header {
-    font-size: 1em;
-    font-weight: bold;
-    color: rgba(255, 60, 60, 1);
-}
+export default class DebianUpdatesExtension extends Extension {
+    enable() {
+        console.log(`Enabling ${this.metadata.name} - Version ${this.metadata['version-name']}`);
 
-.debian-updates-indicator-separator {
-    height: 3px;
+        this._updateManager = new UpdateManager.UpdateManager(this);
+    }
+
+    disable() {
+        console.log(`Disabling ${this.metadata.name} - Version ${this.metadata['version-name']}`);
+
+        if (this._updateManager !== null) {
+            this._updateManager.destroy();
+            this._updateManager = null;
+        }
+    }
 }
 

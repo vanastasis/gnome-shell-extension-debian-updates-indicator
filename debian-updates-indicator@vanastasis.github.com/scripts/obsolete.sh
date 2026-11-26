@@ -1,9 +1,10 @@
 #!/bin/bash
 ##################################################################################
 # This file is part of Debian Linux Updates Indicator.
-# https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator
+# https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator
+# Modified for JAVA Computers (Thinker), 2026-11-26.
 #
-# residual.sh
+# obsolete.sh
 #
 # Copyright (c) 2023-2026 Gianni Lerro {glerro} ~ <glerro@pm.me>
 #
@@ -30,7 +31,7 @@
 
 ######################################
 #                                    #
-#   Check for residual config files  #
+#   Check for obsolete packages      #
 #                                    #
 ######################################
 
@@ -42,9 +43,11 @@ path=${TEMP_FOLDER}
 # Create the directory if it doesn't exist
 mkdir -p ${path}
 
-file=${path}residual-config.list
+file=${path}obsolete.list
+
+# Check for local or obsolete packages
 if [ "$ONLY_PRINT" -lt 1 ]; then
-  dpkg -l | grep '^rc'| awk '{print $2}' > ${file}
+  apt-show-versions | grep 'No available version\|newer than version in archive\|*manually*' | awk '{print $1}' > ${file}
 fi
 
 # Print!

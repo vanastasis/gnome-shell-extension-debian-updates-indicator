@@ -1,7 +1,8 @@
 /* -*- Mode: js; indent-tabs-mode: nil; js-basic-offset: 4; tab-width: 4; -*- */
 /*
  * This file is part of Debian Linux Updates Indicator.
- * https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator
+ * https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator
+ * Modified for JAVA Computers (Thinker), 2026-11-26.
  *
  * indicator.js
  *
@@ -96,8 +97,12 @@ export const DebianUpdatesIndicator = GObject.registerClass({
             style_class: 'system-status-icon',
         });
 
+        // JAVA compatibility patch: GNOME Shell 51 removed St.BoxLayout.vertical.
+        // GNOME 48+ supports orientation; retain the legacy property for 45-47.
         this._box = new St.BoxLayout({
-            vertical: false,
+            ...(SHELL_MAJOR >= 48
+                ? {orientation: Clutter.Orientation.HORIZONTAL}
+                : {vertical: false}),
             style_class: 'panel-status-menu-box',
         });
 

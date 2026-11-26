@@ -1,7 +1,8 @@
 #!/bin/bash
 ##################################################################################
 # This file is part of Apt Update Indicator NG.
-# https://gitlab.gnome.org/glerro/gnome-shell-extension-apt-update-ng
+# https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator
+# Modified for JAVA Computers (Thinker), 2026-11-26.
 #
 # get-updates.sh
 #

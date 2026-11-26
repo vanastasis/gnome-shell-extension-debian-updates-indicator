@@ -1,7 +1,8 @@
 /* -*- Mode: js; indent-tabs-mode: nil; js-basic-offset: 4; tab-width: 4; -*- */
 /*
  * This file is part of Debian Linux Updates Indicator.
- * https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator
+ * https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator
+ * Modified for JAVA Computers (Thinker), 2026-11-26.
  *
  * prefs.js
  *

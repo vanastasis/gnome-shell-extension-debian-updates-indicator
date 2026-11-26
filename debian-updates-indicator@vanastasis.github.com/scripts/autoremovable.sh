@@ -1,9 +1,10 @@
 #!/bin/bash
 ##################################################################################
 # This file is part of Debian Linux Updates Indicator.
-# https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator
+# https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator
+# Modified for JAVA Computers (Thinker), 2026-11-26.
 #
-# obsolete.sh
+# autoremoval.sh
 #
 # Copyright (c) 2023-2026 Gianni Lerro {glerro} ~ <glerro@pm.me>
 #
@@ -42,11 +43,11 @@ path=${TEMP_FOLDER}
 # Create the directory if it doesn't exist
 mkdir -p ${path}
 
-file=${path}obsolete.list
+file=${path}autoremovable.list
 
 # Check for local or obsolete packages
 if [ "$ONLY_PRINT" -lt 1 ]; then
-  apt-show-versions | grep 'No available version\|newer than version in archive\|*manually*' | awk '{print $1}' > ${file}
+  apt-get --simulate autoremove | grep '^Remv' | awk '{print $2}' > ${file}
 fi
 
 # Print!

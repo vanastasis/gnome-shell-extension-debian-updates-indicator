@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
  * This file is part of Debian Linux Updates Indicator.
- * https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator
+ * https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator
+ * Modified for JAVA Computers (Thinker), 2026-11-26.
  *
  * org.gnome.shell.extension.debian-updates-indicator.gschema.xml
  *

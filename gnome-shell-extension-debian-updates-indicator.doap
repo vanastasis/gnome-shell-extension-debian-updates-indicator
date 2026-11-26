@@ -16,19 +16,18 @@ Check for updates and shows also the following packages status (as in Synaptic):
 Available updates; New packages in repository; Local/Obsolete packages; Residual config files;
 Autoremovable packages.
     </description>
-    <homepage rdf:resource="https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator" />
-    <download-page rdf:resource="https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator" />
-    <bug-database rdf:resource="https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator/issues" />
+    <homepage rdf:resource="https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator" />
+    <download-page rdf:resource="https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator" />
+    <bug-database rdf:resource="https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator/issues" />
     <license rdf:resource="https://spdx.org/licenses/GPL-3.0+.html"/>
     <category rdf:resource="http://api.gnome.org/doap-extensions#core" />
     <programming-language>JavaScript</programming-language>
 
     <maintainer>
         <foaf:Person>
-            <foaf:name>Gianni Lerro</foaf:name>
-            <foaf:mbox rdf:resource="mailto:glerro@pm.me" />
-            <foaf:nick>glerro</foaf:nick>
-            <gnome:userid>glerro</gnome:userid>
+            <foaf:name>JAVA Computers — by Thinker</foaf:name>
+            <foaf:homepage rdf:resource="https://github.com/vanastasis" />
+            <foaf:nick>vanastasis</foaf:nick>
         </foaf:Person>
     </maintainer>
 </Project>

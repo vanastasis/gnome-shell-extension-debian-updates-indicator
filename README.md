@@ -1,155 +1,50 @@
-# Debian Linux Updates Indicator
-------------------------------
+# Debian Linux Updates Indicator — JAVA Computers
 
-![Screenshot_01](https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator/-/raw/main/assets/Screenshot_01.webp)
+Maintained by **JAVA Computers — by Thinker** ([vanastasis](https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator)).
 
-![Screenshot_02](https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator/-/raw/main/assets/Screenshot_02.webp)
+A GNOME Shell extension for monitoring APT package updates on Debian and Debian-based distributions.
 
-This extension add an indicator to Gnome Shell for monitoring Debian Linux based distributions packages update.
+## Compatibility
+
+- **GNOME Shell 51:** reported working by the maintainer on Debian sid/forky (Thinker).
+- **GNOME Shell 45–50:** declared compatible; not independently retested for this fork release.
+- GNOME Shell 44 and earlier: not supported by this release.
+- Version: `2.7.0-JAVA.1`.
 
 ## Features
-* Check for updates and show in the linked menu the following package status (as in Synaptic):
-  * Updates available.
-  * New packages in the repository.
-  * Local/obsolete packages (Require apt-show-versions).
-  * Residual configuration files.
-  * Self-removable packages.
-* In the menu it is also possible check for updates, apply the updates and see when the last check was made.
-* It is customizable in many parts via extension settings.
-* Show a notification when there are new updates.
-* Support Gnome Shell Versions 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50.
-* Translatable.
 
-## Installation
-Normal users are recommended to get the extension from
+- Available updates and optional critical-update notifications.
+- New repository packages, obsolete/local packages, residual configuration and autoremovable packages.
+- Manual or scheduled checks, configurable commands and an ignore list.
+- Existing translations and GSettings preferences retained.
 
-[![Get it on GNOME Extensions](https://raw.githubusercontent.com/andyholmes/gnome-shell-extensions-badge/master/get-it-on-ego.svg?sanitize=true){height=100px}](https://extensions.gnome.org/extension/6322/debian-linux-updates-indicator/)
+## Installation from source
 
-## Manual Installation
-You can check out the latest version with git, build and install it with [Meson](https://mesonbuild.com/).
-
-You must install git, meson, ninja and xgettext.
-
-For a regular use and local installation these are the steps:
+Install the build tools and required package-management utilities on Debian:
 
 ```bash
-git clone https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator.git
+sudo apt install git meson ninja-build gettext libglib2.0-bin packagekit apt-show-versions
+```
+
+```bash
+git clone --branch main https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator.git
 cd gnome-shell-extension-debian-updates-indicator
-meson setup --prefix=$HOME/.local _build
+meson setup --prefix="$HOME/.local" _build
 meson install -C _build
 ```
 
-Otherwise you can run the `./local_install.sh` script, it performs the build steps specified in the
-previous section.
-
-You may need to restart GNOME Shell (<kbd>Alt</kbd>+<kbd>F2</kbd>, <kbd>r</kbd>, <kbd>⏎</kbd>)
-after that, or logout and login again.
-
-Finally after restarting Gnome Shell or logging in, you need to enable the extension:
-```bash
-gnome-extensions enable debian-updates-indicator@glerro.pm.me
-```
-
-## Export extension ZIP file
-To create a ZIP file with the extension, just run:
+Disable any previous installation of the upstream extension before enabling this fork. Both use the same settings schema, so existing user preferences can be reused. Do not enable both extensions at once. Log out and back in on Wayland, then run:
 
 ```bash
-git clone https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator.git
-cd gnome-shell-extension-debian-updates-indicator
-./export-zip.sh
+gnome-extensions enable debian-updates-indicator@vanastasis.github.com
 ```
 
-This will create the file `debian-updates-indicator@glerro.pm.me.shell-extension.zip` with the extension, you can install it with this steps:
+## Changes and support
 
-```bash
-gnome-extensions install debian-updates-indicator@glerro.pm.me.shell-extension.zip
-```
+See [CHANGELOG.md](CHANGELOG.md). Report issues or submit changes at [https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator/issues](https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator/issues).
 
-You may need to restart GNOME Shell (<kbd>Alt</kbd>+<kbd>F2</kbd>, <kbd>r</kbd>, <kbd>⏎</kbd>) after that, or logout and login again.
+## Attribution and licence
 
-Finally after restarting Gnome Shell or logging in, you need to enable the extension:
+Derived from the [original Debian Linux Updates Indicator](https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator) by Gianni Lerro, copyright 2023–2026, with contributions and original work by Fran Glais and Raphael Rochet. Original copyright, author, translation and SPDX notices remain intact. This fork contains modifications by JAVA Computers (Thinker), 2026-11-26.
 
-```bash
-gnome-extensions enable debian-updates-indicator@glerro.pm.me
-```
-
-## Translating
-
-To contribute translations you will need a Gnome GitLab account, git, meson, ninja, xgettext and a translation program like Gtranslator.
-
-Start by creating a fork on Gnome GitLab.
-
-Clone your fork with git and setup a project with meson:
-
-```bash
-git clone https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator.git
-cd gnome-shell-extension-debian-updates-indicator
-meson setup --prefix=$HOME/.local _build
-meson compile -C _build
-```
-
-Ensure the translation template is updated:
-
-```bash
-meson compile -C _build gnome-shell-extension-debian-updates-indicator-pot
-```
-
-Add the [language code](https://www.gnu.org/software/gettext/manual/html_node/Language-Codes.html) for your translation in /po/LINGUAS file.
-
-Create the /po/\<language code\>.po file:
-
-```bash
-meson compile -C _build gnome-shell-extension-debian-updates-indicator-update-po
-```
-
-Open /po/\<language code\>.po whith Gtranslator or a similar program, translate all messages and save.
-
-To test your translation, install the extension and restart GNOME Shell:
-
-```bash
-meson setup --prefix=$HOME/.local _build --reconfigure
-meson install -C _build
-```
-
-You may need to restart GNOME Shell (<kbd>Alt</kbd>+<kbd>F2</kbd>, <kbd>r</kbd>, <kbd>⏎</kbd>)
-after that, or logout and login again.
-
-When you're happy with your translation, commit the changes and push them to your fork:
-
-```bash
-git add po/LINGUAS po/<language code>.po
-git commit -m "New translations (<language>)"
-git push
-```
-
-Finally, open a New Merge Request from your fork at https://gitlab.gnome.org/<your_username>/gnome-shell-extension-wifiqrcode.
-
-## Acknowledgments
-This extension is based on APT Update Indicator by Fran Glais.
-
-[APT Update Indicator on Gnome Extensions](https://extensions.gnome.org/extension/1139/apt-update-indicator/)
-
-[APT Update Indicator on GitHub](https://github.com/franglais125/apt-update-indicator)
-
-Many thanks go out to them for their work.
-
-## Donating 💳️
-If you like my work and want to support it, consider [donating](https://ko-fi.com/glerro). 🙂️ Thanks!
-
-## License
-Debian Updates Indicator - Copyright (c) 2023-2026 Gianni Lerro {glerro} ~ <glerro@pm.me>
-
-Debian Updates Indicator is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by the
-Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Debian Updates Indicator is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
-See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along
-with Debian Updates Indicator. If not, see <https://www.gnu.org/licenses/>.
-
+Licensed under the GNU General Public License, version 3 or later (GPL-3.0-or-later). See the repository licence for the full terms. Provided without warranty.
