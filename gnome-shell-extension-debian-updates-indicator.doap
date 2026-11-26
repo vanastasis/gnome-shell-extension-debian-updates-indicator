@@ -25,7 +25,7 @@ Autoremovable packages.
 
     <maintainer>
         <foaf:Person>
-            <foaf:name>JAVA Computers — by Thinker</foaf:name>
+            <foaf:name>vanastasis</foaf:name>
             <foaf:homepage rdf:resource="https://github.com/vanastasis" />
             <foaf:nick>vanastasis</foaf:nick>
         </foaf:Person>

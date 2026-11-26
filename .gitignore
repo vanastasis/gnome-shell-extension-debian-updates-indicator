@@ -5,7 +5,7 @@ node_modules
 package.json
 package-lock.json
 
-# Generated JAVA Computers extension files
+# Generated vanastasis extension files
 /debian-updates-indicator@vanastasis.github.com/Temp/
 /debian-updates-indicator@vanastasis.github.com/locale/
 /debian-updates-indicator@vanastasis.github.com/schemas/gschemas.compiled

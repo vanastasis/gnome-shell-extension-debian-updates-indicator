@@ -2,7 +2,7 @@
 /*
  * This file is part of Debian Linux Updates Indicator.
  * https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator
- * Modified for JAVA Computers (Thinker), 2026-11-26.
+ * Modified for vanastasis, 2026-11-26.
  *
  * utils.js
  *

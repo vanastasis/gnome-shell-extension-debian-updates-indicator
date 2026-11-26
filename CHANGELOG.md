@@ -1,13 +1,13 @@
 # Changelog
 
-## 2.7.0-JAVA.1 — 2026-11-26
+## 2.7.0-1 — 2026-11-26
 
 ### Functional changes from upstream 2.7.0
 
 - `indicator.js`: use `Clutter.Orientation.HORIZONTAL` for `St.BoxLayout` on GNOME Shell 48+ (GNOME 51 removes the legacy `vertical` property); retain `vertical: false` on GNOME 45–47.
 - `updateManager.js`: initialise distinct `_initTimeoutId` and `_checkTimeoutId` instead of the unused `_TimeoutId`; cancel and clear both when rescheduling; use a one-shot initial callback (`GLib.SOURCE_REMOVE`) and a repeating periodic callback (`GLib.SOURCE_CONTINUE`).
 - `updateManager.js`: apply the configured hours/days/weeks unit to recurring checks instead of always treating the interval as hours; guard network checks and timer callbacks against a destroyed indicator/monitor.
-- `metadata.json`: add GNOME Shell 51 to the declared 45–51 compatibility range; set version-name `2.7.0-JAVA.1`.
+- `metadata.json`: add GNOME Shell 51 to the declared 45–51 compatibility range; set version-name `2.7.0-1`.
 - Eighteen other runtime source files matched the imported upstream Git blobs exactly before branding changes. No APT scripts, preference UI or schema behavior changed.
 
 ### Fork identity and packaging

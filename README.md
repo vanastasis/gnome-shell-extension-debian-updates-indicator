@@ -1,10 +1,10 @@
-# Debian Linux Updates Indicator — JAVA Computers
+# Debian Linux Updates Indicator
 
-**Maintained by JAVA Computers — by Thinker** ([vanastasis](https://github.com/vanastasis))
+**Maintained by [vanastasis](https://github.com/vanastasis)**
 
 A GNOME Shell panel extension for monitoring APT package updates on Debian and Debian-based Linux distributions.
 
-**Version:** `2.7.0-JAVA.1` | **Licence:** GPL-3.0-or-later
+**Version:** `2.7.0-1` | **Licence:** GPL-3.0-or-later
 
 ## Compatibility
 
@@ -90,7 +90,7 @@ Expected release filename:
 
 `zip-files/debian-updates-indicator@vanastasis.github.com.shell-extension.zip`
 
-Upload the verified ZIP as a release asset on GitHub under the tag `v2.7.0-JAVA.1`. Do not publish the source ZIP as the installable asset.
+Upload the verified ZIP as a release asset on GitHub under the tag `v2.7.0-1`. Do not publish the source ZIP as the installable asset.
 
 ## Changes and support
 
@@ -99,12 +99,12 @@ Upload the verified ZIP as a release asset on GitHub under the tag `v2.7.0-JAVA.
 - [Report an issue](https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator/issues)
 - [Contribute a change](https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator/pulls)
 
-The maintained branch is `main`. The other imported branches are historical and are not current JAVA Computers releases.
+The maintained branch is `main`. The other imported branches are historical and are not current vanastasis releases.
 
 ## Attribution and licence
 
 Derived from the [original Debian Linux Updates Indicator](https://gitlab.gnome.org/glerro/gnome-shell-extension-debian-updates-indicator) by Gianni Lerro, copyright 2023–2026, with contributions and original work by Fran Glais and Raphael Rochet. Original copyright, author, translation and SPDX notices remain intact.
 
-Modifications by JAVA Computers (Thinker), 2026-11-26.
+Modifications by vanastasis, 2026-11-26.
 
 Licensed under the GNU General Public License, version 3 or later (GPL-3.0-or-later). See [COPYING](COPYING) for full terms. Provided without warranty.

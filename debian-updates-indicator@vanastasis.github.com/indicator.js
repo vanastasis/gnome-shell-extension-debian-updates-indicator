@@ -2,7 +2,7 @@
 /*
  * This file is part of Debian Linux Updates Indicator.
  * https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator
- * Modified for JAVA Computers (Thinker), 2026-11-26.
+ * Modified for vanastasis, 2026-11-26.
  *
  * indicator.js
  *
@@ -97,7 +97,7 @@ export const DebianUpdatesIndicator = GObject.registerClass({
             style_class: 'system-status-icon',
         });
 
-        // JAVA compatibility patch: GNOME Shell 51 removed St.BoxLayout.vertical.
+        // GNOME compatibility patch: GNOME Shell 51 removed St.BoxLayout.vertical.
         // GNOME 48+ supports orientation; retain the legacy property for 45-47.
         this._box = new St.BoxLayout({
             ...(SHELL_MAJOR >= 48
