@@ -1,75 +1,69 @@
-# Debian Linux Updates Indicator
+# Debian APT Updates Indicator
 
 **Maintained by [vanastasis](https://github.com/vanastasis)**
 
-A GNOME Shell panel extension for monitoring APT package updates on Debian and Debian-based Linux distributions.
+A GNOME Shell panel extension for monitoring and managing APT package updates on Debian and Debian-based Linux distributions.
 
-**Version:** `2.7.0-1` | **Licence:** GPL-3.0-or-later
+**Version:** `2.7.0.3` | **GNOME Shell:** 51 | **Licence:** GPL-3.0-or-later
 
-## Compatibility
+## What's new in 2.7.0.3
 
-| GNOME Shell version | Status |
-| --- | --- |
-| 51 | Original modified extension tested and working on Thinker (Debian sid/forky); renamed fork requires runtime verification |
-| 45–50 | Declared compatible; not retested for this release |
-| 44 and earlier | Not supported by the maintained release |
+- **Remove unused packages:** separate, manually triggered menu action immediately below Apply updates.
+- **APT and APT-get presets:** use the desktop-configured terminal (`xdg-terminal-exec`) or Debian's `x-terminal-emulator` alternative.
+- **Nala – XFCE Terminal:** presets for both updates and cleanup, with graphical Polkit authentication.
+- Nala full upgrades automatically confirm prompts and disable automatic autoremove. Cleanup requires manual package confirmation; no automatic `-y` is supplied.
+- Built-in terminal presets display an exit status and a press-any-key prompt before closing. Package lists refresh when the launcher finishes; a terminal that detaches may finish tracking earlier.
+- Independent custom commands and terminal preferences, operation guards and error notifications.
 
 ## Features
 
-- Available package updates and optional critical-update notifications.
-- New packages in repositories, local/obsolete packages, residual configuration and autoremovable packages.
+- Available updates and optional critical-update notifications.
+- New packages in repositories, local/obsolete packages, residual configuration files and autoremovable packages.
 - Manual and automatic update checks with hourly, daily or weekly intervals.
-- Configurable refresh and update commands, ignore list and last-check timestamp.
-- Existing preferences and translations retained.
+- Configurable refresh commands, ignore list and last-check timestamp.
 - GNOME Shell 51 panel-layout compatibility and corrected timer lifecycle.
+- Existing settings and translations retained; new strings may appear in English until translated.
 
-## Manual installation only — no compilation required for release ZIPs
+## Advanced settings
 
-This fork is distributed through GitHub only, not the GNOME Extensions website.
+| Method | Apply updates | Remove unused packages |
+| --- | --- | --- |
+| APT – Default Terminal | `apt full-upgrade -o APT::Get::AutomaticRemove=false` | `apt autoremove` |
+| APT-get – Default Terminal | `apt-get dist-upgrade -o APT::Get::AutomaticRemove=false` | `apt-get autoremove` |
+| Nala – XFCE Terminal | `nala full-upgrade --assume-yes --no-auto-remove` | `nala autoremove` |
+| Custom | User-defined | User-defined |
+| GNOME Software, Synaptic, PackageKit, Ubuntu Update Manager | GUI update methods | — |
 
-Visit [GitHub Releases](https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator/releases) and download the following installable asset when a release is published:
+Built-in terminal commands use `pkexec`. Install Nala and `xfce4-terminal` to use the Nala presets. Full upgrades can still remove conflicting packages to resolve dependencies; disabling autoremove is not a guarantee against all removals. Automatic checks do not automatically install upgrades or run cleanup.
+
+## Compatibility
+
+GNOME Shell 51 is the declared compatibility target. Earlier versions are not declared supported by this release. Build and schema validation do not establish live runtime compatibility for every terminal or distribution.
+
+## Installation
+
+Download the installable ZIP from [GitHub Releases](https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator/releases):
 
 `debian-updates-indicator@vanastasis.github.com.shell-extension.zip`
 
-**Do not use GitHub's automatically generated Source code (zip) archive for direct installation.** The installable release ZIP includes compiled schemas and translations. At the time of this documentation update, the first packaged release has not yet been published.
-
-### Option 1 — Install the release ZIP
-
-Run from the directory containing the downloaded ZIP:
+Do not use GitHub's automatically generated source archive as an installable extension. The GitHub release asset includes compiled schemas and translations.
 
 ```bash
 gnome-extensions install --force "debian-updates-indicator@vanastasis.github.com.shell-extension.zip"
 ```
 
-### Option 2 — Extract the release ZIP manually
+Alternatively, manually extract the GitHub release ZIP into `~/.local/share/gnome-shell/extensions/debian-updates-indicator@vanastasis.github.com/`.
 
-```bash
-UUID="debian-updates-indicator@vanastasis.github.com"
-DEST="$HOME/.local/share/gnome-shell/extensions/$UUID"
-mkdir -p "$DEST"
-unzip -o "$UUID.shell-extension.zip" -d "$DEST"
-```
-
-The archive must contain `metadata.json`, `extension.js`, `schemas/gschemas.compiled`, `scripts/`, `ui/` and the available compiled translations at the correct relative paths.
-
-### Enable the extension
-
-If replacing the upstream extension, disable the old UUID first. Both extensions share the same GSettings schema; do not enable both at the same time.
-
-Log out and log back in on Wayland, then run:
+If replacing the upstream extension, disable the old UUID first; both share a GSettings schema. On Wayland, log out and back in if the old JavaScript is still cached, then enable the extension:
 
 ```bash
 gnome-extensions enable debian-updates-indicator@vanastasis.github.com
 gnome-extensions info debian-updates-indicator@vanastasis.github.com
 ```
 
-The installed extension is located in:
+A separate GNOME Extensions submission archive omits the compiled GSettings schema. Publication on extensions.gnome.org is subject to review; GitHub publication does not automatically update that listing.
 
-`~/.local/share/gnome-shell/extensions/debian-updates-indicator@vanastasis.github.com/`
-
-The release ZIP requires no Git, Meson, Ninja or compiler. Normal runtime utilities such as APT and the configured refresh/update command are still required. Optional obsolete-package checks use `apt-show-versions`; the default refresh command uses PackageKit.
-
-## Build from source (developers and maintainers)
+## Build from source
 
 ```bash
 sudo apt install git meson ninja-build gettext libglib2.0-bin
@@ -80,18 +74,6 @@ meson compile -C _build
 meson install -C _build
 ```
 
-Alternatively, run `./local_install.sh` for a local build and installation.
-
-## Package a release (maintainers)
-
-The repository contains `export_zip.sh` for packaging the extension. Before publishing, verify that the archive contains the compiled schema, translations and all runtime files.
-
-Expected release filename:
-
-`zip-files/debian-updates-indicator@vanastasis.github.com.shell-extension.zip`
-
-Upload the verified ZIP as a release asset on GitHub under the tag `v2.7.0-1`. Do not publish the source ZIP as the installable asset.
-
 ## Changes and support
 
 - [Changelog](CHANGELOG.md)
@@ -99,7 +81,7 @@ Upload the verified ZIP as a release asset on GitHub under the tag `v2.7.0-1`. D
 - [Report an issue](https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator/issues)
 - [Contribute a change](https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator/pulls)
 
-The maintained branch is `main`. The other imported branches are historical and are not current vanastasis releases.
+The maintained branch is `main`. Other imported branches are historical.
 
 ## Attribution and licence
 

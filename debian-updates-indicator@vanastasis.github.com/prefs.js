@@ -190,7 +190,7 @@ const DebianUpdatesAdvancedPrefsPage = GObject.registerClass({
     Template: import.meta.url.replace('prefs.js', 'ui/prefs_advanced_adw1.ui'),
     InternalChildren: ['update_cmd_options', 'update_cmd_button', 'output_on_terminal_switch',
         'terminal_entry', 'field_updatecmd', 'use_custom_cmd_switch', 'field_checkcmd_custom',
-        'reset_button'],
+        'cleanup_cmd_options', 'cleanup_cmd_entry', 'cleanup_terminal_entry', 'reset_button'],
 }, class DebianUpdatesAdvancedPrefsPage extends Adw.PreferencesPage {
     constructor(settings, params = {}) {
         super(params);
@@ -227,6 +227,24 @@ const DebianUpdatesAdvancedPrefsPage = GObject.registerClass({
             'sensitive', Gio.SettingsBindFlags.GET
         );
 
+        // Cleanup commands are independent of the update method.
+        this._settings.bind('cleanup-cmd-options', this._cleanup_cmd_options,
+            'selected', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('cleanup-cmd', this._cleanup_cmd_entry,
+            'text', Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind('cleanup-terminal', this._cleanup_terminal_entry,
+            'text', Gio.SettingsBindFlags.DEFAULT
+        );
+        const updateCleanupSensitivity = () => {
+            const custom = this._cleanup_cmd_options.selected === 2;
+            this._cleanup_cmd_entry.sensitive = custom;
+            this._cleanup_terminal_entry.sensitive = custom;
+        };
+        this._cleanup_cmd_options.connect('notify::selected', updateCleanupSensitivity);
+        updateCleanupSensitivity();
+
         // Check commands
         this._settings.bind('use-custom-cmd', this._use_custom_cmd_switch,
             'active', Gio.SettingsBindFlags.DEFAULT
@@ -246,14 +264,15 @@ const DebianUpdatesAdvancedPrefsPage = GObject.registerClass({
                 'output-on-terminal',
                 'update-cmd',
                 'update-cmd-options',
+                'cleanup-cmd-options',
+                'cleanup-cmd',
+                'cleanup-terminal',
                 'use-custom-cmd',
                 'check-cmd-custom',
             ];
             keys.forEach(val => {
                 this._settings.set_value(val, this._settings.get_default_value(val));
             });
-            // This one needs to be refreshed manually
-            this._update_cmd_options.set_active(this._settings.get_enum('update-cmd-options'));
         });
     }
 });

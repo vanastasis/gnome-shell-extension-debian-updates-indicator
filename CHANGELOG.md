@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.7.0.3 — 2026-11-26
+
+- Add a separate Remove unused packages panel action and independent cleanup preferences.
+- Add APT and APT-get presets using desktop/default Debian terminal detection, and Nala presets using XFCE Terminal, for both updates and cleanup.
+- Use graphical Polkit authentication, exit-status reporting and a press-any-key prompt for built-in terminal presets.
+- Automatically confirm Nala full upgrades without automatic autoremove; keep cleanup manually initiated and interactive.
+- Improve package operation guards, command argument parsing, completion refresh and error notifications.
+- Update README, extension description and release packaging; retain GNOME Shell 51 as the declared target.
+- Use dot-separated version names for GNOME Extensions compatibility.
+
 ## 2.7.0-1 — 2026-11-26
 
 ### Functional changes from upstream 2.7.0

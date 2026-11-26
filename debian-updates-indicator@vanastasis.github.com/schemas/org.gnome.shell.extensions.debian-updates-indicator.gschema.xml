@@ -86,7 +86,7 @@
       <key type="i" name="update-cmd-options">
       <default>0</default>
       <summary>Application to use to update, or custom command</summary>
-      <description>0:gnome-software, 1:synaptic-pkexec, 2: gpk-update-viewer, 3: update-manager, 4: custom command</description>
+      <description>0: GNOME Software, 1: Synaptic, 2: PackageKit, 3: Ubuntu Update Manager, 4: custom, 5: APT default terminal, 6: Nala XFCE Terminal, 7: APT-get default terminal</description>
     </key>
     <key type="s" name="update-cmd">
       <default>"pkexec apt upgrade -y"</default>
@@ -102,6 +102,22 @@
       <default>"gnome-terminal -x bash -c"</default>
       <summary>Terminal and options to use</summary>
       <description>Terminal and options to execute a shell for the upgrade process</description>
+    </key>
+    <key type="i" name="cleanup-cmd-options">
+      <default>0</default>
+      <range min="0" max="3"/>
+      <summary>Method used to remove unused packages</summary>
+      <description>0: APT default terminal, 1: APT-get default terminal, 2: custom, 3: Nala XFCE Terminal</description>
+    </key>
+    <key type="s" name="cleanup-cmd">
+      <default>"sudo apt autoremove"</default>
+      <summary>Custom command to remove unused packages</summary>
+      <description>Executable and arguments, run interactively in a terminal.</description>
+    </key>
+    <key type="s" name="cleanup-terminal">
+      <default>""</default>
+      <summary>Terminal command prefix for package cleanup</summary>
+      <description>Custom method only. Leave empty to use the desktop or Debian default terminal. Prefix must accept an executable and arguments and should wait for completion.</description>
     </key>
     <key type="b" name="strip-versions">
       <default>true</default>

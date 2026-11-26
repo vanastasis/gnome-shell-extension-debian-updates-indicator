@@ -183,6 +183,7 @@ export const DebianUpdatesIndicator = GObject.registerClass({
 
         // "Apply updates", Check now" and "Last Check" menu items
         this.applyUpdatesMenuItem = new PopupMenu.PopupMenuItem(_('Apply updates'));
+        this.removeUnusedMenuItem = new PopupMenu.PopupMenuItem(_('Remove unused packages'));
         this.checkNowMenuItem = new PopupMenu.PopupMenuItem(_('Check now'));
         this.lastCheckMenuItem = new PopupMenu.PopupMenuItem('');
         this.lastCheckMenuItem.reactive = false;
@@ -200,6 +201,7 @@ export const DebianUpdatesIndicator = GObject.registerClass({
         this.menu.addMenuItem(this.autoremovablePackagesExpander);
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         this.menu.addMenuItem(this.applyUpdatesMenuItem);
+        this.menu.addMenuItem(this.removeUnusedMenuItem);
         this.menu.addMenuItem(this.checkNowMenuItem);
         this.menu.addMenuItem(this.lastCheckMenuItem);
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());

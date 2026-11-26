@@ -65,11 +65,14 @@
                 <property name="model">
                   <object class="GtkStringList">
                     <items>
-                      <item>Gnome Software</item>
-                      <item>Synaptic Package Manager</item>
-                      <item>Gnome PackageKit Update Viewer</item>
-                      <item>Ubuntu Update Manager</item>
+                      <item translatable="yes">GNOME Software</item>
+                      <item translatable="yes">Synaptic Package Manager</item>
+                      <item translatable="yes">GNOME PackageKit Update Viewer</item>
+                      <item translatable="yes">Ubuntu Update Manager</item>
                       <item translatable="yes">Custom</item>
+                      <item translatable="yes">APT - Default Terminal</item>
+                      <item translatable="yes">Nala - XFCE Terminal</item>
+                      <item translatable="yes">APT-get - Default Terminal</item>
                     </items>
                   </object>
                 </property>
@@ -92,6 +95,39 @@
                 <property name="show-apply-button">true</property>
               </object>
             </child>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="AdwPreferencesGroup" id="cleanup_command_group">
+        <property name="title" translatable="yes">Remove unused packages</property>
+        <property name="description" translatable="yes">Only runs when selected from the panel menu. Review the removal list in the terminal.</property>
+        <child>
+          <object class="AdwComboRow" id="cleanup_cmd_options">
+            <property name="title" translatable="yes">Cleanup method</property>
+            <property name="model">
+              <object class="GtkStringList">
+                <items>
+                  <item translatable="yes">APT - Default Terminal</item>
+                  <item translatable="yes">APT-get - Default Terminal</item>
+                  <item translatable="yes">Custom command</item>
+                  <item translatable="yes">Nala - XFCE Terminal</item>
+                </items>
+              </object>
+            </property>
+          </object>
+        </child>
+        <child>
+          <object class="AdwEntryRow" id="cleanup_cmd_entry">
+            <property name="title" translatable="yes">Custom cleanup command</property>
+            <property name="show-apply-button">true</property>
+          </object>
+        </child>
+        <child>
+          <object class="AdwEntryRow" id="cleanup_terminal_entry">
+            <property name="title" translatable="yes">Terminal prefix (empty = automatic)</property>
+            <property name="show-apply-button">true</property>
           </object>
         </child>
       </object>

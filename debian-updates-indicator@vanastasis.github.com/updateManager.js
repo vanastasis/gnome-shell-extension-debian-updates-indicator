@@ -35,6 +35,8 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+
 import {gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
 
 import {formatDateWithCFormatString} from 'resource:///org/gnome/shell/misc/dateUtils.js';
@@ -67,6 +69,7 @@ export const UpdateManager = class UpdateManager {
         this._initTimeoutId = null;
         this._checkTimeoutId = null;
         this._initialTimeoutId = null;
+        this._cleanupProcess = null;
 
         if (!GLib.file_test(CHECK_CMD, GLib.FileTest.EXISTS)) {
             STOCK_CHECK_CMD = STOCK_CHECK_CMD_NEW;
@@ -127,31 +130,13 @@ export const UpdateManager = class UpdateManager {
     }
 
     _updateCMD() {
-        let option = this._extensionSettings.get_int('update-cmd-options');
-        if (option === 1) {
-            // Synaptic package manager
-            UPDATE_CMD = '/usr/bin/synaptic-pkexec';
-        } else if (option === 2) {
-            // Gnome Update Viewer: depends on pacakge-kit
-            UPDATE_CMD = '/usr/bin/gpk-update-viewer';
-        } else if (option === 3) {
-            // Update manager, Ubuntu only
-            UPDATE_CMD = '/usr/bin/update-manager';
-        } else if (option === 4 && this._extensionSettings.get_string('update-cmd') !== '') {
-            // Custom command
-            if (this._extensionSettings.get_boolean('output-on-terminal')) {
-                UPDATE_CMD = `/usr/bin/${this._extensionSettings.get_string('terminal')}` +
-                             ` "echo ${this._extensionSettings.get_string('update-cmd')}` +
-                             `; ${this._extensionSettings.get_string('update-cmd')}` +
-                             '; echo Press any key to continue' +
-                             '; read -n1 key"';
-            } else {
-                UPDATE_CMD = `/usr/bin/${this._extensionSettings.get_string('update-cmd')}`;
-            }
-        }  else {
-            // Default, or in case the command is empty, Gnome-Software
-            UPDATE_CMD = STOCK_UPDATE_CMD;
-        }
+        // Presets and custom commands are resolved on activation, not at enable time.
+        const option = this._extensionSettings.get_int('update-cmd-options');
+        UPDATE_CMD = ({
+            1: '/usr/bin/synaptic-pkexec',
+            2: '/usr/bin/gpk-update-viewer',
+            3: '/usr/bin/update-manager',
+        })[option] || STOCK_UPDATE_CMD;
     }
 
     _checkCMD() {
@@ -381,6 +366,10 @@ export const UpdateManager = class UpdateManager {
             this._indicator.applyUpdatesMenuItem,
             'activate',
             this._applyUpdates.bind(this),
+        ], [
+            this._indicator.removeUnusedMenuItem,
+            'activate',
+            this._removeUnusedPackages.bind(this),
         ]);
     }
 
@@ -389,46 +378,143 @@ export const UpdateManager = class UpdateManager {
      *     _applyUpdatesEnd
      */
 
-    _applyUpdates() {
-        if (this._upgradeProcess_sourceId) {
-            // A check is running ! Maybe we should kill it and run another one ?
-            return;
+    _parsePackageCommand(value) {
+        const [ok, argv] = GLib.shell_parse_argv(value.trim());
+        if (!ok || !argv.length)
+            throw new Error(_('Invalid or empty package command.'));
+        return argv;
+    }
+
+    _defaultPackageTerminal() {
+        // Honour the desktop preference first, then Debian alternatives.
+        if (GLib.find_program_in_path('xdg-terminal-exec'))
+            return ['xdg-terminal-exec', '--'];
+        if (GLib.find_program_in_path('x-terminal-emulator'))
+            return ['x-terminal-emulator', '-e'];
+        throw new Error(_('No default terminal found. Install xdg-terminal-exec or x-terminal-emulator.'));
+    }
+
+    _packageTerminal(command, xfce = false, customPrefix = '') {
+        let prefix;
+        if (customPrefix)
+            prefix = this._parsePackageCommand(customPrefix);
+        else if (xfce) {
+            if (!GLib.find_program_in_path('xfce4-terminal'))
+                throw new Error(_('XFCE Terminal is not installed.'));
+            prefix = ['xfce4-terminal', '--disable-server', '-x'];
+        } else {
+            prefix = this._defaultPackageTerminal();
         }
+        if (!GLib.find_program_in_path(command[0]))
+            throw new Error(_('Package command not found: %s').format(command[0]));
+        if (command[0] === 'pkexec' && !GLib.find_program_in_path(command[1]))
+            throw new Error(_('Package manager not found: %s').format(command[1]));
+        // Pass the command as positional arguments, not interpolated shell source.
+        const script = String.raw`"$@"; status=$?; printf "\n%s\n" "Exit status: $status"; printf "Press any key to exit..."; read -r -n 1 -s; exit "$status"`;
+        return [...prefix, 'bash', '-c', script, 'package-operation', ...command];
+    }
 
-        // Parse check command line
-        let [parseok, argvp] = GLib.shell_parse_argv(UPDATE_CMD);
-        if (!parseok)
-            throw new Error('Update cmd parse error');
-
-        let proc = new Gio.Subprocess({argv: argvp, flags: Gio.SubprocessFlags.STDOUT_PIPE});
-        proc.init(this._cancellable);
-
-        let cancelId = 0;
-        if (this._cancellable instanceof Gio.Cancellable)
-            cancelId = this._cancellable.connect(() => proc.force_exit());
-
+    _applyUpdates() {
+        if (!this._indicator || !this._extensionSettings || this._upgradeProcess_sourceId || this._cleanupProcess)
+            return;
         try {
-            // Asynchronously call the output handler when script output is ready
-            proc.communicate_utf8_async(null, this._cancellable, this._applyUpdatesEnd.bind(this));
-
-            this._upgradeProcess_sourceId = 1;
-
-            GLib.strfreev(argvp);
+            const option = this._extensionSettings.get_int('update-cmd-options');
+            let argv;
+            switch (option) {
+            case 5:
+                argv = this._packageTerminal(['pkexec', '/usr/bin/apt', 'full-upgrade', '-o', 'APT::Get::AutomaticRemove=false']);
+                break;
+            case 6:
+                argv = this._packageTerminal(['pkexec', '/usr/bin/nala', 'full-upgrade', '--assume-yes', '--no-auto-remove'], true);
+                break;
+            case 7:
+                argv = this._packageTerminal(['pkexec', '/usr/bin/apt-get', 'dist-upgrade', '-o', 'APT::Get::AutomaticRemove=false']);
+                break;
+            case 4: {
+                const custom = this._extensionSettings.get_string('update-cmd').trim();
+                if (!custom) {
+                    argv = this._parsePackageCommand(STOCK_UPDATE_CMD);
+                } else if (this._extensionSettings.get_boolean('output-on-terminal')) {
+                    // Legacy custom terminal setting already includes its shell invocation.
+                    const terminal = this._extensionSettings.get_string('terminal').trim();
+                    const script = custom + String.raw` ; status=$?; printf "\nPress any key to exit..."; read -r -n 1 -s; exit "$status"`;
+                    argv = terminal ? [...this._parsePackageCommand(terminal), script]
+                        : [...this._defaultPackageTerminal(), 'bash', '-c', script];
+                } else {
+                    argv = this._parsePackageCommand(custom);
+                }
+                break;
+            }
+            default:
+                this._updateCMD();
+                argv = this._parsePackageCommand(UPDATE_CMD);
+                break;
+            }
+            this._runPackageOperation(argv);
         } catch (err) {
-            console.log(`${this._extensionName} - ${err.message}`);
-        } finally {
-            if (cancelId > 0)
-                this._cancellable.disconnect(cancelId);
+            Main.notifyError(this._extensionName, err.message);
         }
     }
 
-    _applyUpdatesEnd() {
-        // Free resources
-        this._upgradeProcess_sourceId = null;
+    // Cleanup never runs as part of the update presets.
+    _removeUnusedPackages() {
+        if (!this._indicator || !this._extensionSettings)
+            return;
+        if (this._upgradeProcess_sourceId || this._cleanupProcess) {
+            Main.notify(this._extensionName, _('Another package operation is running.'));
+            return;
+        }
+        try {
+            const option = this._extensionSettings.get_int('cleanup-cmd-options');
+            let argv;
+            switch (option) {
+            case 0:
+                argv = this._packageTerminal(['pkexec', '/usr/bin/apt', 'autoremove']);
+                break;
+            case 1:
+                argv = this._packageTerminal(['pkexec', '/usr/bin/apt-get', 'autoremove']);
+                break;
+            case 2:
+                argv = this._packageTerminal(
+                    this._parsePackageCommand(this._extensionSettings.get_string('cleanup-cmd')),
+                    false, this._extensionSettings.get_string('cleanup-terminal').trim());
+                break;
+            case 3:
+                argv = this._packageTerminal(['pkexec', '/usr/bin/nala', 'autoremove'], true);
+                break;
+            default:
+                throw new Error(_('Unknown cleanup method.'));
+            }
+            this._runPackageOperation(argv);
+        } catch (err) {
+            Main.notifyError(this._extensionName, err.message);
+        }
+    }
 
-        // Check if updates are available
-        this._dontUpdateDate = true;
-        this._launchScript(SCRIPT.UPGRADES);
+    _runPackageOperation(argv) {
+        const proc = Gio.Subprocess.new(argv, Gio.SubprocessFlags.NONE);
+        this._cleanupProcess = proc; // Shared manual-operation guard.
+        this._upgradeProcess_sourceId = 1;
+        this._indicator.removeUnusedMenuItem.reactive = false;
+        this._dirMonitor.stop();
+        proc.wait_check_async(this._cancellable, (child, result) => {
+            let error = null;
+            try {
+                child.wait_check_finish(result);
+            } catch (err) {
+                error = err;
+            }
+            if (!this._indicator || this._cleanupProcess !== proc)
+                return;
+            this._cleanupProcess = null;
+            this._upgradeProcess_sourceId = null;
+            this._indicator.removeUnusedMenuItem.reactive = true;
+            if (error)
+                Main.notifyError(this._extensionName, error.message);
+            this._dontUpdateDate = true;
+            this._dirMonitor.start();
+            this._launchScript(SCRIPT.UPGRADES);
+        });
     }
 
     /* Update functions:
@@ -439,26 +525,26 @@ export const UpdateManager = class UpdateManager {
      */
 
     _checkNetwork() {
-        if (!this._indicator || !this._netMonitor)
+        if (!this._indicator || !this._netMonitor || this._upgradeProcess_sourceId)
             return;
         this._indicator.showChecking(true);
         this._netMonitor.networkTimeout();
     }
 
     networkFailed() {
+        if (!this._indicator || this._cleanupProcess)
+            return;
         this._indicator.showChecking(false);
         this._indicator.updateStatus(STATUS.NO_INTERNET);
     }
 
     checkUpdates() {
+        if (!this._indicator || !this._dirMonitor || this._upgradeProcess_sourceId)
+            return;
+
         // Stop the dir monitor to prevent it from updating again right after
         // the update
         this._dirMonitor.stop();
-
-        if (this._upgradeProcess_sourceId) {
-            // A check is already running ! Maybe we should kill it and run another one ?
-            return;
-        }
 
         // Run asynchronously, to avoid  shell freeze - even for a 1s check
         // Parse check command line
@@ -504,6 +590,8 @@ export const UpdateManager = class UpdateManager {
      */
 
     _launchScript(index) {
+        if (!this._indicator || this._cleanupProcess)
+            return;
         let scriptNames = [
             'get-updates',
             'new',
@@ -571,7 +659,7 @@ export const UpdateManager = class UpdateManager {
 
     _packagesEnd(index) {
         // Since this runs async, the indicator might have been destroyed!
-        if (this._indicator) {
+        if (this._indicator && !this._cleanupProcess) {
             // Update indicator
             let commandExists = GLib.file_test(STOCK_CHECK_CMD_OLD, GLib.FileTest.EXISTS);
             if (index === SCRIPT.UPGRADES && this._extensionSettings.get_boolean('show-critical-updates') && commandExists) {
