@@ -255,12 +255,9 @@ export const UpdateManager = class UpdateManager {
     }
 
     _residualPackagesBinding() {
-        if (this._extensionSettings.get_boolean('residual-packages')) {
-            this._launchScript(SCRIPT.RESIDUAL);
-        } else {
-            this._indicator._residualPackagesList = [];
-            this._indicator._updateResidualPackagesStatus();
-        }
+        // List visibility is independent of cleanup availability.
+        this._indicator._updateResidualPackagesStatus();
+        this._launchScript(SCRIPT.RESIDUAL);
     }
 
     _autoremovablePackagesBinding() {
@@ -350,6 +347,13 @@ export const UpdateManager = class UpdateManager {
             this._extensionSettings,
             'changed::residual-packages',
             this._residualPackagesBinding.bind(this),
+        ], [
+            this._extensionSettings,
+            'changed::cleanup-purge-residual',
+            () => {
+                this._indicator._updateCleanupSensitivity();
+                this._launchScript(SCRIPT.RESIDUAL);
+            },
         ], [
             this._extensionSettings,
             'changed::autoremovable-packages',
@@ -453,10 +457,44 @@ export const UpdateManager = class UpdateManager {
         }
     }
 
+    // Query dpkg again after autoremove. Never use the truncated display list
+    // as a purge target, and never interpolate package names into shell source.
+    _cleanupWithResiduals(command, manager) {
+        const script = [
+            "manager=$1; shift",
+            "\"$@\" || exit \"$?\"",
+            "rows=$(dpkg-query -W -f='${db:Status-Abbrev}\\t${binary:Package}\\n') || exit \"$?\"",
+            "packages=()",
+            "while IFS=$'\\t' read -r state package; do",
+            "    if [[ $state == \"rc \" && $package =~ ^[a-z0-9][a-z0-9+.-]*(:[a-z0-9][a-z0-9-]*)?$ ]]; then",
+            "        packages+=(\"$package\")",
+            "    fi",
+            "done <<< \"$rows\"",
+            "if ((${#packages[@]} == 0)); then",
+            "    printf \"\\nNo residual configuration files found.\\n\"",
+            "    exit 0",
+            "fi",
+            "printf \"\\nResidual configuration packages:\\n\"",
+            "printf \"  %s\\n\" \"${packages[@]}\"",
+            "read -r -p \"Purge these retained system configuration files? [y/N] \" answer || exit 1",
+            "[[ $answer == [yY] || $answer == [yY][eE][sS] ]] || exit 0",
+            "if [[ $manager == /usr/bin/nala ]]; then",
+            "    pkexec \"$manager\" purge --no-auto-remove \"${packages[@]}\"",
+            "else",
+            "    pkexec \"$manager\" -o APT::Get::AutomaticRemove=false -o APT::Get::Assume-Yes=false purge \"${packages[@]}\"",
+            "fi",
+        ].join('\n');
+        return ['bash', '-c', script, 'cleanup-residual', manager, ...command];
+    }
+
     // Cleanup never runs as part of the update presets.
     _removeUnusedPackages() {
-        if (!this._indicator || !this._extensionSettings ||
-            this._indicator._autoremovablePackagesList.length === 0)
+        if (!this._indicator || !this._extensionSettings)
+            return;
+        const purge = this._extensionSettings.get_boolean('cleanup-purge-residual');
+        const hasUnused = this._indicator._autoremovablePackagesList.length > 0;
+        const hasResidual = this._indicator._residualPackagesList.length > 0;
+        if (!hasUnused && !(purge && hasResidual))
             return;
         if (this._upgradeProcess_sourceId || this._cleanupProcess) {
             Main.notify(this._extensionName, _('Another package operation is running.'));
@@ -464,26 +502,39 @@ export const UpdateManager = class UpdateManager {
         }
         try {
             const option = this._extensionSettings.get_int('cleanup-cmd-options');
-            let argv;
+            let command, manager, xfce = false, customPrefix = '';
             switch (option) {
             case 0:
-                argv = this._packageTerminal(['pkexec', '/usr/bin/apt', 'autoremove']);
+                manager = '/usr/bin/apt';
+                command = ['pkexec', manager, 'autoremove'];
                 break;
             case 1:
-                argv = this._packageTerminal(['pkexec', '/usr/bin/apt-get', 'autoremove']);
+                manager = '/usr/bin/apt-get';
+                command = ['pkexec', manager, 'autoremove'];
                 break;
             case 2:
-                argv = this._packageTerminal(
-                    this._parsePackageCommand(this._extensionSettings.get_string('cleanup-cmd')),
-                    false, this._extensionSettings.get_string('cleanup-terminal').trim());
+                // Custom commands are not rewritten; use APT-get for residuals.
+                manager = '/usr/bin/apt-get';
+                command = this._parsePackageCommand(this._extensionSettings.get_string('cleanup-cmd'));
+                customPrefix = this._extensionSettings.get_string('cleanup-terminal').trim();
                 break;
             case 3:
-                argv = this._packageTerminal(['pkexec', '/usr/bin/nala', 'autoremove'], true);
+                manager = '/usr/bin/nala';
+                command = ['pkexec', manager, 'autoremove'];
+                xfce = true;
                 break;
             default:
                 throw new Error(_('Unknown cleanup method.'));
             }
-            this._runPackageOperation(argv);
+            if (purge) {
+                if (option !== 2)
+                    command.push('--purge');
+                // If only residuals exist, skip the unused-package operation.
+                if (!hasUnused)
+                    command = ['true'];
+                command = this._cleanupWithResiduals(command, manager);
+            }
+            this._runPackageOperation(this._packageTerminal(command, xfce, customPrefix));
         } catch (err) {
             Main.notifyError(this._extensionName, err.message);
         }
@@ -591,7 +642,7 @@ export const UpdateManager = class UpdateManager {
     _launchScript(index) {
         if (!this._indicator || this._cleanupProcess)
             return;
-        if (index === SCRIPT.AUTOREMOVABLE)
+        if (index === SCRIPT.AUTOREMOVABLE || index === SCRIPT.RESIDUAL)
             this._indicator.removeUnusedMenuItem.setSensitive(false);
 
         let scriptNames = [
@@ -608,7 +659,7 @@ export const UpdateManager = class UpdateManager {
         let script = [
             '/bin/bash',
             `${path}/scripts/${scriptNames[index]}.sh`,
-            this._initializing && index !== SCRIPT.AUTOREMOVABLE ? '1' : '0',
+            this._initializing && index !== SCRIPT.AUTOREMOVABLE && index !== SCRIPT.RESIDUAL ? '1' : '0',
             `${path}/Temp/`,
         ];
 
@@ -683,8 +734,8 @@ export const UpdateManager = class UpdateManager {
                     this._launchScript(SCRIPT.NEW);
                 if (this._extensionSettings.get_boolean('obsolete-packages'))
                     this._launchScript(SCRIPT.OBSOLETE);
-                if (this._extensionSettings.get_boolean('residual-packages'))
-                    this._launchScript(SCRIPT.RESIDUAL);
+                // Always detect residuals, even when their list is hidden.
+                this._launchScript(SCRIPT.RESIDUAL);
                 // Always detect unused packages, even when their list is hidden.
                 this._launchScript(SCRIPT.AUTOREMOVABLE);
                 this._initializing = false;

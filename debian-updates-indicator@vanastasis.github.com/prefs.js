@@ -190,7 +190,8 @@ const DebianUpdatesAdvancedPrefsPage = GObject.registerClass({
     Template: import.meta.url.replace('prefs.js', 'ui/prefs_advanced_adw1.ui'),
     InternalChildren: ['update_cmd_options', 'update_cmd_button', 'output_on_terminal_switch',
         'terminal_entry', 'field_updatecmd', 'use_custom_cmd_switch', 'field_checkcmd_custom',
-        'cleanup_cmd_options', 'cleanup_cmd_entry', 'cleanup_terminal_entry', 'reset_button'],
+        'cleanup_cmd_options', 'cleanup_cmd_entry', 'cleanup_terminal_entry',
+        'cleanup_purge_residual_switch', 'reset_button'],
 }, class DebianUpdatesAdvancedPrefsPage extends Adw.PreferencesPage {
     constructor(settings, params = {}) {
         super(params);
@@ -237,6 +238,9 @@ const DebianUpdatesAdvancedPrefsPage = GObject.registerClass({
         this._settings.bind('cleanup-terminal', this._cleanup_terminal_entry,
             'text', Gio.SettingsBindFlags.DEFAULT
         );
+        this._settings.bind('cleanup-purge-residual', this._cleanup_purge_residual_switch,
+            'active', Gio.SettingsBindFlags.DEFAULT
+        );
         const updateCleanupSensitivity = () => {
             const custom = this._cleanup_cmd_options.selected === 2;
             this._cleanup_cmd_entry.sensitive = custom;
@@ -267,6 +271,7 @@ const DebianUpdatesAdvancedPrefsPage = GObject.registerClass({
                 'cleanup-cmd-options',
                 'cleanup-cmd',
                 'cleanup-terminal',
+                'cleanup-purge-residual',
                 'use-custom-cmd',
                 'check-cmd-custom',
             ];

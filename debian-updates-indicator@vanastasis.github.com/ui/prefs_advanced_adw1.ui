@@ -119,6 +119,12 @@
           </object>
         </child>
         <child>
+          <object class="AdwSwitchRow" id="cleanup_purge_residual_switch">
+            <property name="title" translatable="yes">Also purge residual configuration files</property>
+            <property name="subtitle" translatable="yes">Remove retained system configuration files during manual cleanup. Custom commands are unchanged; existing residual files are purged with APT-get in Custom mode.</property>
+          </object>
+        </child>
+        <child>
           <object class="AdwEntryRow" id="cleanup_cmd_entry">
             <property name="title" translatable="yes">Custom cleanup command</property>
             <property name="show-apply-button">true</property>

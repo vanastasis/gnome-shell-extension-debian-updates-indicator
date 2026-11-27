@@ -523,9 +523,18 @@ export const DebianUpdatesIndicator = GObject.registerClass({
         }
     }
 
+    _updateCleanupSensitivity() {
+        const hasUnused = this._autoremovablePackagesList.length > 0;
+        const hasResidual = this._extensionSettings.get_boolean('cleanup-purge-residual') &&
+            this._residualPackagesList.length > 0;
+        this.removeUnusedMenuItem.setSensitive((hasUnused || hasResidual) &&
+            !this._updateManager._upgradeProcess_sourceId && !this._updateManager._cleanupProcess);
+    }
+
     _updateResidualPackagesStatus() {
+        this._updateCleanupSensitivity();
         this.residualPackagesExpander.menu.removeAll();
-        if (this._residualPackagesList.length === 0) {
+        if (this._residualPackagesList.length === 0 || !this._extensionSettings.get_boolean('residual-packages')) {
             this.residualPackagesExpander.visible = false;
         } else {
             for (let i = 0; i < this._residualPackagesList.length; i++) {
@@ -539,8 +548,7 @@ export const DebianUpdatesIndicator = GObject.registerClass({
 
     _updateAutoremovablePackagesStatus() {
         const hasUnused = this._autoremovablePackagesList.length > 0;
-        this.removeUnusedMenuItem.setSensitive(hasUnused &&
-            !this._updateManager._upgradeProcess_sourceId && !this._updateManager._cleanupProcess);
+        this._updateCleanupSensitivity();
         this.autoremovablePackagesExpander.menu.removeAll();
         if (!hasUnused || !this._extensionSettings.get_boolean('autoremovable-packages')) {
             this.autoremovablePackagesExpander.visible = false;

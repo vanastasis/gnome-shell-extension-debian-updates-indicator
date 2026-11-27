@@ -119,6 +119,11 @@
       <summary>Terminal command prefix for package cleanup</summary>
       <description>Custom method only. Leave empty to use the desktop or Debian default terminal. Prefix must accept an executable and arguments and should wait for completion.</description>
     </key>
+    <key type="b" name="cleanup-purge-residual">
+      <default>false</default>
+      <summary>Also purge residual configuration files</summary>
+      <description>When manually removing unused packages, purge their configuration files and offer to purge existing residual configurations. Custom cleanup commands are unchanged; APT-get handles the additional purge.</description>
+    </key>
     <key type="b" name="strip-versions">
       <default>true</default>
       <summary>Remove version numbers from checkupdates output</summary>

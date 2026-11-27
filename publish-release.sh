@@ -204,7 +204,9 @@ git diff --check
 # Include tracked edits and this reusable script; stage additional new source files manually first.
 git add -u -- .
 git add -- publish-release.sh
-if git diff --cached --quiet; then echo 'No changes staged for release.' >&2; exit 1; fi
+if git diff --cached --quiet; then
+    echo 'No staged changes: packaging the already committed source.'
+fi
 if [[ -n $(git ls-files -- zip-files _build) ]]; then echo 'Generated output must not be staged.' >&2; exit 1; fi
 git diff --cached --check
 git diff --cached --stat
@@ -266,7 +268,9 @@ cd "$ROOT"
 # Refuse to publish if index or tracked files changed during the build.
 [[ $(git write-tree) == "$STAGED_TREE" ]] || { echo 'Index changed during build; refusing to publish.' >&2; exit 1; }
 git diff --quiet || { echo 'Tracked files changed during build; refusing to publish.' >&2; exit 1; }
-git commit -m "Release $VERSION"
+if ! git diff --cached --quiet; then
+    git commit -m "Release $VERSION"
+fi
 git push github main
 # gh creates the tag at the exact pushed commit and uploads the verified assets.
 if ! gh release create "$TAG" "$ROOT/zip-files/$ZIP" "$ROOT/zip-files/$ZIP.sha256" --repo "$REPO" --target "$(git rev-parse HEAD)" --title "Debian APT Updates Indicator $VERSION" --notes-file <(python3 - "$VERSION" <<'PY'

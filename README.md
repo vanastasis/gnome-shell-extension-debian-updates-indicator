@@ -4,23 +4,15 @@
 
 A GNOME Shell panel extension for monitoring and managing APT package updates on Debian and Debian-based Linux distributions.
 
-**Version:** `2.7.0.4` | **GNOME Shell:** 51 | **Licence:** GPL-3.0-or-later
+**Version:** `2.7.0.5` | **GNOME Shell:** 51 | **Licence:** GPL-3.0-or-later
 
-## What's new in 2.7.0.4
+## What's new in 2.7.0.5
 
-### Improvements
-
-- Clarify cleanup menu availability when no unused packages are detected.
-- Document independent update and cleanup operations.
-- Retain APT, APT-get and Nala terminal integration.
-- Include the latest local source improvements.
-- Refresh project documentation and extension metadata.
-- Retain GNOME Shell 51 compatibility.
-
-### Distribution
-
-- Installable GitHub release ZIP and SHA256 checksum.
-- Separate GNOME Extensions submission ZIP.
+- Add **Also purge residual configuration files** in Advanced settings, disabled by default.
+- Keep a single Remove unused packages action; enable it for residual-only cleanup when the option is on, even if the residual list is hidden.
+- APT, APT-get and Nala autoremove presets add `--purge` when enabled. Existing residual configurations are detected again from dpkg and offered for explicit confirmation in the same terminal.
+- Custom commands are not modified; additional residual purging uses APT-get. Automatic checks and upgrades do not trigger cleanup.
+- Refresh package lists after the terminal operation finishes. GNOME Shell 51 runtime testing remains required.
 
 ## Features
 
@@ -42,6 +34,8 @@ A GNOME Shell panel extension for monitoring and managing APT package updates on
 | GNOME Software, Synaptic, PackageKit, Ubuntu Update Manager | GUI update methods | — |
 
 Built-in terminal commands use `pkexec`. Install Nala and `xfce4-terminal` to use the Nala presets. Full upgrades can still remove conflicting packages to resolve dependencies; disabling autoremove is not a guarantee against all removals. Automatic checks do not automatically install upgrades or run cleanup.
+
+**Optional residual purge:** enable the new switch in Advanced settings to purge configuration files during manual cleanup. Built-in presets use `autoremove --purge`; any remaining `rc` packages are offered for explicit confirmation. Custom commands remain unchanged, with APT-get used for the extra purge. The switch is off by default; disabling it retains ordinary cleanup behaviour.
 
 ## Compatibility
 

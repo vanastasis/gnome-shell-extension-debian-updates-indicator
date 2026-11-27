@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.7.0.5 — 2026-11-27
+
+- Add **Also purge residual configuration files** in Advanced settings, disabled by default.
+- Keep a single Remove unused packages action; enable it for residual-only cleanup when the option is on, even if the residual list is hidden.
+- APT, APT-get and Nala autoremove presets add `--purge` when enabled. Existing residual configurations are detected again from dpkg and offered for explicit confirmation in the same terminal.
+- Custom commands are not modified; additional residual purging uses APT-get. Automatic checks and upgrades do not trigger cleanup.
+- Refresh package lists after the terminal operation finishes. GNOME Shell 51 runtime testing remains required.
+
 ## 2.7.0.4 — 2026-11-26
 
 ### Improvements
