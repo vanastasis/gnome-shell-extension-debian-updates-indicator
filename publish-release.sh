@@ -235,6 +235,7 @@ fi
 for script in ./*.sh "$UUID"/scripts/*.sh; do bash -n "$script"; done
 for catalog in po/*.po; do msgfmt --check-format -o /dev/null "$catalog"; done
 python3 tests/validate-release.py "$UUID"
+"$NODE" tests/validate-refresh.cjs "$UUID"
 meson setup "$WORK/build" "$WORK/source" --prefix="$WORK/install" --datadir=share
 meson compile -C "$WORK/build"
 meson install -C "$WORK/build"
@@ -295,7 +296,7 @@ then
     [[ $reviewed == REVIEWED ]] || { echo 'Release blocked by unreviewed findings.' >&2; exit 1; }
     printf 'Findings explicitly acknowledged.\n' > "$REPORT/review.txt"
 fi
-printf 'Version %s\nSource tree %s\nJavaScript, Bash, XML, GSettings, translation format, Nala simulations and ZIP checks passed.\n' "$VERSION" "$STAGED_TREE" > "$REPORT/validation.txt"
+printf 'Version %s\nSource tree %s\nJavaScript, Bash, XML, GSettings, translation format, Nala simulations, refresh regression tests and ZIP checks passed.\n' "$VERSION" "$STAGED_TREE" > "$REPORT/validation.txt"
 for variant in github ego; do (cd "$WORK/$variant"; sha256sum "$ZIP" > "$ZIP.sha256"); done
 cp "$WORK/github/$ZIP" "$WORK/github/$ZIP.sha256" "$ROOT/zip-files/"
 cp "$WORK/ego/$ZIP" "$WORK/ego/$ZIP.sha256" "$ROOT/zip-files/ego/"
