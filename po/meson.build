@@ -1,3 +1,4 @@
+# Translation build configuration for Debian APT Updates Indicator.
 i18n = import('i18n')
 
 # define GETTEXT_PACKAGE

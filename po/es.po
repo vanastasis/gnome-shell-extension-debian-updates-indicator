@@ -1,4 +1,5 @@
 # Spanish translations for gnome-shell-extension-debian-updates-indicator package.
+# Maintained for the Debian APT Updates Indicator fork (vanastasis).
 # Copyright (C) 2024 2023 Gianni Lerro {glerro} ~ <glerro@pm.me>
 # This file is distributed under the same license as the gnome-shell-extension-debian-updates-indicator package.
 # Automatically generated, 2024.

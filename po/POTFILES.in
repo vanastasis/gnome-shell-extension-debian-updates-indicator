@@ -3,11 +3,11 @@ debian-updates-indicator@vanastasis.github.com/ignoreListBox.js
 debian-updates-indicator@vanastasis.github.com/indicator.js
 debian-updates-indicator@vanastasis.github.com/monitors.js
 debian-updates-indicator@vanastasis.github.com/prefs.js
+debian-updates-indicator@vanastasis.github.com/ui/prefs_add_shortcuts_adw1.ui
+debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui
+debian-updates-indicator@vanastasis.github.com/ui/prefs_basic_adw1.ui
+debian-updates-indicator@vanastasis.github.com/ui/prefs_ignore_list_adw1.ui
+debian-updates-indicator@vanastasis.github.com/ui/prefs_packages_status_adw1.ui
 debian-updates-indicator@vanastasis.github.com/updateManager.js
 debian-updates-indicator@vanastasis.github.com/utils.js
-debian-updates-indicator@vanastasis.github.com/ui/prefs_basic_adw1.ui
-debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui
-debian-updates-indicator@vanastasis.github.com/ui/prefs_packages_status_adw1.ui
-debian-updates-indicator@vanastasis.github.com/ui/prefs_ignore_list_adw1.ui
-debian-updates-indicator@vanastasis.github.com/ui/prefs_add_shortcuts_adw1.ui
 
