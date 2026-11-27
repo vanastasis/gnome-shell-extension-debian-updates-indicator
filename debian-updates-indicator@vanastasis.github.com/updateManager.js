@@ -415,6 +415,35 @@ export const UpdateManager = class UpdateManager {
         return [...prefix, 'bash', '-c', script, 'package-operation', ...command];
     }
 
+    // Probe the installed CLI in the terminal before elevation. Never retry a
+    // failed package transaction or upgrade without disabling automatic removal.
+    _nalaCompatibleCommand(action) {
+        const script = [
+            "action=$1",
+            "shift",
+            "help=$(LC_ALL=C TERM=dumb NO_COLOR=1 COLUMNS=200 /usr/bin/nala \"$action\" --help 2>&1) || { printf '%s\\n' \"$help\" >&2; exit 2; }",
+            "has_option() { grep -Eq -- \"(^|[^[:alnum:]_-])$1([^[:alnum:]_-]|$)\" <<< \"$help\"; }",
+            "case \"$action\" in",
+            "    full-upgrade)",
+            "        if has_option --no-auto-remove; then flag=--no-auto-remove",
+            "        elif has_option --no-autoremove; then flag=--no-autoremove",
+            "        else printf '%s\\n' 'Cannot detect the Nala option to disable automatic removal. No upgrade started.' >&2; exit 2",
+            "        fi",
+            "        exec pkexec /usr/bin/nala full-upgrade --assume-yes \"$flag\"",
+            "        ;;",
+            "    autoremove)",
+            "        if has_option --remove-config; then flag=--remove-config",
+            "        elif has_option --config; then flag=--config",
+            "        else printf '%s\\n' 'Cannot detect the Nala residual configuration option. No cleanup started.' >&2; exit 2",
+            "        fi",
+            "        exec pkexec /usr/bin/nala autoremove --purge \"$flag\"",
+            "        ;;",
+            "    *) exit 2 ;;",
+            "esac",
+        ].join('\n');
+        return ['bash', '-c', script, 'nala-compat', action];
+    }
+
     _applyUpdates() {
         if (!this._indicator || !this._extensionSettings || this._upgradeProcess_sourceId || this._cleanupProcess)
             return;
@@ -426,7 +455,7 @@ export const UpdateManager = class UpdateManager {
                 argv = this._packageTerminal(['pkexec', '/usr/bin/apt', 'full-upgrade', '-o', 'APT::Get::AutomaticRemove=false']);
                 break;
             case 6:
-                argv = this._packageTerminal(['pkexec', '/usr/bin/nala', 'full-upgrade', '--assume-yes', '--no-auto-remove'], true);
+                argv = this._packageTerminal(this._nalaCompatibleCommand('full-upgrade'), true);
                 break;
             case 7:
                 argv = this._packageTerminal(['pkexec', '/usr/bin/apt-get', 'dist-upgrade', '-o', 'APT::Get::AutomaticRemove=false']);
@@ -527,7 +556,7 @@ export const UpdateManager = class UpdateManager {
                     // Nala handles unused dependencies and already-removed
                     // packages in config state in a single native transaction.
                     // Run even when there are only residual configurations.
-                    command.push('--purge', '--remove-config');
+                    command = this._nalaCompatibleCommand('autoremove');
                 } else {
                     if (option !== 2)
                         command.push('--purge');

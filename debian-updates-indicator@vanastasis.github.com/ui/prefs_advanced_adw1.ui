@@ -121,7 +121,7 @@
         <child>
           <object class="AdwSwitchRow" id="cleanup_purge_residual_switch">
             <property name="title" translatable="yes">Also purge residual configuration files</property>
-            <property name="subtitle" translatable="yes">Also purge configuration files from previously removed packages. Nala handles both in one transaction. APT and APT-get offer an additional residual purge; Custom uses APT-get for residuals.</property>
+            <property name="subtitle" translatable="yes">Also purge configuration files from previously removed packages. Nala detects the supported residual purge option and handles both in one transaction. APT and APT-get offer an additional residual purge; Custom uses APT-get for residuals.</property>
           </object>
         </child>
         <child>

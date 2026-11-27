@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.7.0.8 — 2026-11-28
+
+- Fix Nala CLI compatibility on Debian 13 (Trixie) with Nala 0.16.0 and newer Nala releases, including 0.18.1.
+- Detect the supported residual purge option at runtime: `--config` or `--remove-config`.
+- Detect the supported automatic-removal prevention option for full upgrades: `--no-autoremove` or `--no-auto-remove`.
+- Probe unprivileged command help before starting the package transaction; refuse to run if the necessary option cannot be detected. Never retry a failed transaction automatically.
+- Retain GNOME Shell 48–51 declarations, graphical authentication, optional residual purge, XFCE Terminal integration and package-list refresh.
+- Update extension metadata, settings descriptions and documentation.
+
 ## 2.7.0.7 — 2026-11-28
 
 - Extend declared GNOME Shell compatibility to versions 48, 49, 50 and 51. The existing version-aware panel layout already uses the orientation API introduced in GNOME Shell 48.
