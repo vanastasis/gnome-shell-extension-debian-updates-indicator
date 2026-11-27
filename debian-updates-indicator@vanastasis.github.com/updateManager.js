@@ -478,11 +478,7 @@ export const UpdateManager = class UpdateManager {
             "printf \"  %s\\n\" \"${packages[@]}\"",
             "read -r -p \"Purge these retained system configuration files? [y/N] \" answer || exit 1",
             "[[ $answer == [yY] || $answer == [yY][eE][sS] ]] || exit 0",
-            "if [[ $manager == /usr/bin/nala ]]; then",
-            "    pkexec \"$manager\" purge --no-auto-remove \"${packages[@]}\"",
-            "else",
-            "    pkexec \"$manager\" -o APT::Get::AutomaticRemove=false -o APT::Get::Assume-Yes=false purge \"${packages[@]}\"",
-            "fi",
+            "pkexec \"$manager\" -o APT::Get::AutomaticRemove=false -o APT::Get::Assume-Yes=false purge \"${packages[@]}\"",
         ].join('\n');
         return ['bash', '-c', script, 'cleanup-residual', manager, ...command];
     }
@@ -527,12 +523,19 @@ export const UpdateManager = class UpdateManager {
                 throw new Error(_('Unknown cleanup method.'));
             }
             if (purge) {
-                if (option !== 2)
-                    command.push('--purge');
-                // If only residuals exist, skip the unused-package operation.
-                if (!hasUnused)
-                    command = ['true'];
-                command = this._cleanupWithResiduals(command, manager);
+                if (option === 3) {
+                    // Nala handles unused dependencies and already-removed
+                    // packages in config state in a single native transaction.
+                    // Run even when there are only residual configurations.
+                    command.push('--purge', '--remove-config');
+                } else {
+                    if (option !== 2)
+                        command.push('--purge');
+                    // If only residuals exist, skip the unused-package operation.
+                    if (!hasUnused)
+                        command = ['true'];
+                    command = this._cleanupWithResiduals(command, manager);
+                }
             }
             this._runPackageOperation(this._packageTerminal(command, xfce, customPrefix));
         } catch (err) {

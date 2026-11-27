@@ -1,5 +1,5 @@
 {
-  "description": "Monitor and manage package updates on Debian and Debian-based Linux distributions.\n\nFeatures:\n• Available updates and critical-update notifications.\n• New, obsolete, residual and autoremovable packages.\n• Automatic and manual update checks.\n• Separate update and cleanup actions.\n• Optional purge of residual configuration files during cleanup (off by default).\n• Cleanup remains available when only residual configuration files exist and purging is enabled.\n• APT and APT-get with default terminal detection.\n• Nala with XFCE Terminal integration.\n• Graphical administrator authentication.\n• Press any key to exit after terminal operations.\n• Independent custom update and cleanup commands.\n• Configurable update intervals and package ignore list.\n\nMaintained by vanastasis.\nGNOME Shell 51.",
+  "description": "Monitor and manage package updates on Debian and Debian-based Linux distributions.\n\nFeatures:\n• Available updates and critical-update notifications.\n• New, obsolete, residual and autoremovable packages.\n• Automatic and manual update checks.\n• Separate update and cleanup actions.\n• Optional purge of residual configuration files during cleanup (off by default).\n• Cleanup remains available when only residual configuration files exist and purging is enabled.\n• APT and APT-get with default terminal detection.\n• Nala with XFCE Terminal integration, including native residual configuration cleanup.\n• Review and confirm cleanup transactions interactively.\n• Graphical administrator authentication.\n• Press any key to exit after terminal operations.\n• Independent custom update and cleanup commands.\n• Configurable update intervals and package ignore list.\n\nMaintained by vanastasis.\nGNOME Shell 51.",
   "gettext-domain": "gnome-shell-extension-debian-updates-indicator",
   "name": "Debian APT Updates Indicator",
   "settings-schema": "org.gnome.shell.extensions.debian-updates-indicator",
@@ -8,5 +8,5 @@
   ],
   "url": "https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator",
   "uuid": "debian-updates-indicator@vanastasis.github.com",
-  "version-name": "2.7.0.5"
+  "version-name": "2.7.0.6"
 }

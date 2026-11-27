@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.7.0.6 — 2026-11-27
+
+- Fix Nala residual configuration cleanup: use native `nala autoremove --purge --remove-config` instead of separately purging already-uninstalled packages.
+- Run the Nala cleanup transaction even when no unused dependencies remain but residual configuration files exist.
+- Retain the optional residual purge setting (disabled by default), manual cleanup confirmation, graphical authentication, XFCE Terminal integration and press-any-key exit.
+- Retain APT/APT-get residual purge and default terminal detection, plus independent custom commands and package-list refresh.
+- Update extension metadata, settings descriptions and documentation. Ordinary upgrades and automatic checks do not trigger cleanup.
+
 ## 2.7.0.5 — 2026-11-27
 
 - Add **Also purge residual configuration files** in Advanced settings, disabled by default.

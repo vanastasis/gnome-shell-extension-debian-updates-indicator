@@ -122,7 +122,7 @@
     <key type="b" name="cleanup-purge-residual">
       <default>false</default>
       <summary>Also purge residual configuration files</summary>
-      <description>When manually removing unused packages, purge their configuration files and offer to purge existing residual configurations. Custom cleanup commands are unchanged; APT-get handles the additional purge.</description>
+      <description>When manually removing unused packages, also purge retained configuration files. Nala uses autoremove --purge --remove-config; APT and APT-get offer an additional residual purge. Custom commands are unchanged; APT-get handles residuals.</description>
     </key>
     <key type="b" name="strip-versions">
       <default>true</default>
