@@ -4,16 +4,17 @@
 
 A GNOME Shell panel extension for monitoring and managing APT package updates on Debian and Debian-based Linux distributions.
 
-**Version:** `2.7.0.8` | **GNOME Shell:** 48–51 | **Licence:** GPL-3.0-or-later
+**Version:** `2.7.0.9` | **GNOME Shell:** 48–51 | **Licence:** GPL-3.0-or-later
 
-## What's new in 2.7.0.8
+## What's new in 2.7.0.9
 
-- Fix Nala CLI compatibility on Debian 13 (Trixie) with Nala 0.16.0 and newer Nala releases, including 0.18.1.
-- Detect the supported residual purge option at runtime: `--config` or `--remove-config`.
-- Detect the supported automatic-removal prevention option for full upgrades: `--no-autoremove` or `--no-auto-remove`.
-- Probe unprivileged command help before starting the package transaction; refuse to run if the necessary option cannot be detected. Never retry a failed transaction automatically.
-- Retain GNOME Shell 48–51 declarations, graphical authentication, optional residual purge, XFCE Terminal integration and package-list refresh.
-- Update extension metadata, settings descriptions and documentation.
+- Fix PackageKit executable detection, report refresh failures, and update the last-check timestamp only after a successful refresh and scan.
+- Cancel obsolete read-only scans and guard asynchronous callbacks, monitors, notifications and main-loop sources on disable.
+- Prevent overlapping extension-managed package operations; track built-in terminal completion independently of a detached launcher.
+- Move generated package lists to the user cache; use locale-independent, failure-aware scans and handle missing optional dependencies.
+- Start the first local scan after two seconds; retain GNOME Shell 48–51 and all existing preferences.
+- Require explicit Nala cleanup confirmation even when system defaults request automatic confirmation; retain old and new Nala CLI option detection.
+- Add release validation for JavaScript, shell scripts, schemas, translations, simulated Nala commands and Shexli reports.
 
 ## Features
 
@@ -37,6 +38,8 @@ A GNOME Shell panel extension for monitoring and managing APT package updates on
 Built-in terminal commands use `pkexec`. Install Nala and `xfce4-terminal` to use the Nala presets. Full upgrades can still remove conflicting packages to resolve dependencies; disabling autoremove is not a guarantee against all removals. Automatic checks do not automatically install upgrades or run cleanup. The Nala update preset detects `--no-autoremove` or `--no-auto-remove` from the installed command help; the residual cleanup preset detects `--config` or `--remove-config`. If detection fails, the corresponding transaction is not started.
 
 **Optional residual purge:** enable **Also purge residual configuration files** in Advanced settings. Nala uses `nala autoremove --purge` with the detected `--config` (0.16.0) or `--remove-config` (0.18.1) option in a single interactive transaction, including when only residual configurations remain. APT and APT-get use `autoremove --purge` followed by a freshly detected list of remaining `rc` packages for explicit confirmation. Custom commands remain unchanged, with APT-get used for the extra purge. The switch is off by default; disabling it retains ordinary cleanup behaviour.
+
+Package-list cache: `$XDG_CACHE_HOME/debian-updates-indicator@vanastasis.github.com/` (normally under `~/.cache`). The default refresh requires `pkcon` or `pkgcli`; if neither exists, install PackageKit or configure a custom refresh command. Obsolete-package detection is optional and requires `apt-show-versions`. Built-in terminal commands track completion via a private marker; arbitrary GUI/custom commands may still detach. A forcibly killed terminal can leave tracking pending until the extension is restarted; do not restart it during a package transaction.
 
 ## Compatibility
 
@@ -79,6 +82,8 @@ meson install -C _build
 ## Publish a release (maintainers)
 
 From the repository root, run `./publish-release.sh VERSION release-notes.md` after reviewing local changes. The script stages tracked edits and builds from the staged source, installs locally, pushes to GitHub and creates a release with the GitHub ZIP and checksum. Stage any new source files explicitly first. The separate EGO ZIP is generated for manual submission.
+
+Publishing requires Node.js, gettext, GLib schema utilities and Shexli (on PATH or in `~/.venvs/shexli`). The publisher saves validation reports under `zip-files/validation/`. It blocks on non-allowlisted Shexli errors; any other findings require explicit acknowledgment. The known `EGO-M-004` finding must be reviewed rather than automatically ignored.
 
 ## Changes and support
 

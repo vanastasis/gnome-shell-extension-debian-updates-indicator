@@ -21,7 +21,7 @@ REPO='vanastasis/gnome-shell-extension-debian-updates-indicator'
 ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && git rev-parse --show-toplevel)
 ZIP="$UUID.shell-extension.zip"
 cd "$ROOT"
-for cmd in git gh python3 meson glib-compile-schemas zip unzip sha256sum gnome-extensions; do
+for cmd in git gh python3 meson glib-compile-schemas zip unzip sha256sum gnome-extensions msgfmt bash; do
     command -v "$cmd" >/dev/null || { echo "Required command missing: $cmd" >&2; exit 1; }
 done
 [[ $(git branch --show-current) == main ]] || { echo 'Expected main branch.' >&2; exit 1; }
@@ -229,8 +229,12 @@ if command -v node >/dev/null || command -v nodejs >/dev/null; then
     NODE=$(command -v node || command -v nodejs)
     for f in "$UUID"/*.js; do cp "$f" "$WORK/check.mjs"; "$NODE" --check "$WORK/check.mjs"; done
 else
-    echo 'WARNING: Node.js unavailable; JavaScript syntax check not performed.'
+    echo 'Node.js is required for strict JavaScript validation. Install nodejs and retry.' >&2
+    exit 1
 fi
+for script in ./*.sh "$UUID"/scripts/*.sh; do bash -n "$script"; done
+for catalog in po/*.po; do msgfmt --check-format -o /dev/null "$catalog"; done
+python3 tests/validate-release.py "$UUID"
 meson setup "$WORK/build" "$WORK/source" --prefix="$WORK/install" --datadir=share
 meson compile -C "$WORK/build"
 meson install -C "$WORK/build"
@@ -255,6 +259,42 @@ with zipfile.ZipFile(root/'github'/name) as g, zipfile.ZipFile(root/'ego'/name) 
     assert all(n in g.namelist() for n in ('COPYING','extension.js','updateManager.js','prefs.js','indicator.js','metadata.json'))
 print('Both ZIPs verified; only compiled schema differs.')
 PY
+REPORT="$ROOT/zip-files/validation/$VERSION"
+mkdir -p "$REPORT"
+if command -v shexli >/dev/null; then
+    SHEXLI=$(command -v shexli)
+elif [[ -x "$HOME/.venvs/shexli/bin/shexli" ]]; then
+    SHEXLI="$HOME/.venvs/shexli/bin/shexli"
+else
+    echo 'Shexli is required. Install it in a virtual environment or put it on PATH.' >&2
+    exit 1
+fi
+SHEXLI_RC=0
+"$SHEXLI" "$WORK/ego/$ZIP" --format json > "$REPORT/shexli.json" 2> "$REPORT/shexli.stderr" || SHEXLI_RC=$?
+python3 - "$REPORT/shexli.json" "$SHEXLI_RC" <<'PY'
+import json, pathlib, sys
+report = json.loads(pathlib.Path(sys.argv[1]).read_text())
+findings = report['findings']
+if not isinstance(findings, list) or report.get('summary', {}).get('status') not in ('clean', 'ok', 'issues_found', 'passed', 'no_issues'):
+    raise SystemExit('Unrecognized Shexli report; inspect validation directory.')
+for f in findings:
+    print(f"{f['rule_id']} [{f['severity']}]: {f['message']}")
+if any(f['severity'] == 'error' and f['rule_id'] != 'EGO-M-004' for f in findings):
+    raise SystemExit('Shexli found blocking errors. Correct them before publishing.')
+if int(sys.argv[2]) != 0 and not findings:
+    raise SystemExit('Shexli failed without findings.')
+PY
+if python3 - "$REPORT/shexli.json" <<'PY'
+import json, sys
+sys.exit(0 if json.load(open(sys.argv[1]))['findings'] else 1)
+PY
+then
+    printf '\nReview Shexli findings in %s. Only proceed after verifying them.\n' "$REPORT"
+    read -r -p 'Type REVIEWED to acknowledge the findings: ' reviewed
+    [[ $reviewed == REVIEWED ]] || { echo 'Release blocked by unreviewed findings.' >&2; exit 1; }
+    printf 'Findings explicitly acknowledged.\n' > "$REPORT/review.txt"
+fi
+printf 'Version %s\nSource tree %s\nJavaScript, Bash, XML, GSettings, translation format, Nala simulations and ZIP checks passed.\n' "$VERSION" "$STAGED_TREE" > "$REPORT/validation.txt"
 for variant in github ego; do (cd "$WORK/$variant"; sha256sum "$ZIP" > "$ZIP.sha256"); done
 cp "$WORK/github/$ZIP" "$WORK/github/$ZIP.sha256" "$ROOT/zip-files/"
 cp "$WORK/ego/$ZIP" "$WORK/ego/$ZIP.sha256" "$ROOT/zip-files/ego/"

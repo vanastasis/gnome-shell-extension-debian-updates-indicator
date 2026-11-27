@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.7.0.9 — 2026-11-28
+
+- Fix PackageKit executable detection, report refresh failures, and update the last-check timestamp only after a successful refresh and scan.
+- Cancel obsolete read-only scans and guard asynchronous callbacks, monitors, notifications and main-loop sources on disable.
+- Prevent overlapping extension-managed package operations; track built-in terminal completion independently of a detached launcher.
+- Move generated package lists to the user cache; use locale-independent, failure-aware scans and handle missing optional dependencies.
+- Start the first local scan after two seconds; retain GNOME Shell 48–51 and all existing preferences.
+- Require explicit Nala cleanup confirmation even when system defaults request automatic confirmation; retain old and new Nala CLI option detection.
+- Add release validation for JavaScript, shell scripts, schemas, translations, simulated Nala commands and Shexli reports.
+
 ## 2.7.0.8 — 2026-11-28
 
 - Fix Nala CLI compatibility on Debian 13 (Trixie) with Nala 0.16.0 and newer Nala releases, including 0.18.1.

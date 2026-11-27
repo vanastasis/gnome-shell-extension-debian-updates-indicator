@@ -296,3 +296,56 @@ msgstr ""
 #: debian-updates-indicator@vanastasis.github.com/ui/prefs_add_shortcuts_adw1.ui:37
 msgid "Press Esc to exit or Backspace to clear"
 msgstr ""
+
+#: debian-updates-indicator@vanastasis.github.com/updateManager.js:393
+msgid "Invalid or empty package command."
+msgstr ""
+
+#: debian-updates-indicator@vanastasis.github.com/updateManager.js:403
+msgid "No default terminal found. Install xdg-terminal-exec or x-terminal-emulator."
+msgstr ""
+
+#: debian-updates-indicator@vanastasis.github.com/updateManager.js:412
+msgid "XFCE Terminal is not installed."
+msgstr ""
+
+#: debian-updates-indicator@vanastasis.github.com/updateManager.js:418
+msgid "Package command not found: %s"
+msgstr ""
+
+#: debian-updates-indicator@vanastasis.github.com/updateManager.js:420
+msgid "Package manager not found: %s"
+msgstr ""
+
+#: debian-updates-indicator@vanastasis.github.com/updateManager.js:454
+msgid "Package operation failed or was cancelled."
+msgstr ""
+
+#: debian-updates-indicator@vanastasis.github.com/updateManager.js:459
+msgid "Terminal did not start the package command."
+msgstr ""
+
+#: debian-updates-indicator@vanastasis.github.com/updateManager.js:491
+msgid "Nala or pkexec is not installed."
+msgstr ""
+
+#: debian-updates-indicator@vanastasis.github.com/updateManager.js:606
+msgid "Another package operation is running."
+msgstr ""
+
+#: debian-updates-indicator@vanastasis.github.com/updateManager.js:633
+msgid "Unknown cleanup method."
+msgstr ""
+
+#: debian-updates-indicator@vanastasis.github.com/updateManager.js:755
+msgid "Install PackageKit or configure a custom refresh command in Advanced settings."
+msgstr ""
+
+#: debian-updates-indicator@vanastasis.github.com/updateManager.js:765
+msgid "Package refresh failed."
+msgstr ""
+
+#: debian-updates-indicator@vanastasis.github.com/updateManager.js:832
+msgid "Package list scan failed."
+msgstr ""
+
