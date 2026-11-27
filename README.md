@@ -4,15 +4,14 @@
 
 A GNOME Shell panel extension for monitoring and managing APT package updates on Debian and Debian-based Linux distributions.
 
-**Version:** `2.7.0.6` | **GNOME Shell:** 51 | **Licence:** GPL-3.0-or-later
+**Version:** `2.7.0.7` | **GNOME Shell:** 48–51 | **Licence:** GPL-3.0-or-later
 
-## What's new in 2.7.0.6
+## What's new in 2.7.0.7
 
-- Fix Nala residual configuration cleanup: use native `nala autoremove --purge --remove-config` instead of separately purging already-uninstalled packages.
-- Run the Nala cleanup transaction even when no unused dependencies remain but residual configuration files exist.
-- Retain the optional residual purge setting (disabled by default), manual cleanup confirmation, graphical authentication, XFCE Terminal integration and press-any-key exit.
-- Retain APT/APT-get residual purge and default terminal detection, plus independent custom commands and package-list refresh.
-- Update extension metadata, settings descriptions and documentation. Ordinary upgrades and automatic checks do not trigger cleanup.
+- Extend declared GNOME Shell compatibility to versions 48, 49, 50 and 51. The existing version-aware panel layout already uses the orientation API introduced in GNOME Shell 48.
+- Retain APT, APT-get and Nala update and cleanup presets, optional residual configuration purging and existing preferences.
+- Refresh translation catalog and build helper documentation using the neutral project identity; retain original licence and attribution.
+- GNOME Shell 51 has been exercised by the maintainer; live testing of this release on GNOME Shell 48–50 remains outstanding.
 
 ## Features
 
@@ -20,7 +19,7 @@ A GNOME Shell panel extension for monitoring and managing APT package updates on
 - New packages in repositories, local/obsolete packages, residual configuration files and autoremovable packages.
 - Manual and automatic update checks with hourly, daily or weekly intervals.
 - Configurable refresh commands, ignore list and last-check timestamp.
-- GNOME Shell 51 panel-layout compatibility and corrected timer lifecycle.
+- GNOME Shell 48–51 panel-layout compatibility and corrected timer lifecycle.
 - Existing settings and translations retained; new strings may appear in English until translated.
 
 ## Advanced settings
@@ -39,7 +38,7 @@ Built-in terminal commands use `pkexec`. Install Nala and `xfce4-terminal` to us
 
 ## Compatibility
 
-GNOME Shell 51 is the declared compatibility target. Earlier versions are not declared supported by this release. Build and schema validation do not establish live runtime compatibility for every terminal or distribution.
+GNOME Shell 48, 49, 50 and 51 are the declared compatibility targets. GNOME Shell 51 has been exercised by the maintainer; live runtime testing of this release on GNOME Shell 48–50 is still required. Earlier versions and unreleased future versions are not declared supported. Build and schema validation do not establish live runtime compatibility for every terminal or distribution.
 
 ## Installation
 

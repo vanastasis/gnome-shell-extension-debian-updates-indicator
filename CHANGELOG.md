@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.7.0.7 — 2026-11-28
+
+- Extend declared GNOME Shell compatibility to versions 48, 49, 50 and 51. The existing version-aware panel layout already uses the orientation API introduced in GNOME Shell 48.
+- Retain APT, APT-get and Nala update and cleanup presets, optional residual configuration purging and existing preferences.
+- Refresh translation catalog and build helper documentation using the neutral project identity; retain original licence and attribution.
+- GNOME Shell 51 has been exercised by the maintainer; live testing of this release on GNOME Shell 48–50 remains outstanding.
+
 ## 2.7.0.6 — 2026-11-27
 
 - Fix Nala residual configuration cleanup: use native `nala autoremove --purge --remove-config` instead of separately purging already-uninstalled packages.
