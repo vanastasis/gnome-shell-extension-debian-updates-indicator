@@ -35,25 +35,6 @@
 #                                    #
 ######################################
 
-ONLY_PRINT=$1
-TEMP_FOLDER=$2
-# Paths and files
-path=${TEMP_FOLDER}
-
-# Create the directory if it doesn't exist
-mkdir -p ${path}
-
-file=${path}residual-config.list
-if [ "$ONLY_PRINT" -lt 1 ]; then
-  dpkg -l | grep '^rc'| awk '{print $2}' > ${file}
-fi
-
-# Print!
-if [ -f ${file} ]; then
-  num=`cat ${file} | wc -l`
-  if [ "$num" -gt 500 ]; then
-    echo "** Too many! Showing only 500 **"
-  fi
-  head -500 $file
-fi
-
+set -euo pipefail
+export LC_ALL=C
+dpkg-query -W -f='${db:Status-Abbrev}\t${binary:Package}\n' | awk '$1 == "rc" {print $2}' | awk 'NR <= 500 {print}'

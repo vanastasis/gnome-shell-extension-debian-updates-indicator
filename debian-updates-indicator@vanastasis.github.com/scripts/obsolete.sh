@@ -35,27 +35,6 @@
 #                                    #
 ######################################
 
-ONLY_PRINT=$1
-TEMP_FOLDER=$2
-# Paths and files
-path=${TEMP_FOLDER}
-
-# Create the directory if it doesn't exist
-mkdir -p ${path}
-
-file=${path}obsolete.list
-
-# Check for local or obsolete packages
-if [ "$ONLY_PRINT" -lt 1 ]; then
-  apt-show-versions | grep 'No available version\|newer than version in archive\|*manually*' | awk '{print $1}' > ${file}
-fi
-
-# Print!
-if [ -f ${file} ]; then
-  num=`cat ${file} | wc -l`
-  if [ "$num" -gt 500 ]; then
-    echo "** Too many! Showing only 500 **"
-  fi
-  head -500 $file
-fi
-
+set -euo pipefail
+export LC_ALL=C
+apt-show-versions | awk '/No available version|newer than version in archive|manually/ {print $1}' | awk 'NR <= 500 {print}'

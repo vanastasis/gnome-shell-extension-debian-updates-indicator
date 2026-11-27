@@ -36,14 +36,6 @@
 #                                    #
 ######################################
 
-# List updates               | Print "Results" section | Keep only urgent ones
-LANG=en pkcon -p get-updates | sed '1,/Results/d'      | grep 'Security\|Important'
-
-# Urgent statuses:
-#     Security, Important
-
-# Low priority:
-#     Bug fix, Normal, Trivial, Enhancement
-
-# Source: https://github.com/hughsie/PackageKit/blob/master/po/en_GB.po
-
+set -euo pipefail
+export LC_ALL=C
+pkcon -p get-updates | awk '/Results/ {results=1; next} results && /Security|Important/'

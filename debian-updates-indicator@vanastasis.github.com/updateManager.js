@@ -74,6 +74,7 @@ export const UpdateManager = class UpdateManager {
         this._destroyed = false;
         this._scanProcesses = new Map();
         this._refreshProcess = null;
+        this._terminalState = null;
         this._upgradeProcess_sourceId = null;
         this._cachePath = GLib.build_filenamev([GLib.get_user_cache_dir(), extension.uuid]);
         this._initializing = true;
@@ -417,9 +418,68 @@ export const UpdateManager = class UpdateManager {
             throw new Error(_('Package command not found: %s').format(command[0]));
         if (command[0] === 'pkexec' && !GLib.find_program_in_path(command[1]))
             throw new Error(_('Package manager not found: %s').format(command[1]));
-        // Pass the command as positional arguments, not interpolated shell source.
-        const script = String.raw`"$@"; status=$?; printf "\n%s\n" "Exit status: $status"; printf "Press any key to exit..."; read -r -n 1 -s; exit "$status"`;
-        return [...prefix, 'bash', '-c', script, 'package-operation', ...command];
+        // A private completion marker tracks the terminal child even if the
+        // desktop terminal launcher exits immediately (e.g. D-Bus activation).
+        const state = this._prepareTerminalState();
+        const script = [
+            'state=$1; shift',
+            '[[ -d "$state" ]] || exit 125',
+            'umask 077',
+            ': > "$state/started" || exit 125',
+            'finish() { status=$?; if [[ -d "$state" ]]; then if (( status == 0 )); then : > "$state/done"; else : > "$state/failed"; fi; fi; }',
+            'trap finish EXIT',
+            '"$@"; status=$?',
+            'printf "\\n%s\\n" "Exit status: $status"',
+            'printf "Press any key to exit..."; read -r -n 1 -s',
+            'exit "$status"',
+        ].join('\n');
+        return [...prefix, 'bash', '-c', script, 'package-operation', state.path, ...command];
+    }
+
+    _prepareTerminalState() {
+        const path = GLib.dir_make_tmp('debian-apt-operation-XXXXXX');
+        const state = {path, monitor: null, signal: 0, timeout: 0, started: false};
+        this._terminalState = state;
+        try {
+            state.monitor = Gio.File.new_for_path(path).monitor_directory(Gio.FileMonitorFlags.NONE, null);
+            state.signal = state.monitor.connect('changed', (monitor, file) => {
+                if (this._destroyed || this._terminalState !== state)
+                    return;
+                const name = file.get_basename();
+                if (name === 'started')
+                    state.started = true;
+                if (name === 'done' || name === 'failed')
+                    this._finishPackageOperation(name === 'failed' ? new Error(_('Package operation failed or was cancelled.')) : null);
+            });
+            state.timeout = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 30, () => {
+                state.timeout = 0;
+                if (this._terminalState === state && !state.started)
+                    this._finishPackageOperation(new Error(_('Terminal did not start the package command.')));
+                return GLib.SOURCE_REMOVE;
+            });
+            return state;
+        } catch (error) {
+            this._clearTerminalState();
+            throw error;
+        }
+    }
+
+    _clearTerminalState() {
+        const state = this._terminalState;
+        this._terminalState = null;
+        if (!state)
+            return;
+        if (state.timeout)
+            GLib.source_remove(state.timeout);
+        if (state.monitor) {
+            if (state.signal)
+                state.monitor.disconnect(state.signal);
+            state.monitor.cancel();
+        }
+        // Never terminate a package transaction when disabling the extension.
+        for (const name of ['started', 'done', 'failed'])
+            GLib.unlink(GLib.build_filenamev([state.path, name]));
+        GLib.rmdir(state.path);
     }
 
     // Probe the installed CLI in the terminal before elevation. Never retry a
@@ -443,7 +503,7 @@ export const UpdateManager = class UpdateManager {
             "        elif has_option --config; then flag=--config",
             "        else printf '%s\\n' 'Cannot detect the Nala residual configuration option. No cleanup started.' >&2; exit 2",
             "        fi",
-            "        exec pkexec /usr/bin/nala autoremove --purge \"$flag\"",
+            "        exec pkexec /usr/bin/nala autoremove --option Nala::assume_yes=false --purge \"$flag\"",
             "        ;;",
             "    *) exit 2 ;;",
             "esac",
@@ -521,7 +581,8 @@ export const UpdateManager = class UpdateManager {
 
     // Cleanup never runs as part of the update presets.
     _removeUnusedPackages() {
-        if (!this._indicator || !this._extensionSettings)
+        if (!this._indicator || !this._extensionSettings ||
+            this._scanProcesses.has(SCRIPT.RESIDUAL) || this._scanProcesses.has(SCRIPT.AUTOREMOVABLE))
             return;
         const purge = this._extensionSettings.get_boolean('cleanup-purge-residual');
         const hasUnused = this._indicator._autoremovablePackagesList.length > 0;
@@ -538,11 +599,11 @@ export const UpdateManager = class UpdateManager {
             switch (option) {
             case 0:
                 manager = '/usr/bin/apt';
-                command = ['pkexec', manager, 'autoremove'];
+                command = ['pkexec', manager, 'autoremove', '-o', 'APT::Get::Assume-Yes=false', '-o', 'APT::Get::Assume-No=false'];
                 break;
             case 1:
                 manager = '/usr/bin/apt-get';
-                command = ['pkexec', manager, 'autoremove'];
+                command = ['pkexec', manager, 'autoremove', '-o', 'APT::Get::Assume-Yes=false', '-o', 'APT::Get::Assume-No=false'];
                 break;
             case 2:
                 // Custom commands are not rewritten; use APT-get for residuals.
@@ -552,7 +613,7 @@ export const UpdateManager = class UpdateManager {
                 break;
             case 3:
                 manager = '/usr/bin/nala';
-                command = ['pkexec', manager, 'autoremove'];
+                command = ['pkexec', manager, 'autoremove', '--option', 'Nala::assume_yes=false'];
                 xfce = true;
                 break;
             default:
@@ -596,7 +657,14 @@ export const UpdateManager = class UpdateManager {
 
     _runPackageOperation(argv) {
         this._cancelScans();
-        const proc = Gio.Subprocess.new(argv, Gio.SubprocessFlags.NONE);
+        let proc;
+        try {
+            proc = Gio.Subprocess.new(argv, Gio.SubprocessFlags.NONE);
+        } catch (error) {
+            this._clearTerminalState();
+            this._launchScript(SCRIPT.UPGRADES);
+            throw error;
+        }
         this._cleanupProcess = proc; // Shared manual-operation guard.
         this._upgradeProcess_sourceId = 1;
         this._indicator.removeUnusedMenuItem.setSensitive(false);
@@ -612,17 +680,28 @@ export const UpdateManager = class UpdateManager {
             }
             if (!this._indicator || this._cleanupProcess !== proc)
                 return;
-            this._cleanupProcess = null;
-            this._upgradeProcess_sourceId = null;
-            this._indicator.checkNowMenuItem.setSensitive(true);
-            // Keep cleanup disabled until the fresh package scan finishes.
-            this._indicator.removeUnusedMenuItem.setSensitive(false);
-            if (error)
-                Main.notifyError(this._extensionName, error.message);
-            this._dontUpdateDate = true;
-            this._dirMonitor.start();
-            this._launchScript(SCRIPT.UPGRADES);
+            if (this._terminalState) {
+                // Terminal wrappers write their own completion status. A
+                // successful detached launcher is not a completed transaction.
+                if (!error || this._terminalState.started)
+                    return;
+            }
+            this._finishPackageOperation(error);
         });
+    }
+
+    _finishPackageOperation(error = null) {
+        if (this._destroyed || !this._cleanupProcess)
+            return;
+        this._clearTerminalState();
+        this._cleanupProcess = null;
+        this._upgradeProcess_sourceId = null;
+        this._indicator.showChecking(false);
+        this._indicator.checkNowMenuItem.setSensitive(true);
+        if (error)
+            Main.notifyError(this._extensionName, error.message);
+        this._dirMonitor.start();
+        this._launchScript(SCRIPT.UPGRADES);
     }
 
     /* Update functions:
@@ -844,6 +923,7 @@ export const UpdateManager = class UpdateManager {
 
     destroy() {
         this._destroyed = true;
+        this._clearTerminalState();
         this._cancelScans();
         // Do not terminate an already authorized package transaction.
         this._refreshProcess = null;

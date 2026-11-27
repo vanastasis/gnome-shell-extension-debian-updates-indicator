@@ -36,6 +36,6 @@
 #                                    #
 ######################################
 
-# Get updates list    | Rm 1st line | "\" -> " "    | Package name and version
-apt list --upgradable | tail -n +2  | sed 's/\// /' | awk '{print $1 "\t" $3}'
-
+set -euo pipefail
+export LC_ALL=C
+apt list --upgradable | awk 'NR > 1 {split($1, p, "/"); print p[1] "\t" $2}'
