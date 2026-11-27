@@ -72,6 +72,7 @@ export const UpdateManager = class UpdateManager {
         this._cleanupProcess = null;
 
         this._destroyed = false;
+        this._networkPending = false;
         this._scanProcesses = new Map();
         this._refreshProcess = null;
         this._terminalState = null;
@@ -490,6 +491,7 @@ export const UpdateManager = class UpdateManager {
         if (!GLib.find_program_in_path('/usr/bin/nala') || !GLib.find_program_in_path('pkexec'))
             throw new Error(_('Nala or pkexec is not installed.'));
         const script = [
+            "set -o pipefail",
             "action=$1",
             "purge=$2",
             "help=$(LC_ALL=C TERM=dumb NO_COLOR=1 COLUMNS=200 MANWIDTH=200 MANPAGER=cat PAGER=cat /usr/bin/nala \"$action\" --help 2>&1) || { printf '%s\\n' \"$help\" >&2; exit 2; }",
@@ -513,7 +515,7 @@ export const UpdateManager = class UpdateManager {
             "        fi",
             "        printf '%s\\n' 'APT simulation of unused packages (Nala may resolve differently):'",
             "        /usr/bin/apt-get --simulate autoremove || exit 2",
-            "        if [[ $purge == true ]]; then dpkg-query -W -f='${db:Status-Abbrev}\\t${binary:Package}\\n' | awk '$1 == \"rc\" {print $2}'; fi",
+            "        if [[ $purge == true ]]; then dpkg-query -W -f='${db:Status-Abbrev}\\t${binary:Package}\\n' | awk '$1 == \"rc\" {print $2}' || exit 2; fi",
             "        read -r -p 'Start Nala cleanup? [y/N] ' answer || exit 1",
             "        [[ $answer == [yY] || $answer == [yY][eE][sS] ]] || exit 0",
             "        exec pkexec /usr/bin/nala autoremove --option Nala::assume_yes=false \"${args[@]}\"",
@@ -587,7 +589,7 @@ export const UpdateManager = class UpdateManager {
             "printf \"  %s\\n\" \"${packages[@]}\"",
             "read -r -p \"Purge these retained system configuration files? [y/N] \" answer || exit 1",
             "[[ $answer == [yY] || $answer == [yY][eE][sS] ]] || exit 0",
-            "pkexec \"$manager\" -o APT::Get::AutomaticRemove=false -o APT::Get::Assume-Yes=false purge \"${packages[@]}\"",
+            "pkexec \"$manager\" -o APT::Get::AutomaticRemove=false -o APT::Get::Assume-Yes=false -o APT::Get::Assume-No=false -o quiet=0 purge \"${packages[@]}\"",
         ].join('\n');
         return ['bash', '-c', script, 'cleanup-residual', manager, ...command];
     }
@@ -612,11 +614,11 @@ export const UpdateManager = class UpdateManager {
             switch (option) {
             case 0:
                 manager = '/usr/bin/apt';
-                command = ['pkexec', manager, 'autoremove', '-o', 'APT::Get::Assume-Yes=false', '-o', 'APT::Get::Assume-No=false'];
+                command = ['pkexec', manager, 'autoremove', '-o', 'APT::Get::Assume-Yes=false', '-o', 'APT::Get::Assume-No=false', '-o', 'quiet=0'];
                 break;
             case 1:
                 manager = '/usr/bin/apt-get';
-                command = ['pkexec', manager, 'autoremove', '-o', 'APT::Get::Assume-Yes=false', '-o', 'APT::Get::Assume-No=false'];
+                command = ['pkexec', manager, 'autoremove', '-o', 'APT::Get::Assume-Yes=false', '-o', 'APT::Get::Assume-No=false', '-o', 'quiet=0'];
                 break;
             case 2:
                 // Custom commands are not rewritten; use APT-get for residuals.

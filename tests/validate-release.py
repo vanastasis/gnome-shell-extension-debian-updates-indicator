@@ -24,13 +24,13 @@ script = "\n".join(json.loads(line.strip().rstrip(",")) for line in body.splitli
 with tempfile.TemporaryDirectory() as tmp:
     d = pathlib.Path(tmp)
     for name, contents in {
-        "nala": '#!/bin/bash\nprintf "%s\\n" "$FAKE_HELP"; exit "\${FAKE_HELP_RC:-0}"\n',
+        "nala": '#!/bin/bash\nprintf "%s\\n" "$FAKE_HELP"; exit "${FAKE_HELP_RC:-0}"\n',
         "apt-get": '#!/bin/bash\nprintf "simulation\\n"\n',
         "dpkg-query": '#!/bin/bash\nprintf "rc \\tlibexample:amd64\\n"\n',
-        "pkexec": '#!/bin/bash\nprintf "%s\\n" "$@" > "$CALL_LOG"; exit "\${FAKE_EXIT:-0}"\n',
+        "pkexec": '#!/bin/bash\nprintf "%s\\n" "$@" > "$CALL_LOG"; exit "${FAKE_EXIT:-0}"\n',
     }.items():
         path = d / name
-        path.write_text(contents.replace(r"\$", "$"))
+        path.write_text(contents)
         path.chmod(0o700)
     for name in ("nala", "apt-get"):
         script = script.replace("/usr/bin/" + name, str(d / name))

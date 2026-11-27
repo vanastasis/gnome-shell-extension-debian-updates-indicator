@@ -261,6 +261,7 @@ print('Both ZIPs verified; only compiled schema differs.')
 PY
 REPORT="$ROOT/zip-files/validation/$VERSION"
 mkdir -p "$REPORT"
+rm -f -- "$REPORT/review.txt" "$REPORT/validation.txt"
 if command -v shexli >/dev/null; then
     SHEXLI=$(command -v shexli)
 elif [[ -x "$HOME/.venvs/shexli/bin/shexli" ]]; then

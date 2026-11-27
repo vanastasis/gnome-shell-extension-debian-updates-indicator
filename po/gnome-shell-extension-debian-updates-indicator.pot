@@ -349,3 +349,63 @@ msgstr ""
 msgid "Package list scan failed."
 msgstr ""
 
+#: debian-updates-indicator@vanastasis.github.com/indicator.js:186
+msgid "Remove unused packages"
+msgstr ""
+
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui:68
+msgid "GNOME Software"
+msgstr ""
+
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui:69
+msgid "Synaptic Package Manager"
+msgstr ""
+
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui:70
+msgid "GNOME PackageKit Update Viewer"
+msgstr ""
+
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui:71
+msgid "Ubuntu Update Manager"
+msgstr ""
+
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui:73
+msgid "APT - Default Terminal"
+msgstr ""
+
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui:74
+msgid "Nala - XFCE Terminal"
+msgstr ""
+
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui:75
+msgid "APT-get - Default Terminal"
+msgstr ""
+
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui:105
+msgid "Only runs when selected from the panel menu. Review the removal list in the terminal."
+msgstr ""
+
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui:108
+msgid "Cleanup method"
+msgstr ""
+
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui:114
+msgid "Custom command"
+msgstr ""
+
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui:123
+msgid "Also purge residual configuration files"
+msgstr ""
+
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui:124
+msgid "Also purge configuration files from previously removed packages. Nala detects the supported residual purge option and handles both in one transaction. APT and APT-get offer an additional residual purge; Custom uses APT-get for residuals."
+msgstr ""
+
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui:129
+msgid "Custom cleanup command"
+msgstr ""
+
+#: debian-updates-indicator@vanastasis.github.com/ui/prefs_advanced_adw1.ui:135
+msgid "Terminal prefix (empty = automatic)"
+msgstr ""
+
