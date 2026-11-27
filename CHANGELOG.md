@@ -58,7 +58,7 @@
 - Update project name, project URLs, issue tracker, installation instructions and translation source paths to the GitHub fork. Remove upstream donation link from active metadata and README. Preserve original copyright and licence notices, original authors and translator credit.
 - Align Meson project version with the fork release; remove the installed archive's generated numeric extension version (not present in upstream source). Exclude generated package lists, compiled schemas and translations from the source package; build these locally.
 - Update project maintainer metadata and AUTHORS; retire the upstream GitLab-specific CI configuration on this GitHub fork.
-- Report GNOME Shell 51 as maintainer-tested on Thinker; GNOME 45–50 are declared compatible but not retested. GNOME 44 and earlier are not supported by this release.
+- Report GNOME Shell 51 as maintainer-tested on Debian; GNOME 45–50 are declared compatible but not retested. GNOME 44 and earlier are not supported by this release.
 
 ### Verification
 
