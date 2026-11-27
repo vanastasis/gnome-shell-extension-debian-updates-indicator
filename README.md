@@ -4,17 +4,17 @@
 
 A GNOME Shell panel extension for monitoring and managing APT package updates on Debian and Debian-based Linux distributions.
 
-**Version:** `2.7.0.9` | **GNOME Shell:** 48–51 | **Licence:** GPL-3.0-or-later
+**Version:** `2.7.0.10` | **GNOME Shell:** 48–51 | **Licence:** GPL-3.0-or-later
 
-## What's new in 2.7.0.9
+## What's new in 2.7.0.10
 
-- Fix PackageKit executable detection, report refresh failures, and update the last-check timestamp only after a successful refresh and scan.
-- Cancel obsolete read-only scans and guard asynchronous callbacks, monitors, notifications and main-loop sources on disable.
-- Prevent overlapping extension-managed package operations; track built-in terminal completion independently of a detached launcher.
-- Move generated package lists to the user cache; use locale-independent, failure-aware scans and handle missing optional dependencies.
-- Start the first local scan after two seconds; retain GNOME Shell 48–51 and all existing preferences.
-- Require explicit Nala cleanup confirmation even when system defaults request automatic confirmation; retain old and new Nala CLI option detection.
-- Add release validation for JavaScript, shell scripts, schemas, translations, simulated Nala commands and Shexli reports.
+- Fix stuck checking indicator when PackageKit refresh or optional security classification stalls.
+- Run the actual configured refresh command for both Check now and scheduled checks; use pkcon refresh force or pkgcli refresh by default.
+- Reject common install, upgrade and removal commands mistakenly configured as a refresh command.
+- Bound repository refresh to five minutes and package-list queries to one minute; report failures without recording a false successful check.
+- Keep refresh and primary scan locked together, redraw updates before optional urgency classification and preserve unformatted package data.
+- Honour hours, days, weeks and zero (disabled); defer busy scheduled checks and retry failed scheduled checks without waiting a full interval.
+- Add mocked refresh lifecycle and scheduling regression tests; retain declared GNOME Shell 48–51 compatibility.
 
 ## Features
 
@@ -24,6 +24,10 @@ A GNOME Shell panel extension for monitoring and managing APT package updates on
 - Configurable refresh commands, ignore list and last-check timestamp.
 - GNOME Shell 48–51 panel-layout compatibility and corrected timer lifecycle.
 - Existing settings and translations retained; new strings may appear in English until translated.
+
+## Repository refresh
+
+**Check now** and scheduled checks execute the same refresh command selected in Advanced settings. With custom refresh disabled, the extension uses `pkcon --plain refresh force` if available, otherwise `pkgcli refresh`. A custom refresh command is used as entered, including any explicitly configured authentication; `pkgcli update` installs updates and is not a refresh command. A successful refresh followed by a successful local APT scan records Last check; local cache changes and initial scans do not. A five-minute refresh timeout and one-minute scan timeout prevent an indefinitely checking indicator; stopping the client does not guarantee that PackageKit's backend or an arbitrary custom command has stopped. A busy scheduled check is deferred 30 seconds, and failed automatic checks retry after up to five minutes. Zero disables scheduled checks. Optional urgency classification is currently available through pkcon and does not block the normal update list.
 
 ## Advanced settings
 

@@ -46,8 +46,10 @@ import * as Monitors from './monitors.js';
 import * as Utils from './utils.js';
 
 /* Options */
-const STOCK_CHECK_CMD_OLD = '/usr/bin/pkcon refresh';
+const STOCK_CHECK_CMD_OLD = '/usr/bin/pkcon --plain refresh force';
 const STOCK_CHECK_CMD_NEW = '/usr/bin/pkgcli refresh';
+const REFRESH_TIMEOUT_SECONDS = 300;
+const SCAN_TIMEOUT_SECONDS = 60;
 const STOCK_UPDATE_CMD    = '/usr/bin/gnome-software --mode updates';
 
 let STOCK_CHECK_CMD = STOCK_CHECK_CMD_OLD;
@@ -73,7 +75,10 @@ export const UpdateManager = class UpdateManager {
 
         this._destroyed = false;
         this._networkPending = false;
+        this._refreshScanPending = false;
+        this._refreshTimeoutId = 0;
         this._scanProcesses = new Map();
+        this._scanTimeouts = new Map();
         this._refreshProcess = null;
         this._terminalState = null;
         this._upgradeProcess_sourceId = null;
@@ -106,7 +111,7 @@ export const UpdateManager = class UpdateManager {
         this._applySettings();
 
         // Start network and directory monitors
-        this._netMonitor = new Monitors.NetworkMonitor(this);
+        this._netMonitor = null;
         this._dirMonitor = new Monitors.DirectoryMonitor(this);
 
         // Read local package state promptly without refreshing repositories.
@@ -145,104 +150,74 @@ export const UpdateManager = class UpdateManager {
     }
 
     _checkCMD() {
-        if (this._extensionSettings.get_boolean('use-custom-cmd') &&
-            this._extensionSettings.get_string('check-cmd-custom') !== '')
+        // Resolve the configured command for every check, including automatic
+        // checks. A blank custom command is an error, not a silent fallback.
+        if (this._extensionSettings.get_boolean('use-custom-cmd'))
             CHECK_CMD = this._extensionSettings.get_string('check-cmd-custom').trim();
         else
-            CHECK_CMD = STOCK_CHECK_CMD;
+            CHECK_CMD = GLib.find_program_in_path('pkcon') ? STOCK_CHECK_CMD_OLD :
+                GLib.find_program_in_path('pkgcli') ? STOCK_CHECK_CMD_NEW : '';
+        return CHECK_CMD;
+    }
+
+    _refreshArgv() {
+        const command = this._checkCMD();
+        if (!command)
+            throw new Error(_('No refresh command configured. Install PackageKit or set a custom refresh command.'));
+        const argv = this._parsePackageCommand(command);
+        // Reject common accidental installation commands in the refresh
+        // field. Arbitrary user-authored scripts remain the user's responsibility.
+        const words = argv.map(arg => GLib.path_get_basename(arg));
+        const manager = words.findIndex(word => ['pkcon', 'pkgcli', 'apt', 'apt-get', 'nala', 'dpkg'].includes(word));
+        if (manager >= 0) {
+            const tool = words[manager];
+            const verbs = words.slice(manager + 1);
+            if ((['pkcon', 'pkgcli'].includes(tool) && verbs.some(v => ['update', 'upgrade', 'upgrade-system', 'install', 'remove', 'install-local', 'repair', 'offline-update', 'offline-trigger'].includes(v))) ||
+                (['apt', 'apt-get', 'nala'].includes(tool) && verbs.some(v => ['upgrade', 'full-upgrade', 'dist-upgrade', 'install', 'remove', 'purge', 'autoremove', 'autopurge', 'reinstall'].includes(v))) ||
+                tool === 'dpkg')
+                throw new Error(_('The custom check command changes packages. Use a refresh-only command, such as pkgcli refresh or pkexec apt update.'));
+        }
+        return argv;
+    }
+
+    _intervalSeconds() {
+        const unit = this._extensionSettings.get_int('interval-unit');
+        const seconds = [3600, 86400, 604800][unit] || 3600;
+        return Math.max(0, this._extensionSettings.get_int('check-interval')) * seconds;
     }
 
     _initializeInterval() {
-        this._isAutomaticCheck = false;
-
-        // Remove the periodic check before adding a new one
         if (this._initTimeoutId) {
             GLib.source_remove(this._initTimeoutId);
             this._initTimeoutId = null;
         }
-        if (this._checkTimeoutId) {
-            GLib.source_remove(this._checkTimeoutId);
-            this._checkTimeoutId = null;
-        }
-
-        // Interval in hours from settings, convert to seconds
-        let unit = this._extensionSettings.get_int('interval-unit');
-        let conversion = 0;
-
-        switch (unit) {
-        case 0: // Hours
-            conversion = 60 * 60;
-            break;
-        case 1: // Days
-            conversion = 60 * 60 * 24;
-            break;
-        case 2: // Weeks
-            conversion = 60 * 60 * 24 * 7;
-            break;
-        }
-
-        let CHECK_INTERVAL = conversion * this._extensionSettings.get_int('check-interval');
-
-        if (CHECK_INTERVAL) {
-            // This has to be relative to the last check!
-            // Date is in milliseconds, convert to seconds
-            let lastCheck = this._extensionSettings.get_double('last-check-date-automatic-double');
-            let now = new Date();
-            let elapsed = (now - lastCheck) / 1000; // In seconds
-
-            CHECK_INTERVAL -= elapsed;
-            if (CHECK_INTERVAL < 0) {
-                if (this._initializing)
-                    // Wait 2 minutes if just initialized, i.e. after boot or
-                    // unlock screen
-                    CHECK_INTERVAL = 120;
-                else
-                    CHECK_INTERVAL = 10;
-            }
-
-            this._initTimeoutId = GLib.timeout_add_seconds(
-                GLib.PRIORITY_DEFAULT,
-                CHECK_INTERVAL,
-                () => {
-                    this._initTimeoutId = null;
-                    if (!this._indicator)
-                        return GLib.SOURCE_REMOVE;
-                    if (!this._operationBusy()) {
-                        this._isAutomaticCheck = true;
-                        this._checkNetwork();
-                    }
-                    this._checkInterval();
-                    return GLib.SOURCE_REMOVE;
-                });
-        }
+        const interval = this._intervalSeconds();
+        if (!interval)
+            return;
+        const last = this._extensionSettings.get_double('last-check-date-automatic-double');
+        const elapsed = Math.max(0, (Date.now() - last) / 1000);
+        const remaining = last > 0 ? interval - elapsed : 0;
+        this._scheduleAutomatic(remaining > 0 ? remaining : (this._initializing ? 120 : 10));
     }
 
-    _checkInterval() {
-        // Remove the periodic check before adding a new one
-        if (this._checkTimeoutId) {
-            GLib.source_remove(this._checkTimeoutId);
-            this._checkTimeoutId = null;
+    _scheduleAutomatic(delay) {
+        if (this._initTimeoutId) {
+            GLib.source_remove(this._initTimeoutId);
+            this._initTimeoutId = null;
         }
-
-        let unit = this._extensionSettings.get_int('interval-unit');
-        let conversion = unit === 1 ? 60 * 60 * 24 : unit === 2 ? 60 * 60 * 24 * 7 : 60 * 60;
-        let CHECK_INTERVAL = this._extensionSettings.get_int('check-interval') * conversion;
-        if (CHECK_INTERVAL) {
-            this._checkTimeoutId = GLib.timeout_add_seconds(
-                GLib.PRIORITY_DEFAULT,
-                CHECK_INTERVAL,
-                () => {
-                    if (!this._indicator) {
-                        this._checkTimeoutId = null;
-                        return GLib.SOURCE_REMOVE;
-                    }
-                    if (!this._operationBusy()) {
-                        this._isAutomaticCheck = true;
-                        this._checkNetwork();
-                    }
-                    return GLib.SOURCE_CONTINUE;
-                });
-        }
+        if (this._destroyed || !this._intervalSeconds())
+            return;
+        this._initTimeoutId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
+            Math.max(1, Math.min(2147483647, Math.ceil(delay))), () => {
+                this._initTimeoutId = null;
+                if (this._destroyed || !this._intervalSeconds())
+                    return GLib.SOURCE_REMOVE;
+                if (this._operationBusy())
+                    this._scheduleAutomatic(30);
+                else
+                    this._checkNetwork(true);
+                return GLib.SOURCE_REMOVE;
+            });
     }
 
     _newPackagesBinding() {
@@ -371,7 +346,7 @@ export const UpdateManager = class UpdateManager {
             // Indicator buttons
             this._indicator.checkNowMenuItem,
             'activate',
-            this._checkNetwork.bind(this),
+            () => this._checkNetwork(false),
         ], [
             this._indicator.applyUpdatesMenuItem,
             'activate',
@@ -656,10 +631,13 @@ export const UpdateManager = class UpdateManager {
     }
 
     _operationBusy() {
-        return this._destroyed || !!this._networkPending || !!this._refreshProcess || !!this._cleanupProcess;
+        return this._destroyed || !!this._networkPending || !!this._refreshProcess || this._refreshScanPending || !!this._cleanupProcess;
     }
 
     _cancelScans() {
+        for (const id of this._scanTimeouts.values())
+            GLib.source_remove(id);
+        this._scanTimeouts.clear();
         for (const proc of this._scanProcesses.values()) {
             try {
                 proc.force_exit();
@@ -726,24 +704,24 @@ export const UpdateManager = class UpdateManager {
      *     _checkUpdatesEnd
      */
 
-    _checkNetwork() {
-        if (this._operationBusy() || !this._netMonitor)
+    _checkNetwork(automatic = false) {
+        if (this._operationBusy())
             return;
+        this._isAutomaticCheck = automatic === true;
         this._networkPending = true;
         this._indicator.showChecking(true);
         this._indicator.applyUpdatesMenuItem.setSensitive(false);
         this._indicator.removeUnusedMenuItem.setSensitive(false);
-        this._netMonitor.networkTimeout();
+        // The actual configured refresh is the authoritative network test.
+        // NetworkManager connectivity hints can be false on Debian systems.
+        this.checkUpdates();
     }
 
-    networkFailed() {
-        if (this._destroyed || !this._networkPending)
-            return;
-        this._networkPending = false;
-        this._isAutomaticCheck = false;
-        this._indicator.showChecking(false);
-        this._indicator.updateStatus(STATUS.NO_INTERNET);
-        this._indicator._updateCleanupSensitivity();
+    _clearRefreshTimeout() {
+        if (this._refreshTimeoutId) {
+            GLib.source_remove(this._refreshTimeoutId);
+            this._refreshTimeoutId = 0;
+        }
     }
 
     checkUpdates() {
@@ -753,44 +731,64 @@ export const UpdateManager = class UpdateManager {
         this._cancelScans();
         this._dirMonitor.stop();
         try {
-            if (!CHECK_CMD)
-                throw new Error(_('Install PackageKit or configure a custom refresh command in Advanced settings.'));
-            const argv = this._parsePackageCommand(CHECK_CMD);
-            const proc = Gio.Subprocess.new(argv, Gio.SubprocessFlags.STDERR_PIPE);
+            const argv = this._refreshArgv();
+            const proc = Gio.Subprocess.new(argv,
+                Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_PIPE);
             this._refreshProcess = proc;
             this._upgradeProcess_sourceId = 1;
+            this._refreshTimeoutId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
+                REFRESH_TIMEOUT_SECONDS, () => {
+                    this._refreshTimeoutId = 0;
+                    if (!this._destroyed && this._refreshProcess === proc) {
+                        this._refreshProcess = null;
+                        try { proc.force_exit(); } catch (error) { /* Already exited. */ }
+                        this._refreshFailed(new Error(_('Repository refresh timed out. Check PackageKit, authentication, network and APT locks.')));
+                    }
+                    return GLib.SOURCE_REMOVE;
+                });
             proc.communicate_utf8_async(null, this._cancellable, (child, result) => {
                 let error = null;
                 try {
-                    const [, , stderr] = child.communicate_utf8_finish(result);
+                    const [, stdout, stderr] = child.communicate_utf8_finish(result);
                     if (!child.get_successful())
-                        throw new Error(stderr?.trim() || _('Package refresh failed.'));
+                        throw new Error((stderr || stdout || _('Package refresh failed.')).trim().slice(-2000));
                 } catch (err) {
                     error = err;
                 }
                 if (this._destroyed || this._refreshProcess !== proc)
                     return;
+                this._clearRefreshTimeout();
                 this._refreshProcess = null;
-                this._upgradeProcess_sourceId = null;
-                this._dirMonitor.start();
                 if (error)
                     this._refreshFailed(error);
-                else
+                else {
+                    this._refreshScanPending = true;
                     this._launchScript(SCRIPT.UPGRADES, true);
+                }
             });
         } catch (error) {
+            this._clearRefreshTimeout();
             this._refreshProcess = null;
-            this._upgradeProcess_sourceId = null;
-            this._dirMonitor.start();
             this._refreshFailed(error);
         }
+    }
+
+    _endRefresh(success) {
+        const automatic = this._isAutomaticCheck;
+        this._networkPending = false;
+        this._refreshScanPending = false;
+        this._upgradeProcess_sourceId = null;
+        this._isAutomaticCheck = false;
+        this._indicator.showChecking(false);
+        this._dirMonitor.start();
+        if (automatic && this._intervalSeconds())
+            this._scheduleAutomatic(success ? this._intervalSeconds() : Math.min(300, this._intervalSeconds()));
     }
 
     _refreshFailed(error) {
         if (this._destroyed)
             return;
-        this._isAutomaticCheck = false;
-        this._indicator.showChecking(false);
+        this._endRefresh(false);
         this._indicator.updateStatus(STATUS.ERROR);
         this._indicator._updateCleanupSensitivity();
         Main.notifyError(this._extensionName, error.message);
@@ -804,14 +802,14 @@ export const UpdateManager = class UpdateManager {
      */
 
     _launchScript(index, refreshed = false) {
-        if (this._operationBusy())
+        if (this._destroyed || (this._operationBusy() &&
+            !(refreshed && index === SCRIPT.UPGRADES && this._refreshScanPending)))
             return;
-        if (this._scanProcesses.has(index)) {
-            if (!refreshed)
-                return;
-            this._scanProcesses.get(index).force_exit();
-            this._scanProcesses.delete(index);
-        }
+        if (this._scanProcesses.has(index))
+            return;
+        // An older optional security query must not redraw a newer result.
+        if (index === SCRIPT.UPGRADES && this._scanProcesses.has(5))
+            this._stopScan(5);
         if (index === SCRIPT.AUTOREMOVABLE || index === SCRIPT.RESIDUAL)
             this._indicator.removeUnusedMenuItem.setSensitive(false);
         const names = ['get-updates', 'new', 'obsolete', 'residual', 'autoremovable', 'urgency'];
@@ -826,75 +824,109 @@ export const UpdateManager = class UpdateManager {
             const proc = Gio.Subprocess.new(script,
                 Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_PIPE);
             this._scanProcesses.set(index, proc);
+            const timeout = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, SCAN_TIMEOUT_SECONDS, () => {
+                this._scanTimeouts.delete(index);
+                if (!this._destroyed && this._scanProcesses.get(index) === proc) {
+                    this._stopScan(index);
+                    this._scanFailed(index, new Error(_('Package list scan timed out.')), refreshed);
+                }
+                return GLib.SOURCE_REMOVE;
+            });
+            this._scanTimeouts.set(index, timeout);
             proc.communicate_utf8_async(null, this._cancellable, (child, result) => {
                 let output = '', error = null;
                 try {
                     const [, stdout, stderr] = child.communicate_utf8_finish(result);
                     if (!child.get_successful())
-                        throw new Error(stderr?.trim() || _('Package list scan failed.'));
+                        throw new Error((stderr || stdout || _('Package list scan failed.')).trim().slice(-2000));
                     output = stdout || '';
                 } catch (err) {
                     error = err;
                 }
                 if (this._destroyed || this._scanProcesses.get(index) !== proc)
                     return;
-                this._scanProcesses.delete(index);
-                if (this._operationBusy())
+                this._forgetScan(index);
+                if (this._operationBusy() && !(refreshed && this._refreshScanPending))
                     return;
                 if (error) {
-                    if (index === SCRIPT.UPGRADES)
-                        this._refreshFailed(error);
-                    else if (index === 5) {
-                        this._indicator._urgentList = [];
+                    this._scanFailed(index, error, refreshed);
+                    return;
+                }
+                try {
+                    const list = output.split('\n').filter(line => line.trim());
+                    if (index === 5) {
+                        this._indicator._urgentList = this._indicator._updateList.filter(pkg =>
+                            list.some(line => line.includes(`${pkg.split('\t', 2)[0]}-`)));
                         this._indicator.updatePackagesStatus(SCRIPT.UPGRADES);
-                    } else {
-                        this._setPackageList(index, []);
-                        this._indicator.updatePackagesStatus(index);
+                        return;
                     }
-                    return;
-                }
-                const list = output.split('\n').filter(line => line.trim());
-                if (index === 5) {
-                    this._indicator._urgentList = this._indicator._updateList.filter(pkg =>
-                        list.some(line => line.includes(`${pkg.split('\t', 2)[0]}-`)));
-                    this._indicator.updatePackagesStatus(SCRIPT.UPGRADES);
-                    return;
-                }
-                this._setPackageList(index, list);
-                if (index === SCRIPT.UPGRADES) {
-                    this._indicator._urgentList = [];
-                    if (this._extensionSettings.get_boolean('show-critical-updates') &&
-                        GLib.find_program_in_path('pkcon'))
-                        this._launchScript(5);
-                    else
+                    this._setPackageList(index, list);
+                    if (index !== SCRIPT.UPGRADES) {
                         this._indicator.updatePackagesStatus(index);
-                    this._indicator.showChecking(false);
-                    if (refreshed)
+                        return;
+                    }
+                    this._indicator._urgentList = [];
+                    if (refreshed) {
                         this._lastCheck();
-                    else if (this._initializing)
+                        this._endRefresh(true);
+                    } else if (this._initializing)
                         this._restoreLastCheck();
                     this._initializing = false;
                     this._dontUpdateDate = false;
+                    // Always redraw the normal update result immediately.
+                    // Security classification is optional and may fail or hang.
+                    this._indicator.updatePackagesStatus(index);
+                    if (this._extensionSettings.get_boolean('show-critical-updates') &&
+                        this._indicator._updateList.length && GLib.find_program_in_path('pkcon'))
+                        this._launchScript(5);
                     if (this._extensionSettings.get_boolean('new-packages'))
                         this._launchScript(SCRIPT.NEW);
                     if (this._extensionSettings.get_boolean('obsolete-packages'))
                         this._launchScript(SCRIPT.OBSOLETE);
                     this._launchScript(SCRIPT.RESIDUAL);
                     this._launchScript(SCRIPT.AUTOREMOVABLE);
-                } else {
-                    this._indicator.updatePackagesStatus(index);
+                } catch (err) {
+                    this._scanFailed(index, err, refreshed);
                 }
             });
         } catch (error) {
-            this._scanProcesses.delete(index);
-            if (index === SCRIPT.UPGRADES)
-                this._refreshFailed(error);
-            else if (index === 5)
-                this._indicator.updatePackagesStatus(SCRIPT.UPGRADES);
-            else {
-                this._setPackageList(index, []);
-                this._indicator.updatePackagesStatus(index);
-            }
+            this._stopScan(index);
+            this._scanFailed(index, error, refreshed);
+        }
+    }
+
+    _forgetScan(index) {
+        const timeout = this._scanTimeouts.get(index);
+        if (timeout)
+            GLib.source_remove(timeout);
+        this._scanTimeouts.delete(index);
+        this._scanProcesses.delete(index);
+    }
+
+    _stopScan(index) {
+        const proc = this._scanProcesses.get(index);
+        this._forgetScan(index);
+        if (proc) {
+            try { proc.force_exit(); } catch (error) { /* Already exited. */ }
+        }
+    }
+
+    _scanFailed(index, error, refreshed) {
+        if (this._destroyed)
+            return;
+        if (index === SCRIPT.UPGRADES && refreshed)
+            this._refreshFailed(error);
+        else if (index === SCRIPT.UPGRADES) {
+            this._indicator.updateStatus(STATUS.ERROR);
+            Main.notifyError(this._extensionName, error.message);
+        } else if (index === 5) {
+            // Keep the already rendered list; no security classification is
+            // better than an indefinitely spinning indicator.
+            this._indicator._urgentList = [];
+            console.warn(`${this._extensionName}: ${error.message}`);
+        } else {
+            this._setPackageList(index, []);
+            this._indicator.updatePackagesStatus(index);
         }
     }
 
@@ -919,7 +951,6 @@ export const UpdateManager = class UpdateManager {
         this._extensionSettings.set_double('last-check-date-double', now.getTime());
         if (this._isAutomaticCheck)
             this._extensionSettings.set_double('last-check-date-automatic-double', now.getTime());
-        this._isAutomaticCheck = false;
         this._indicator.lastCheckMenuItem.label.set_text(_('Last check: ') + date);
         this._indicator.lastCheckMenuItem.visible = true;
     }
@@ -938,6 +969,7 @@ export const UpdateManager = class UpdateManager {
 
     destroy() {
         this._destroyed = true;
+        this._clearRefreshTimeout();
         this._clearTerminalState();
         this._cancelScans();
         // Do not terminate an already authorized package transaction.

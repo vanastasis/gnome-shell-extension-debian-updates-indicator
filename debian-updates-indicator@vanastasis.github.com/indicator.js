@@ -268,12 +268,16 @@ export const DebianUpdatesIndicator = GObject.registerClass({
 
     showChecking(isChecking) {
         if (isChecking === true) {
+            this.visible = true;
             this._updateIcon.set_icon_name('emblem-synchronizing-symbolic');
-            this.checkNowMenuItem.reactive = false;
+            this.checkNowMenuItem.setSensitive(false);
             this.checkNowMenuItem.label.set_text(_('Checking'));
         } else {
-            this.checkNowMenuItem.reactive = true;
+            this.checkNowMenuItem.setSensitive(true);
             this.checkNowMenuItem.label.set_text(_('Check now'));
+            this._updateIcon.set_icon_name(this._updateList.length ?
+                (this._urgentList.length ? 'software-update-urgent-symbolic' : 'software-update-available-symbolic') :
+                'package-x-generic-symbolic');
         }
     }
 
@@ -284,15 +288,13 @@ export const DebianUpdatesIndicator = GObject.registerClass({
             this.updatesExpander.menu.removeAll();
 
             // Update the menu look:
-            this._cleanUpgradeLists();
+            const [displayUpdates, displayUrgent] = this._cleanUpgradeLists();
 
             let iconName = this._urgentList.length > 0
                 ? 'software-update-urgent-symbolic'
                 : 'software-update-available-symbolic';
-            let menuUpdateList = this._urgentList.length > 0
-                ? this._updateList.filter(pkg => {
-                    return this._urgentList.indexOf(pkg) < 0;
-                }) : this._updateList;
+            const menuUpdateList = displayUpdates.filter((pkg, index) =>
+                !this._urgentList.includes(this._updateList[index]));
 
             if (this._urgentList.length > 0) {
                 let header = new PopupMenu.PopupMenuItem('Important/Security');
@@ -300,7 +302,7 @@ export const DebianUpdatesIndicator = GObject.registerClass({
                 this.updatesExpander.menu.addMenuItem(header);
 
                 for (let i = 0; i < this._urgentList.length; i++) {
-                    let text = this._urgentList[i];
+                    let text = displayUrgent[i];
                     let item = this._createItem(text);
                     item.remove_style_class_name('debian-updates-indicator-item');
                     item.add_style_class_name('debian-updates-indicator-urgent-item');
@@ -436,8 +438,8 @@ export const DebianUpdatesIndicator = GObject.registerClass({
             let name = line.split('\t', 2)[0];
             maxWidth = name.length > maxWidth ? name.length : maxWidth;
         });
-        this._updateList = this._cleanUpgradeList(this._updateList, maxWidth);
-        this._urgentList = this._cleanUpgradeList(this._urgentList, maxWidth);
+        return [this._cleanUpgradeList(this._updateList, maxWidth),
+            this._cleanUpgradeList(this._urgentList, maxWidth)];
     }
 
     _cleanUpgradeList(list, maxWidth) {
@@ -459,7 +461,7 @@ export const DebianUpdatesIndicator = GObject.registerClass({
                 let spacing = '\t';
                 for (let i = 0; i < nTabs; i++)
                     spacing += '\t';
-                return chunks[0] + spacing + chunks[1];
+                return chunks.length > 1 ? chunks[0] + spacing + chunks[1] : chunks[0];
             });
         }
     }

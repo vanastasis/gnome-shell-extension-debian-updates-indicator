@@ -409,3 +409,18 @@ msgstr ""
 msgid "Terminal prefix (empty = automatic)"
 msgstr ""
 
+msgid "No refresh command configured. Install PackageKit or set a custom refresh command."
+msgstr ""
+
+msgid "The custom check command changes packages. Use a refresh-only command, such as pkgcli refresh or pkexec apt update."
+msgstr ""
+
+msgid "Repository refresh timed out. Check PackageKit, authentication, network and APT locks."
+msgstr ""
+
+msgid "Package list scan timed out."
+msgstr ""
+
+msgid "Automatically uses pkcon or pkgcli to refresh repository metadata. A custom command replaces this default for both manual and scheduled checks. Use refresh-only commands, for example pkexec apt update. Do not use pkgcli update."
+msgstr ""
+

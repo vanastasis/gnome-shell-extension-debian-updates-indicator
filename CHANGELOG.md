@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.7.0.10 — 2026-11-28
+
+- Fix stuck checking indicator when PackageKit refresh or optional security classification stalls.
+- Run the actual configured refresh command for both Check now and scheduled checks; use pkcon refresh force or pkgcli refresh by default.
+- Reject common install, upgrade and removal commands mistakenly configured as a refresh command.
+- Bound repository refresh to five minutes and package-list queries to one minute; report failures without recording a false successful check.
+- Keep refresh and primary scan locked together, redraw updates before optional urgency classification and preserve unformatted package data.
+- Honour hours, days, weeks and zero (disabled); defer busy scheduled checks and retry failed scheduled checks without waiting a full interval.
+- Add mocked refresh lifecycle and scheduling regression tests; retain declared GNOME Shell 48–51 compatibility.
+
 ## 2.7.0.9 — 2026-11-28
 
 - Fix PackageKit executable detection, report refresh failures, and update the last-check timestamp only after a successful refresh and scan.

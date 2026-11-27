@@ -76,7 +76,7 @@
     </key>
     <key type="b" name="use-custom-cmd">
       <default>false</default>
-      <summary>Allow checks for updates without a passwrd</summary>
+      <summary>Use a custom repository refresh command</summary>
     </key>
     <key type="s" name="check-cmd-custom">
       <default>"pkexec apt update"</default>

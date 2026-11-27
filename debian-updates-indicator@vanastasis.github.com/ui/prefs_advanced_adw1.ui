@@ -143,7 +143,7 @@
         <child>
           <object class="AdwSwitchRow" id="use_custom_cmd_switch">
             <property name="title" translatable="yes">Use a custom command to check for updates</property>
-            <property name="subtitle" translatable="yes">The default command is &quot;pkcon refresh&quot;, which uses packagekit with the apt backend. You can define a custom command below, to be executed using pkexec.</property>
+            <property name="subtitle" translatable="yes">Automatically uses pkcon or pkgcli to refresh repository metadata. A custom command replaces this default for both manual and scheduled checks. Use refresh-only commands, for example pkexec apt update. Do not use pkgcli update.</property>
           </object>
         </child>
         <child>
