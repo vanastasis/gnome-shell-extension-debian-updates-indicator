@@ -134,6 +134,14 @@ From the repository root, run `./publish-release.sh VERSION release-notes.md` af
 
 Publishing requires Node.js, gettext, GLib schema utilities and Shexli (on PATH or in `~/.venvs/shexli`). The publisher saves validation reports under `zip-files/validation/`. New strings are included in the translation template; existing translations are preserved and untranslated strings fall back to English. It blocks on non-allowlisted Shexli errors; any other findings require explicit acknowledgment. The known `EGO-M-004` finding must be reviewed rather than automatically ignored.
 
+### Shexli 0.2.1 and GNOME 51
+
+The maintainer reproduced `EGO-M-004` using temporary copies of the 2.7.0.10 submission archive: GNOME 48, 49 and 50 passed individually and together; GNOME 51 alone triggered the finding. The installed Shexli 0.2.1 source confirmed that `shexli/analyzer/rules/metadata.py` contains the hardcoded condition `if major > 50:`.
+
+A maintainer-local correction to `if major > 51:`, with the original analyzer file backed up, produced **0 findings, 0 errors and 0 warnings** on the unchanged 2.7.0.10 EGO archive. This is a local analyzer correction, not a change to the extension or a bypass of the rule. Versions above 51 and the rule's other metadata checks remain subject to validation. Prefer an upstream Shexli release that corrects the limit when available; an analyzer upgrade may replace the local patch.
+
+The published extension ZIPs and GNOME 48–51 declarations remain unchanged. The local clean report does not establish approval by GNOME Extensions or runtime compatibility on every declared Shell version; the website's independent analyzer may still flag the older limit. Do not automatically suppress other findings.
+
 ## Changes and support
 
 - [Changelog](CHANGELOG.md)
