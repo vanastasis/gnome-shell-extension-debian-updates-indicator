@@ -25,6 +25,51 @@ A GNOME Shell panel extension for monitoring and managing APT package updates on
 - GNOME Shell 48–51 panel-layout compatibility and corrected timer lifecycle.
 - Existing settings and translations retained; new strings may appear in English until translated.
 
+## Screenshots
+
+### Desktop overview
+
+![Debian APT Updates Indicator on the GNOME desktop, showing the panel menu and Advanced preferences](assets/Screenshot_01.webp)
+
+The panel menu brings together the available updates, **Apply updates**, **Remove unused packages**, **Check now**, the last successful check time and access to Settings. Update and cleanup actions are separate; their availability reflects the detected package state.
+
+### Preferences — animated preview
+
+<p align="center">
+  <img src="assets/Screenshot_Settings.webp" alt="Animated preview cycling through Basic, Advanced, Packages and Ignore preferences" width="480">
+</p>
+
+### Settings windows
+
+<table>
+  <tr>
+    <th width="50%">Basic</th>
+    <th width="50%">Advanced</th>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><a href="assets/Screenshot_02.webp"><img src="assets/Screenshot_02.webp" alt="Basic preferences" width="340"></a></td>
+    <td align="center" valign="top"><a href="assets/Screenshot_03.webp"><img src="assets/Screenshot_03.webp" alt="Advanced preferences" width="340"></a></td>
+  </tr>
+  <tr>
+    <td valign="top">Set automatic refresh intervals in hours, days or weeks (zero disables automatic checks). Configure version-number display, security highlighting, indicator visibility, notifications and keyboard shortcuts.</td>
+    <td valign="top">Select independent update and cleanup methods using APT, APT-get, Nala or custom commands. Configure optional residual configuration purging, terminal settings and the repository refresh command. Reset command preferences when needed.</td>
+  </tr>
+  <tr>
+    <th>Packages</th>
+    <th>Ignore</th>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><a href="assets/Screenshot_04.webp"><img src="assets/Screenshot_04.webp" alt="Package category preferences" width="340"></a></td>
+    <td align="center" valign="top"><a href="assets/Screenshot_05.webp"><img src="assets/Screenshot_05.webp" alt="Ignored package list preferences" width="340"></a></td>
+  </tr>
+  <tr>
+    <td valign="top">Choose which package categories appear in the panel menu: new repository packages, local or obsolete packages, residual configuration files and autoremovable packages.</td>
+    <td valign="top">Manage packages excluded from the extension's displayed update list. This display filter is not an APT package hold and does not prevent a package manager from upgrading a package.</td>
+  </tr>
+</table>
+
+Select an individual screenshot to view it at full size. These screenshots illustrate the interface and example settings; the exact wording may differ slightly from the latest release. Use refresh-only commands for automatic checks (for example, `pkgcli refresh`, not `pkgcli update`).
+
 ## Repository refresh
 
 **Check now** and scheduled checks execute the same refresh command selected in Advanced settings. With custom refresh disabled, the extension uses `pkcon --plain refresh force` if available, otherwise `pkgcli refresh`. A custom refresh command is used as entered, including any explicitly configured authentication; `pkgcli update` installs updates and is not a refresh command. A successful refresh followed by a successful local APT scan records Last check; local cache changes and initial scans do not. A five-minute refresh timeout and one-minute scan timeout prevent an indefinitely checking indicator; stopping the client does not guarantee that PackageKit's backend or an arbitrary custom command has stopped. A busy scheduled check is deferred 30 seconds, and failed automatic checks retry after up to five minutes. Zero disables scheduled checks. Optional urgency classification is currently available through pkcon and does not block the normal update list.
