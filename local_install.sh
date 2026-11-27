@@ -1,9 +1,9 @@
 #!/bin/bash
 ##################################################################################
-# This file is part of Debian Linux Updates Indicator.
+# This helper is maintained for Debian APT Updates Indicator (vanastasis fork).
 # https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator
 #
-# local:install.sh
+# local_install.sh
 #
 # Copyright (c) 2023-2026 Gianni Lerro {glerro} ~ <glerro@pm.me>
 #

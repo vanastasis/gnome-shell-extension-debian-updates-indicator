@@ -1,3 +1,4 @@
+# Build configuration for Debian APT Updates Indicator (vanastasis fork).
 extension_ui = files(
     'prefs_basic_adw1.ui',
     'prefs_advanced_adw1.ui',

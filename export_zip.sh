@@ -1,6 +1,6 @@
 #!/bin/bash
 ##################################################################################
-# This file is part of Debian Linux Updates Indicator.
+# This helper is maintained for Debian APT Updates Indicator (vanastasis fork).
 # https://github.com/vanastasis/gnome-shell-extension-debian-updates-indicator
 #
 # export_zip.sh

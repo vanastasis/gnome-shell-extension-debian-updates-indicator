@@ -1,3 +1,4 @@
+# Build configuration for Debian APT Updates Indicator (vanastasis fork).
 extension_schemas = files('org.gnome.shell.extensions.debian-updates-indicator.gschema.xml')
 
 glib_compile_schemas_exe = find_program('glib-compile-schemas')

@@ -1,3 +1,4 @@
+# Build configuration for Debian APT Updates Indicator (vanastasis fork).
 extension_sources = files(
     'extension.js',
     'ignoreListBox.js',
