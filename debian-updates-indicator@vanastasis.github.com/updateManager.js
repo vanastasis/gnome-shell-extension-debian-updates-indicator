@@ -71,10 +71,15 @@ export const UpdateManager = class UpdateManager {
         this._initialTimeoutId = null;
         this._cleanupProcess = null;
 
-        if (!GLib.file_test(CHECK_CMD, GLib.FileTest.EXISTS)) {
-            STOCK_CHECK_CMD = STOCK_CHECK_CMD_NEW;
-            CHECK_CMD = STOCK_CHECK_CMD;
-        }
+        this._destroyed = false;
+        this._scanProcesses = new Map();
+        this._refreshProcess = null;
+        this._upgradeProcess_sourceId = null;
+        this._cachePath = GLib.build_filenamev([GLib.get_user_cache_dir(), extension.uuid]);
+        this._initializing = true;
+        STOCK_CHECK_CMD = GLib.find_program_in_path('pkcon') ? STOCK_CHECK_CMD_OLD :
+            GLib.find_program_in_path('pkgcli') ? STOCK_CHECK_CMD_NEW : '';
+        CHECK_CMD = STOCK_CHECK_CMD;
 
         // Create a Gio.Cancellable for use with Gio.SubProcess
         this._cancellable = new Gio.Cancellable();
@@ -102,10 +107,8 @@ export const UpdateManager = class UpdateManager {
         this._netMonitor = new Monitors.NetworkMonitor(this);
         this._dirMonitor = new Monitors.DirectoryMonitor(this);
 
-        // Initial run. We wait 30 seconds before listing the upgrades, this:
-        //  - allows a smoother initialization
-        //  - lets the async calls finish in case of a quick disable/enable loop
-        let initialRunTimeout = 30;
+        // Read local package state promptly without refreshing repositories.
+        let initialRunTimeout = 2;
         this._initialTimeoutId = GLib.timeout_add_seconds(
             GLib.PRIORITY_DEFAULT,
             initialRunTimeout,
@@ -142,7 +145,7 @@ export const UpdateManager = class UpdateManager {
     _checkCMD() {
         if (this._extensionSettings.get_boolean('use-custom-cmd') &&
             this._extensionSettings.get_string('check-cmd-custom') !== '')
-            CHECK_CMD = `/usr/bin/${this._extensionSettings.get_string('check-cmd-custom')}`;
+            CHECK_CMD = this._extensionSettings.get_string('check-cmd-custom').trim();
         else
             CHECK_CMD = STOCK_CHECK_CMD;
     }
@@ -202,8 +205,10 @@ export const UpdateManager = class UpdateManager {
                     this._initTimeoutId = null;
                     if (!this._indicator)
                         return GLib.SOURCE_REMOVE;
-                    this._isAutomaticCheck = true;
-                    this._checkNetwork();
+                    if (!this._operationBusy()) {
+                        this._isAutomaticCheck = true;
+                        this._checkNetwork();
+                    }
                     this._checkInterval();
                     return GLib.SOURCE_REMOVE;
                 });
@@ -229,8 +234,10 @@ export const UpdateManager = class UpdateManager {
                         this._checkTimeoutId = null;
                         return GLib.SOURCE_REMOVE;
                     }
-                    this._isAutomaticCheck = true;
-                    this._checkNetwork();
+                    if (!this._operationBusy()) {
+                        this._isAutomaticCheck = true;
+                        this._checkNetwork();
+                    }
                     return GLib.SOURCE_CONTINUE;
                 });
         }
@@ -445,7 +452,7 @@ export const UpdateManager = class UpdateManager {
     }
 
     _applyUpdates() {
-        if (!this._indicator || !this._extensionSettings || this._upgradeProcess_sourceId || this._cleanupProcess)
+        if (!this._indicator || !this._extensionSettings || this._operationBusy())
             return;
         try {
             const option = this._extensionSettings.get_int('update-cmd-options');
@@ -521,7 +528,7 @@ export const UpdateManager = class UpdateManager {
         const hasResidual = this._indicator._residualPackagesList.length > 0;
         if (!hasUnused && !(purge && hasResidual))
             return;
-        if (this._upgradeProcess_sourceId || this._cleanupProcess) {
+        if (this._operationBusy()) {
             Main.notify(this._extensionName, _('Another package operation is running.'));
             return;
         }
@@ -572,11 +579,29 @@ export const UpdateManager = class UpdateManager {
         }
     }
 
+    _operationBusy() {
+        return this._destroyed || !!this._networkPending || !!this._refreshProcess || !!this._cleanupProcess;
+    }
+
+    _cancelScans() {
+        for (const proc of this._scanProcesses.values()) {
+            try {
+                proc.force_exit();
+            } catch (error) {
+                // Process may have exited already.
+            }
+        }
+        this._scanProcesses.clear();
+    }
+
     _runPackageOperation(argv) {
+        this._cancelScans();
         const proc = Gio.Subprocess.new(argv, Gio.SubprocessFlags.NONE);
         this._cleanupProcess = proc; // Shared manual-operation guard.
         this._upgradeProcess_sourceId = 1;
         this._indicator.removeUnusedMenuItem.setSensitive(false);
+        this._indicator.applyUpdatesMenuItem.setSensitive(false);
+        this._indicator.checkNowMenuItem.setSensitive(false);
         this._dirMonitor.stop();
         proc.wait_check_async(this._cancellable, (child, result) => {
             let error = null;
@@ -589,6 +614,7 @@ export const UpdateManager = class UpdateManager {
                 return;
             this._cleanupProcess = null;
             this._upgradeProcess_sourceId = null;
+            this._indicator.checkNowMenuItem.setSensitive(true);
             // Keep cleanup disabled until the fresh package scan finishes.
             this._indicator.removeUnusedMenuItem.setSensitive(false);
             if (error)
@@ -607,61 +633,73 @@ export const UpdateManager = class UpdateManager {
      */
 
     _checkNetwork() {
-        if (!this._indicator || !this._netMonitor || this._upgradeProcess_sourceId)
+        if (this._operationBusy() || !this._netMonitor)
             return;
+        this._networkPending = true;
         this._indicator.showChecking(true);
+        this._indicator.applyUpdatesMenuItem.setSensitive(false);
+        this._indicator.removeUnusedMenuItem.setSensitive(false);
         this._netMonitor.networkTimeout();
     }
 
     networkFailed() {
-        if (!this._indicator || this._cleanupProcess)
+        if (this._destroyed || !this._networkPending)
             return;
+        this._networkPending = false;
+        this._isAutomaticCheck = false;
         this._indicator.showChecking(false);
         this._indicator.updateStatus(STATUS.NO_INTERNET);
+        this._indicator._updateCleanupSensitivity();
     }
 
     checkUpdates() {
-        if (!this._indicator || !this._dirMonitor || this._upgradeProcess_sourceId)
+        if (this._destroyed || !this._networkPending)
             return;
-
-        // Stop the dir monitor to prevent it from updating again right after
-        // the update
+        this._networkPending = false;
+        this._cancelScans();
         this._dirMonitor.stop();
-
-        // Run asynchronously, to avoid  shell freeze - even for a 1s check
-        // Parse check command line
-        let [parseok, argvp] = GLib.shell_parse_argv(CHECK_CMD);
-        if (!parseok)
-            throw new Error('Check cmd parse error');
-
-        let proc = new Gio.Subprocess({argv: argvp, flags: Gio.SubprocessFlags.STDOUT_PIPE});
-        proc.init(this._cancellable);
-
-        let cancelId = 0;
-        if (this._cancellable instanceof Gio.Cancellable)
-            cancelId = this._cancellable.connect(() => proc.force_exit());
-
         try {
-            // Asynchronously call the output handler when script output is ready
-            proc.communicate_utf8_async(null, this._cancellable, this._checkUpdatesEnd.bind(this));
-
+            if (!CHECK_CMD)
+                throw new Error(_('Install PackageKit or configure a custom refresh command in Advanced settings.'));
+            const argv = this._parsePackageCommand(CHECK_CMD);
+            const proc = Gio.Subprocess.new(argv, Gio.SubprocessFlags.STDERR_PIPE);
+            this._refreshProcess = proc;
             this._upgradeProcess_sourceId = 1;
-        } catch (err) {
-            console.log(`${this._extensionName} - ${err.message}`);
-            this._indicator.showChecking(false);
-            this._indicator.updateStatus(STATUS.ERROR);
-        } finally {
-            if (cancelId > 0)
-                this._cancellable.disconnect(cancelId);
+            proc.communicate_utf8_async(null, this._cancellable, (child, result) => {
+                let error = null;
+                try {
+                    const [, , stderr] = child.communicate_utf8_finish(result);
+                    if (!child.get_successful())
+                        throw new Error(stderr?.trim() || _('Package refresh failed.'));
+                } catch (err) {
+                    error = err;
+                }
+                if (this._destroyed || this._refreshProcess !== proc)
+                    return;
+                this._refreshProcess = null;
+                this._upgradeProcess_sourceId = null;
+                this._dirMonitor.start();
+                if (error)
+                    this._refreshFailed(error);
+                else
+                    this._launchScript(SCRIPT.UPGRADES, true);
+            });
+        } catch (error) {
+            this._refreshProcess = null;
+            this._upgradeProcess_sourceId = null;
+            this._dirMonitor.start();
+            this._refreshFailed(error);
         }
     }
 
-    _checkUpdatesEnd() {
-        // Free resources
-        this._upgradeProcess_sourceId = null;
-
-        // Update indicator
-        this._launchScript(SCRIPT.UPGRADES);
+    _refreshFailed(error) {
+        if (this._destroyed)
+            return;
+        this._isAutomaticCheck = false;
+        this._indicator.showChecking(false);
+        this._indicator.updateStatus(STATUS.ERROR);
+        this._indicator._updateCleanupSensitivity();
+        Main.notifyError(this._extensionName, error.message);
     }
 
     /* Extra packages functions:
@@ -671,179 +709,125 @@ export const UpdateManager = class UpdateManager {
      *     _lastCheck
      */
 
-    _launchScript(index) {
-        if (!this._indicator || this._cleanupProcess)
+    _launchScript(index, refreshed = false) {
+        if (this._operationBusy())
             return;
+        if (this._scanProcesses.has(index)) {
+            if (!refreshed)
+                return;
+            this._scanProcesses.get(index).force_exit();
+            this._scanProcesses.delete(index);
+        }
         if (index === SCRIPT.AUTOREMOVABLE || index === SCRIPT.RESIDUAL)
             this._indicator.removeUnusedMenuItem.setSensitive(false);
-
-        let scriptNames = [
-            'get-updates',
-            'new',
-            'obsolete',
-            'residual',
-            'autoremovable',
-        ];
-
-        // Run asynchronously, to avoid shell freeze - even for a 1s check
-
-        let path = this._extensionPath;
-        let script = [
-            '/bin/bash',
-            `${path}/scripts/${scriptNames[index]}.sh`,
-            this._initializing && index !== SCRIPT.AUTOREMOVABLE && index !== SCRIPT.RESIDUAL ? '1' : '0',
-            `${path}/Temp/`,
-        ];
-
-        let proc = new Gio.Subprocess({argv: script, flags: Gio.SubprocessFlags.STDOUT_PIPE});
-        proc.init(this._cancellable);
-
-        let cancelId = 0;
-        if (this._cancellable instanceof Gio.Cancellable)
-            cancelId = this._cancellable.connect(() => proc.force_exit());
-
-        try {
-            // Asynchronously call the output handler when script output is ready
-            proc.communicate_utf8_async(null, this._cancellable, this._packagesRead.bind(this, index));
-        } catch (err) {
-            console.log(`${this._extensionName} - Failed to run ${scriptNames[index]}.sh - ${err.message}`);
-            if (index === SCRIPT.UPGRADES) {
-                this._indicator.showChecking(false);
-                this._indicator.updateStatus(STATUS.ERROR);
-            }
-        } finally {
-            if (cancelId > 0)
-                this._cancellable.disconnect(cancelId);
-        }
-    }
-
-    _packagesRead(index, proc, result) {
-        // Reset the new packages list
-        let [, output] = proc.communicate_utf8_finish(result);
-        let packagesList = output.split('\n');
-        packagesList.pop(); // Last item is empty
-
-        // Since this runs async, the indicator might have been destroyed!
-        if (this._indicator) {
-            if (index === SCRIPT.UPGRADES) {
-                packagesList = this._filterList(packagesList);
-                this._indicator._updateList = packagesList;
-            } else if (index === SCRIPT.NEW) {
-                this._indicator._newPackagesList = packagesList;
-            } else if (index === SCRIPT.OBSOLETE) {
-                this._indicator._obsoletePackagesList = packagesList;
-            } else if (index === SCRIPT.RESIDUAL) {
-                this._indicator._residualPackagesList = packagesList;
-            } else if (index === SCRIPT.AUTOREMOVABLE) {
-                this._indicator._autoremovablePackagesList = packagesList;
-            }
-        }
-
-        this._packagesEnd(index);
-    }
-
-    _packagesEnd(index) {
-        // Since this runs async, the indicator might have been destroyed!
-        if (this._indicator && !this._cleanupProcess) {
-            // Update indicator
-            let commandExists = GLib.file_test(STOCK_CHECK_CMD_OLD, GLib.FileTest.EXISTS);
-            if (index === SCRIPT.UPGRADES && this._extensionSettings.get_boolean('show-critical-updates') && commandExists) {
-                this._checkUrgency();
-            } else {
-                this._indicator.updatePackagesStatus(index);
-                this._indicator._urgentList = [];
-            }
-
-            if (index === SCRIPT.UPGRADES) {
-                // Update indicator
-                this._indicator.showChecking(false);
-
-                // Update time on menu
-                this._lastCheck();
-
-                // Launch other checks
-                if (this._extensionSettings.get_boolean('new-packages'))
-                    this._launchScript(SCRIPT.NEW);
-                if (this._extensionSettings.get_boolean('obsolete-packages'))
-                    this._launchScript(SCRIPT.OBSOLETE);
-                // Always detect residuals, even when their list is hidden.
-                this._launchScript(SCRIPT.RESIDUAL);
-                // Always detect unused packages, even when their list is hidden.
-                this._launchScript(SCRIPT.AUTOREMOVABLE);
-                this._initializing = false;
-
-                this._dirMonitor.start();
-            }
-        }
-    }
-
-    _checkUrgency() {
-        let path = this._extensionPath;
-        let script = ['/bin/bash', `${path}/scripts/urgency.sh`];
-
-        let proc = new Gio.Subprocess({argv: script, flags: Gio.SubprocessFlags.STDOUT_PIPE});
-        proc.init(this._cancellable);
-
-        let cancelId = 0;
-        if (this._cancellable instanceof Gio.Cancellable)
-            cancelId = this._cancellable.connect(() => proc.force_exit());
-
-        try {
-            // Asynchronously call the output handler when script output is ready
-            proc.communicate_utf8_async(null, this._cancellable, this._checkUrgencyRead.bind(this));
-        } catch (err) {
-            console.log(`${this._extensionName} - Failed to run urgency.sh - ${err.message}`);
-        } finally {
-            if (cancelId > 0)
-                this._cancellable.disconnect(cancelId);
-        }
-    }
-
-    _checkUrgencyRead(proc, result) {
-        // Reset the new packages list
-        let [, output] = proc.communicate_utf8_finish(result);
-        let urgencyList = output.split('\n');
-        urgencyList.pop(); // Last item is empty
-
-        let cleanUrgentList = this._indicator._updateList.filter(pkg => {
-            for (let i = 0; i < urgencyList.length; i++) {
-                // Only get the package name, in case the version is included
-                let pkgName = pkg.split('\t', 2)[0];
-                if (urgencyList[i].indexOf(`${pkgName}-`) !== -1)
-                    return true;
-            }
-            return false;
-        });
-
-        this._indicator._urgentList = cleanUrgentList;
-        this._indicator.updatePackagesStatus(SCRIPT.UPGRADES);
-    }
-
-    _lastCheck() {
-        if (this._dontUpdateDate) {
-            this._dontUpdateDate = false;
+        const names = ['get-updates', 'new', 'obsolete', 'residual', 'autoremovable', 'urgency'];
+        const name = names[index];
+        if (index === SCRIPT.OBSOLETE && !GLib.find_program_in_path('apt-show-versions')) {
+            this._indicator._obsoletePackagesList = [];
+            this._indicator.updatePackagesStatus(index);
             return;
         }
-        let date;
-        let dateFormat = '%a %b %d, %H:%M';
-
-        if (this._initializing) {
-            let lastCheck = new Date(this._extensionSettings.get_double('last-check-date-double'));
-            date = formatDateWithCFormatString(lastCheck, dateFormat);
-        } else {
-            let now = new Date();
-            date = formatDateWithCFormatString(now, dateFormat);
-            this._extensionSettings.set_double('last-check-date-double', now);
-            if (this._isAutomaticCheck) {
-                this._extensionSettings.set_double('last-check-date-automatic-double', now);
-                this._isAutomaticCheck = false;
+        const script = ['/bin/bash', `${this._extensionPath}/scripts/${name}.sh`, '0', `${this._cachePath}/`];
+        try {
+            const proc = Gio.Subprocess.new(script,
+                Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_PIPE);
+            this._scanProcesses.set(index, proc);
+            proc.communicate_utf8_async(null, this._cancellable, (child, result) => {
+                let output = '', error = null;
+                try {
+                    const [, stdout, stderr] = child.communicate_utf8_finish(result);
+                    if (!child.get_successful())
+                        throw new Error(stderr?.trim() || _('Package list scan failed.'));
+                    output = stdout || '';
+                } catch (err) {
+                    error = err;
+                }
+                if (this._destroyed || this._scanProcesses.get(index) !== proc)
+                    return;
+                this._scanProcesses.delete(index);
+                if (this._operationBusy())
+                    return;
+                if (error) {
+                    if (index === SCRIPT.UPGRADES)
+                        this._refreshFailed(error);
+                    else if (index === 5) {
+                        this._indicator._urgentList = [];
+                        this._indicator.updatePackagesStatus(SCRIPT.UPGRADES);
+                    } else {
+                        this._setPackageList(index, []);
+                        this._indicator.updatePackagesStatus(index);
+                    }
+                    return;
+                }
+                const list = output.split('\n').filter(line => line.trim());
+                if (index === 5) {
+                    this._indicator._urgentList = this._indicator._updateList.filter(pkg =>
+                        list.some(line => line.includes(`${pkg.split('\t', 2)[0]}-`)));
+                    this._indicator.updatePackagesStatus(SCRIPT.UPGRADES);
+                    return;
+                }
+                this._setPackageList(index, list);
+                if (index === SCRIPT.UPGRADES) {
+                    this._indicator._urgentList = [];
+                    if (this._extensionSettings.get_boolean('show-critical-updates') &&
+                        GLib.find_program_in_path('pkcon'))
+                        this._launchScript(5);
+                    else
+                        this._indicator.updatePackagesStatus(index);
+                    this._indicator.showChecking(false);
+                    if (refreshed)
+                        this._lastCheck();
+                    else if (this._initializing)
+                        this._restoreLastCheck();
+                    this._initializing = false;
+                    this._dontUpdateDate = false;
+                    if (this._extensionSettings.get_boolean('new-packages'))
+                        this._launchScript(SCRIPT.NEW);
+                    if (this._extensionSettings.get_boolean('obsolete-packages'))
+                        this._launchScript(SCRIPT.OBSOLETE);
+                    this._launchScript(SCRIPT.RESIDUAL);
+                    this._launchScript(SCRIPT.AUTOREMOVABLE);
+                } else {
+                    this._indicator.updatePackagesStatus(index);
+                }
+            });
+        } catch (error) {
+            this._scanProcesses.delete(index);
+            if (index === SCRIPT.UPGRADES)
+                this._refreshFailed(error);
+            else if (index === 5)
+                this._indicator.updatePackagesStatus(SCRIPT.UPGRADES);
+            else {
+                this._setPackageList(index, []);
+                this._indicator.updatePackagesStatus(index);
             }
         }
+    }
 
-        if (date !== '') {
+    _setPackageList(index, list) {
+        const fields = ['_updateList', '_newPackagesList', '_obsoletePackagesList',
+            '_residualPackagesList', '_autoremovablePackagesList'];
+        this._indicator[fields[index]] = index === SCRIPT.UPGRADES ? this._filterList(list) : list;
+    }
+
+    _restoreLastCheck() {
+        const time = this._extensionSettings.get_double('last-check-date-double');
+        if (time > 0) {
+            const date = formatDateWithCFormatString(new Date(time), '%a %b %d, %H:%M');
             this._indicator.lastCheckMenuItem.label.set_text(_('Last check: ') + date);
             this._indicator.lastCheckMenuItem.visible = true;
         }
+    }
+
+    _lastCheck() {
+        const now = new Date();
+        const date = formatDateWithCFormatString(now, '%a %b %d, %H:%M');
+        this._extensionSettings.set_double('last-check-date-double', now.getTime());
+        if (this._isAutomaticCheck)
+            this._extensionSettings.set_double('last-check-date-automatic-double', now.getTime());
+        this._isAutomaticCheck = false;
+        this._indicator.lastCheckMenuItem.label.set_text(_('Last check: ') + date);
+        this._indicator.lastCheckMenuItem.visible = true;
     }
 
     _filterList(packagesList) {
@@ -859,6 +843,11 @@ export const UpdateManager = class UpdateManager {
     }
 
     destroy() {
+        this._destroyed = true;
+        this._cancelScans();
+        // Do not terminate an already authorized package transaction.
+        this._refreshProcess = null;
+        this._cleanupProcess = null;
         // Remove timeouts
         if (this._initTimeoutId) {
             GLib.source_remove(this._initTimeoutId);

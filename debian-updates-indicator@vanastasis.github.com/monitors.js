@@ -34,77 +34,37 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import {gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
-
 export const NetworkMonitor = class NetworkMonitor {
     constructor(updateManager) {
         this._updateManager = updateManager;
-        this._extension = this._updateManager._extension;
-        this._extensionName = this._extension.metadata.name;
-
-        // We check for the network status before trying to update apt-cache
         this._network_monitor = Gio.network_monitor_get_default();
-
-        this._networkTimeoutId = 0;
-
-        this._url = 'https://ftp.debian.org';
-        this._address = Gio.NetworkAddress.parse_uri(this._url, 80);
+        this._sourceId = 0;
     }
 
     networkTimeout() {
-        if (this._networkTimeoutId) {
-            GLib.source_remove(this._networkTimeoutId);
-            this._networkTimeoutId = 0;
-        }
-
-        // Timeout in seconds. We allow 10 seconds for the network check to
-        // finish. If it doesn't, we assume the network is down.
-        let timeout = 10;
-        this._networkTimeoutId = GLib.timeout_add_seconds(
-            GLib.PRIORITY_DEFAULT,
-            timeout,
-            () => {
-                this._updateManager.networkFailed();
-                this._networkTimeoutId = 0;
-                return false;
+        // Let the actual repository refresh determine reachability.
+        // A hard-coded Debian mirror is not a valid test for every distribution.
+        if (this._sourceId)
+            GLib.source_remove(this._sourceId);
+        this._sourceId = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+            this._sourceId = 0;
+            if (this._updateManager) {
+                if (this._network_monitor.network_available)
+                    this._updateManager.checkUpdates();
+                else
+                    this._updateManager.networkFailed();
             }
-        );
-
-        this._checkConnectionState();
-    }
-
-    _checkConnectionState() {
-        let cancellable = Gio.Cancellable.new();
-        try {
-            this._network_monitor.can_reach_async(this._address, cancellable, this._asyncReadyCallback.bind(this));
-        } catch (err) {
-            let title = _('Can not connect to %s').format(this._url);
-            console.log(`${this._extensionName} - ${title} - ${err.message}`);
-        }
-    }
-
-    _asyncReadyCallback(nm, res) {
-        try {
-            this._network_monitor.can_reach_finish(res);
-        } catch (err) {
-            let title = _('Can not connect to %s').format(this._url);
-            console.log(`${this._extensionName} - ${title} - ${err.message}`);
-        }
-
-        if (this._networkTimeoutId) {
-            GLib.source_remove(this._networkTimeoutId);
-            this._networkTimeoutId = 0;
-        }
-
-        // If the network is up, perform update check
-        this._updateManager.checkUpdates();
+            return GLib.SOURCE_REMOVE;
+        });
     }
 
     destroy() {
-        if (this._networkTimeoutId) {
-            GLib.source_remove(this._networkTimeoutId);
-            this._networkTimeoutId = 0;
+        if (this._sourceId) {
+            GLib.source_remove(this._sourceId);
+            this._sourceId = 0;
         }
+        this._updateManager = null;
+        this._network_monitor = null;
     }
 };
 
@@ -117,29 +77,25 @@ export const DirectoryMonitor = class DirectoryMonitor {
 
     start() {
         this.stop();
-
-        let directory = '/var/lib/apt/lists';
-        this._apt_dir = Gio.file_new_for_path(directory);
-        this._apt_monitor = this._apt_dir.monitor_directory(Gio.FileMonitorFlags.NONE, null);
-        this._apt_monitorId = this._apt_monitor.connect('changed', this._onFolderChanged.bind(this));
-
-        directory = '/var/lib/dpkg';
-        this._dpkg_dir = Gio.file_new_for_path(directory);
-        this._dpkg_monitor = this._dpkg_dir.monitor_directory(Gio.FileMonitorFlags.NONE, null);
-        this._dpkg_monitorId = this._dpkg_monitor.connect('changed', this._onFolderChanged.bind(this));
+        // Missing directories on a non-Debian host must not crash GNOME Shell.
+        this._monitors = [];
+        for (const path of ['/var/lib/apt/lists', '/var/lib/dpkg']) {
+            try {
+                const monitor = Gio.File.new_for_path(path).monitor_directory(Gio.FileMonitorFlags.NONE, null);
+                const id = monitor.connect('changed', this._onFolderChanged.bind(this));
+                this._monitors.push([monitor, id]);
+            } catch (error) {
+                // Manual refresh remains available.
+            }
+        }
     }
 
     stop() {
-        if (this._apt_monitorId) {
-            this._apt_monitor.disconnect(this._apt_monitorId);
-            this._apt_monitorId = null;
+        for (const [monitor, id] of this._monitors || []) {
+            monitor.disconnect(id);
+            monitor.cancel();
         }
-
-        if (this._dpkg_monitorId) {
-            this._dpkg_monitor.disconnect(this._dpkg_monitorId);
-            this._dpkg_monitorId = null;
-        }
-
+        this._monitors = [];
         if (this._folderMonitorId) {
             GLib.source_remove(this._folderMonitorId);
             this._folderMonitorId = null;
@@ -155,16 +111,16 @@ export const DirectoryMonitor = class DirectoryMonitor {
             GLib.PRIORITY_DEFAULT,
             timeout,
             () => {
-                let checkUpgrades = 0;
-                this._updateManager._dontUpdateDate = true;
-                this._updateManager._launchScript(checkUpgrades);
                 this._folderMonitorId = null;
-                return false;
+                if (this._updateManager)
+                    this._updateManager._launchScript(0);
+                return GLib.SOURCE_REMOVE;
             });
     }
 
     destroy() {
         this.stop();
+        this._updateManager = null;
     }
 };
 

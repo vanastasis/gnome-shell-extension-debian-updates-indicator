@@ -212,6 +212,8 @@ export const DebianUpdatesIndicator = GObject.registerClass({
     destroy() {
         // Disconnect global signals
         this._signalsHandler.destroy();
+        this._notifySource?.destroy();
+        this._notifySource = null;
 
         this._box.destroy();
 
@@ -238,8 +240,7 @@ export const DebianUpdatesIndicator = GObject.registerClass({
      */
 
     _checkShowHideIndicator() {
-        if (this._upgradeProcess_sourceId)
-            // Do not apply visibility change while checking for updates
+        if (this._updateManager._operationBusy())
             return;
 
         if (!this._extensionSettings.get_boolean('always-visible') && this._updateList.length < 1)
@@ -464,40 +465,30 @@ export const DebianUpdatesIndicator = GObject.registerClass({
     }
 
     updatePackagesStatus(index) {
+        // Subprocess callbacks already execute on the Shell main loop.
+        // Avoid untracked idle sources that could outlive this indicator.
         switch (index) {
         case SCRIPT.UPGRADES:
-            GLib.idle_add(GLib.PRIORITY_DEFAULT,
-                () => {
-                    this.updateStatus(this._updateList.length);
-                }
-            );
+            this.updateStatus(this._updateList.length);
             break;
         case SCRIPT.NEW:
-            GLib.idle_add(GLib.PRIORITY_DEFAULT,
-                this._updateNewPackagesStatus.bind(this)
-            );
+            this._updateNewPackagesStatus();
             break;
         case SCRIPT.OBSOLETE:
-            GLib.idle_add(GLib.PRIORITY_DEFAULT,
-                this._updateObsoletePackagesStatus.bind(this)
-            );
+            this._updateObsoletePackagesStatus();
             break;
         case SCRIPT.RESIDUAL:
-            GLib.idle_add(GLib.PRIORITY_DEFAULT,
-                this._updateResidualPackagesStatus.bind(this)
-            );
+            this._updateResidualPackagesStatus();
             break;
         case SCRIPT.AUTOREMOVABLE:
-            GLib.idle_add(GLib.PRIORITY_DEFAULT,
-                this._updateAutoremovablePackagesStatus.bind(this)
-            );
+            this._updateAutoremovablePackagesStatus();
             break;
         }
     }
 
     _updateNewPackagesStatus() {
         this.newPackagesExpander.menu.removeAll();
-        if (this._newPackagesList.length === 0) {
+        if (this._newPackagesList.length === 0 || !this._extensionSettings.get_boolean('new-packages')) {
             this.newPackagesExpander.visible = false;
         } else {
             for (let i = 0; i < this._newPackagesList.length; i++) {
@@ -511,7 +502,7 @@ export const DebianUpdatesIndicator = GObject.registerClass({
 
     _updateObsoletePackagesStatus() {
         this.obsoletePackagesExpander.menu.removeAll();
-        if (this._obsoletePackagesList.length === 0) {
+        if (this._obsoletePackagesList.length === 0 || !this._extensionSettings.get_boolean('obsolete-packages')) {
             this.obsoletePackagesExpander.visible = false;
         } else {
             for (let i = 0; i < this._obsoletePackagesList.length; i++) {
@@ -528,7 +519,9 @@ export const DebianUpdatesIndicator = GObject.registerClass({
         const hasResidual = this._extensionSettings.get_boolean('cleanup-purge-residual') &&
             this._residualPackagesList.length > 0;
         this.removeUnusedMenuItem.setSensitive((hasUnused || hasResidual) &&
-            !this._updateManager._upgradeProcess_sourceId && !this._updateManager._cleanupProcess);
+            !this._updateManager._operationBusy() &&
+            !this._updateManager._scanProcesses.has(SCRIPT.RESIDUAL) &&
+            !this._updateManager._scanProcesses.has(SCRIPT.AUTOREMOVABLE));
     }
 
     _updateResidualPackagesStatus() {
@@ -583,7 +576,7 @@ export const DebianUpdatesIndicator = GObject.registerClass({
         }
 
         // 'Update now' visibility is linked so let's save a few lines and set it here
-        this.applyUpdatesMenuItem.reactive = enabled;
+        this.applyUpdatesMenuItem.setSensitive(enabled && !this._updateManager._operationBusy());
     }
 
     /*

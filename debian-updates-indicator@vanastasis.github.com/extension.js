@@ -45,7 +45,7 @@ export default class DebianUpdatesExtension extends Extension {
     disable() {
         console.log(`Disabling ${this.metadata.name} - Version ${this.metadata['version-name']}`);
 
-        if (this._updateManager !== null) {
+        if (this._updateManager) {
             this._updateManager.destroy();
             this._updateManager = null;
         }
